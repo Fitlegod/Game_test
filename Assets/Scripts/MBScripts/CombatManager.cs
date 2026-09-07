@@ -5,7 +5,6 @@ using TMPro;
 public class CombatManager : MonoBehaviour
 {
     public TMP_Text budgetText;
-    public Enemy enemy;
     public Player player;
 
     public float CurrentTime { get; private set; }
@@ -20,11 +19,6 @@ public class CombatManager : MonoBehaviour
     public void RegisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
         scheduledEvents.Add(scheduledEvent);
-    }
-
-    public Combatant GetCombatant(EffectTarget target)
-    {
-        return target == EffectTarget.Self ? (Combatant)player : enemy;
     }
 
     public void AdvanceTime(float amount)
