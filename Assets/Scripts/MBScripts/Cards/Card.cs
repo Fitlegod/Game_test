@@ -1,43 +1,49 @@
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using TMPro;
 
-public class Card : MonoBehaviour
+public class Card : MonoBehaviour, IPointerClickHandler
 {
-    public string cardName;
-    public float timeCostSeconds;
-    public float effectDelaySeconds;
-    public CardType cardType;
+    public CardData data;
     public CombatManager combatManager;
-    public List<CardEffectEntry> effects = new List<CardEffectEntry>();
+    public TMP_Text nameLabel;
+
+    void Awake()
+    {
+        if (nameLabel != null)
+            nameLabel.text = data.cardName;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        TargetSelectionManager.Instance.SelectCard(this);
+    }
 
     public bool RequiresTarget =>
-        effects.Exists(e => e.kind == EffectKind.Damage || e.kind == EffectKind.ApplyStatus);
-
-    void Start()
-    {
-        Debug.Log(cardName + " (" + timeCostSeconds + " сек, эффект через " + effectDelaySeconds + " сек, " + cardType + ")");
-    }
+        data.instantActions.Exists(a => a.kind == InstantActionKind.Damage) || data.appliedEffects.Count > 0;
 
     public bool IsValidTarget(Combatant target)
     {
-        bool hasDamage = effects.Exists(e => e.kind == EffectKind.Damage);
+        bool hasDamage = data.instantActions.Exists(a => a.kind == InstantActionKind.Damage);
         if (hasDamage && target is Player)
-            return false; // урон не может лететь в игрока
+            return false;
         return true;
     }
 
     public void Play(Combatant target)
     {
-        float effectTime = combatManager.CurrentTime + effectDelaySeconds;
+        float effectTime = combatManager.CurrentTime + data.effectDelaySeconds;
         combatManager.RegisterScheduledEvent(new OneShotEvent(effectTime, priority: 0, () => ApplyAllEffects(target)));
 
-        combatManager.AdvanceTime(timeCostSeconds);
+        combatManager.AdvanceTime(data.timeCostSeconds);
         combatManager.ResolveUpTo(combatManager.CurrentTime);
     }
 
     private void ApplyAllEffects(Combatant target)
     {
-        foreach (var effect in effects)
+        foreach (var action in data.instantActions)
+            action.Apply(combatManager, target);
+        foreach (var effect in data.appliedEffects)
             effect.Apply(combatManager, target);
     }
 }

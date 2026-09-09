@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public abstract class Combatant : MonoBehaviour
+public abstract class Combatant : MonoBehaviour, IPointerClickHandler
 {
     public int maxHP = 30;
     public int CurrentHP { get; protected set; }
@@ -13,6 +14,12 @@ public abstract class Combatant : MonoBehaviour
     protected virtual void Awake()
     {
         CurrentHP = maxHP;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        TargetSelectionManager.Instance.SelectTarget(this);
+
     }
 
     public int GetStacks(StatusEffectType type)
