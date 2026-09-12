@@ -13,9 +13,20 @@ public class DeckManager : MonoBehaviour
     {
         drawPile = new List<CardInstance>(characterDeck);
         Shuffle(drawPile);
+        MoveFrontOfDrawToEnd();
         discardPile.Clear();
         exhaustPile.Clear();
         Debug.Log("Колода добора собрана: " + drawPile.Count + " карт");
+    }
+
+    private void MoveFrontOfDrawToEnd()
+    {
+        var priority = drawPile.FindAll(c => (c.EffectiveProperties & CardPropertyFlags.FrontOfDraw) != 0);
+        foreach (var card in priority)
+        {
+            drawPile.Remove(card);
+            drawPile.Add(card); // DrawCard берёт с конца списка — значит эти будут добраны первыми
+        }
     }
 
     private void Shuffle(List<CardInstance> list)

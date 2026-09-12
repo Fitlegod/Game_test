@@ -10,12 +10,6 @@ public class Enemy : Combatant, IScheduledEvent
     public float NextTime => scheduledHitTime;
     public int Priority => 1;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        combatManager.RegisterScheduledEvent(this);
-    }
-
     public void Trigger()
     {
         int damage = CalculateOutgoingDamage(attackDamage);

@@ -4,13 +4,15 @@ using TMPro;
 
 public class Card : MonoBehaviour, IPointerClickHandler
 {
-    public CardData data;
+    public CardInstance instance;
     public CombatManager combatManager;
     public TMP_Text nameLabel;
 
+    public CardData data => instance.data;
+
     void Awake()
     {
-        if (nameLabel != null)
+        if (instance != null && instance.data != null && nameLabel != null)
             nameLabel.text = data.cardName;
     }
 
@@ -37,6 +39,9 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
         combatManager.AdvanceTime(data.timeCostSeconds);
         combatManager.ResolveUpTo(combatManager.CurrentTime);
+
+        if (HandManager.Instance != null)
+            HandManager.Instance.OnCardPlayed(this);
     }
 
     private void ApplyAllEffects(Combatant target)

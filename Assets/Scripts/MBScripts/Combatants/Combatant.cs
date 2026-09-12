@@ -58,9 +58,16 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler
         CurrentHP = Mathf.Min(maxHP, CurrentHP + amount);
     }
 
+    public event System.Action OnDeath;
+
     public virtual void TakeDamage(int amount)
     {
+        if (CurrentHP <= 0) return;
+
         CurrentHP -= amount;
         if (CurrentHP < 0) CurrentHP = 0;
+
+        if (CurrentHP == 0)
+            OnDeath?.Invoke();
     }
 }
