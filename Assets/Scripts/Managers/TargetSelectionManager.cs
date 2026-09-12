@@ -4,7 +4,9 @@ public class TargetSelectionManager : MonoBehaviour
 {
     public static TargetSelectionManager Instance { get; private set; }
 
-    private Card pendingCard;
+    public Card PendingCard { get; private set; }
+    public Combatant HoveredTarget { get; private set; }
+
     private bool inputLocked;
 
     void Awake()
@@ -17,18 +19,24 @@ public class TargetSelectionManager : MonoBehaviour
         inputLocked = true;
     }
 
+    public void SetHoveredTarget(Combatant target) => HoveredTarget = target;
+    public void ClearHoveredTarget(Combatant target)
+    {
+        if (HoveredTarget == target) HoveredTarget = null;
+    }
+
     public void SelectCard(Card card)
     {
         if (inputLocked) return;
 
         if (card.RequiresTarget)
         {
-            pendingCard = card;
+            PendingCard = card;
             Debug.Log(card.data.cardName + ": выбери цель");
         }
         else
         {
-            pendingCard = null;
+            PendingCard = null;
             card.Play(null);
         }
     }
@@ -37,10 +45,10 @@ public class TargetSelectionManager : MonoBehaviour
     {
         if (inputLocked) return;
 
-        if (pendingCard != null && pendingCard.IsValidTarget(target))
+        if (PendingCard != null && PendingCard.IsValidTarget(target))
         {
-            pendingCard.Play(target);
-            pendingCard = null;
+            PendingCard.Play(target);
+            PendingCard = null;
         }
     }
 }

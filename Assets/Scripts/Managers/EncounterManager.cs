@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EncounterManager : MonoBehaviour
 {
-    public List<GameObject> enemyPrefabs; // один элемент списка — один враг в этом бою
+    public EncounterData encounterData;
     public RectTransform enemiesArea;
     public CombatManager combatManager;
     public Player player;
@@ -11,6 +11,7 @@ public class EncounterManager : MonoBehaviour
     void Start()
     {
         List<Enemy> spawned = new List<Enemy>();
+        List<GameObject> enemyPrefabs = encounterData.enemyPrefabs;
         float spacing = enemiesArea.rect.width / (enemyPrefabs.Count + 1);
 
         for (int i = 0; i < enemyPrefabs.Count; i++)
@@ -23,6 +24,7 @@ public class EncounterManager : MonoBehaviour
             enemy.combatManager = combatManager;
             enemy.player = player;
             combatManager.RegisterScheduledEvent(enemy);
+            enemy.OnDeath += () => combatManager.UnregisterScheduledEvent(enemy);
 
             var timerDisplay = obj.GetComponentInChildren<EnemyAttackTimerDisplay>();
             if (timerDisplay != null)

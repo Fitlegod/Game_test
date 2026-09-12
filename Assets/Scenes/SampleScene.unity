@@ -276,6 +276,10 @@ MonoBehaviour:
     instanceProperties: 0
   - data: {fileID: 11400000, guid: 6f51449839337bc48b1a4de1f5edef1e, type: 2}
     instanceProperties: 0
+  - data: {fileID: 11400000, guid: cffc046e747b3c94f8327fe3a3f2d774, type: 2}
+    instanceProperties: 0
+  - data: {fileID: 11400000, guid: e4b2b1a7c7b564042b36201d8aed330b, type: 2}
+    instanceProperties: 0
 --- !u!1 &317070279
 GameObject:
   m_ObjectHideFlags: 0
@@ -1320,8 +1324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bbb0fdc583be424490caa85a0c9ea39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EncounterManager
-  enemyPrefabs:
-  - {fileID: 1987708877559637288, guid: 88efe637d7d273f41aa2f059fa82e03d, type: 3}
+  encounterData: {fileID: 11400000, guid: 7511e5a5f8b290a4284dc2e2cac9b951, type: 2}
   enemiesArea: {fileID: 1058605781}
   combatManager: {fileID: 323996491}
   player: {fileID: 1950733147}

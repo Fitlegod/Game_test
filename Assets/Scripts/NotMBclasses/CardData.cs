@@ -12,6 +12,9 @@ public class CardData : ScriptableObject
     [Header("Разовые действия")]
     public List<InstantActionEntry> instantActions = new List<InstantActionEntry>();
 
+    [Header("Добор карт")]
+    public int drawCardsOnPlay;
+
     [Header("Накладываемые эффекты")]
     public List<AppliedEffectEntry> appliedEffects = new List<AppliedEffectEntry>();
 

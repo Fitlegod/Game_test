@@ -19,7 +19,10 @@ MonoBehaviour:
   instantActions:
   - kind: 0
     amount: 6
+    hitCount: 1
+    targetTag: 1
   appliedEffects:
   - statusType: 1
     stacks: 1
+    targetTag: 1
   properties: 0

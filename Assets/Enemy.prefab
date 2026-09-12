@@ -129,10 +129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   maxHP: 50
   combatManager: {fileID: 0}
-  scheduledHitTime: 3
-  attackIntervalSeconds: 3
-  attackDamage: 18
   player: {fileID: 0}
+  pattern: {fileID: 11400000, guid: c75490589c5b62942aeccf5087b6e2f7, type: 2}
 --- !u!1 &3511477092984128214
 GameObject:
   m_ObjectHideFlags: 0

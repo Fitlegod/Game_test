@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class PeriodicEffectEvent : IScheduledEvent
 {
     private readonly System.Action onTrigger;
@@ -50,9 +52,19 @@ public static class StatusEffectRules
                 action = owner => owner.RemoveStacks(StatusEffectType.Weak, 1);
                 return true;
 
+            case StatusEffectType.Frailty:
+                interval = 3f;
+                action = owner => owner.RemoveStacks(StatusEffectType.Frailty, 1);
+                return true;
+
+            case StatusEffectType.Vulnerable:
+                interval = 3f;
+                action = owner => owner.RemoveStacks(StatusEffectType.Vulnerable, 1);
+                return true;
+
             case StatusEffectType.Regen:
                 interval = 1f;
-                action = owner => owner.Heal(owner.GetStacks(StatusEffectType.Regen));
+                action = owner => owner.Heal(Mathf.RoundToInt(owner.GetStacks(StatusEffectType.Regen)));
                 return true;
 
             default:

@@ -2,5 +2,9 @@ public enum StatusEffectType
 {
     Strength,
     Weak,
-    Regen
+    Regen,
+    Toughness,
+    Frailty,
+    Vulnerable,
+    Stagger
 }

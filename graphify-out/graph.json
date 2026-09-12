@@ -1,0 +1,5951 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "managers_combatmanager_combatmanager",
+      "label": "CombatManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "combatmanager",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "managers_encountermanager_encountermanager",
+      "label": "EncounterManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "encountermanager",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy",
+      "label": "Enemy",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "enemy",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "mbscripts_combatants_player_player",
+      "label": "Player",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "player",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "label": "EnemyAttackTimerDisplay",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "enemyattacktimerdisplay",
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "managers_handmanager_handmanager",
+      "label": "HandManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "handmanager",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager",
+      "label": "TargetSelectionManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "targetselectionmanager",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "mbscripts_cards_card_card",
+      "label": "Card",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "card",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant",
+      "label": "Combatant",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "combatant",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "enums_cardtype_cardtype",
+      "label": "CardType",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "cardtype",
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_cardactions_appliedeffectentry",
+      "label": "AppliedEffectEntry",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "appliedeffectentry",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L39"
+    },
+    {
+      "id": "notmbclasses_cardactions_cardpropertyflags",
+      "label": "CardPropertyFlags",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "cardpropertyflags",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L60"
+    },
+    {
+      "id": "notmbclasses_cardactions_instantactionentry",
+      "label": "InstantActionEntry",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "instantactionentry",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L9"
+    },
+    {
+      "id": "notmbclasses_cardactions_instantactionkind",
+      "label": "InstantActionKind",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "instantactionkind",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "notmbclasses_carddata_carddata",
+      "label": "CardData",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "carddata",
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "interfaces_ischeduledevent_ischeduledevent",
+      "label": "IScheduledEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "ischeduledevent",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_timedeffects_oneshotevent",
+      "label": "OneShotEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "oneshotevent",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L24"
+    },
+    {
+      "id": "notmbclasses_timedeffects_periodiceffectevent",
+      "label": "PeriodicEffectEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "periodiceffectevent",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "notmbclasses_timedeffects_statuseffectrules",
+      "label": "StatusEffectRules",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "statuseffectrules",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L44"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager",
+      "label": "DeckManager",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "deckmanager",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "notmbclasses_cardinstance_cardinstance",
+      "label": "CardInstance",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "cardinstance",
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype",
+      "label": "StatusEffectType",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "statuseffecttype",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "label": "EffectStacksDisplay",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "effectstacksdisplay",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "notmbclasses_cardeffects_applystatuseffect",
+      "label": "ApplyStatusEffect",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": "applystatuseffect",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L34"
+    },
+    {
+      "id": "notmbclasses_cardeffects_blockeffect",
+      "label": "BlockEffect",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": "blockeffect",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L22"
+    },
+    {
+      "id": "notmbclasses_cardeffects_cardeffect",
+      "label": "CardEffect",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": "cardeffect",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "notmbclasses_cardeffects_damageeffect",
+      "label": "DamageEffect",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": "damageeffect",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L9"
+    },
+    {
+      "id": "mbscripts_hpbardisplay_hpbardisplay",
+      "label": "HPBarDisplay",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "HP Bar Display",
+      "file_type": "code",
+      "norm_label": "hpbardisplay",
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "interfaces_ischeduledevent_ischeduledevent_trigger",
+      "label": ".Trigger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".trigger()",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_advancetime",
+      "label": ".AdvanceTime()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".advancetime()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L37"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_endcombat",
+      "label": ".EndCombat()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".endcombat()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L68"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_handleenemydeath",
+      "label": ".HandleEnemyDeath()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "TrueForAll",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L64"
+          }
+        ]
+      },
+      "norm_label": ".handleenemydeath()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L62"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_handleplayerdeath",
+      "label": ".HandlePlayerDeath()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".handleplayerdeath()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L60"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_registerenemies",
+      "label": ".RegisterEnemies()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".registerenemies()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L25"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_resolveupto",
+      "label": ".ResolveUpTo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".resolveupto()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L43"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_start",
+      "label": ".Start()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".start()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L17"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_updatebudgettext",
+      "label": ".UpdateBudgetText()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".updatebudgettext()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L77"
+    },
+    {
+      "id": "managers_encountermanager_encountermanager_start",
+      "label": ".Start()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "GetComponent",
+            "receiver_type": "GameObject",
+            "lang": "csharp",
+            "line": "L19"
+          },
+          {
+            "callee": "GetComponentInChildren",
+            "receiver_type": "GameObject",
+            "lang": "csharp",
+            "line": "L27"
+          },
+          {
+            "callee": "Add",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L31"
+          }
+        ]
+      },
+      "norm_label": ".start()",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L11"
+    },
+    {
+      "id": "mbscripts_combatants_player_player_gainblock",
+      "label": ".GainBlock()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": ".gainblock()",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L7"
+    },
+    {
+      "id": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay_update",
+      "label": ".Update()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Max",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L13"
+          }
+        ]
+      },
+      "norm_label": ".update()",
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L10"
+    },
+    {
+      "id": "managers_handmanager_handmanager_awake",
+      "label": ".Awake()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".awake()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L18"
+    },
+    {
+      "id": "managers_handmanager_handmanager_findfirstemptyslot",
+      "label": ".FindFirstEmptySlot()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".findfirstemptyslot()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L88"
+    },
+    {
+      "id": "managers_handmanager_handmanager_oncardplayed",
+      "label": ".OnCardPlayed()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".oncardplayed()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L61"
+    },
+    {
+      "id": "managers_handmanager_handmanager_removefromhand",
+      "label": ".RemoveFromHand()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".removefromhand()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L67"
+    },
+    {
+      "id": "managers_handmanager_handmanager_testdraw",
+      "label": ".TestDraw()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".testdraw()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L96"
+    },
+    {
+      "id": "managers_handmanager_handmanager_testplayfirst",
+      "label": ".TestPlayFirst()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".testplayfirst()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L99"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager_awake",
+      "label": ".Awake()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".awake()",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L10"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager_lockinput",
+      "label": ".LockInput()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".lockinput()",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L15"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager_selectcard",
+      "label": ".SelectCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L27"
+          }
+        ]
+      },
+      "norm_label": ".selectcard()",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L20"
+    },
+    {
+      "id": "mbscripts_cards_card_card_awake",
+      "label": ".Awake()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".awake()",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L13"
+    },
+    {
+      "id": "mbscripts_cards_card_card_onpointerclick",
+      "label": ".OnPointerClick()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": ".onpointerclick()",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L19"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager_selecttarget",
+      "label": ".SelectTarget()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".selecttarget()",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L36"
+    },
+    {
+      "id": "mbscripts_cards_card_card_applyalleffects",
+      "label": ".ApplyAllEffects()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".applyalleffects()",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L47"
+    },
+    {
+      "id": "mbscripts_cards_card_card_isvalidtarget",
+      "label": ".IsValidTarget()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".isvalidtarget()",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L27"
+    },
+    {
+      "id": "mbscripts_cards_card_card_play",
+      "label": ".Play()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".play()",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L35"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_applyincomingdamagemodifiers",
+      "label": ".ApplyIncomingDamageModifiers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "FloorToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L58"
+          }
+        ]
+      },
+      "norm_label": ".applyincomingdamagemodifiers()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L55"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_awake",
+      "label": ".Awake()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".awake()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L14"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_calculateincomingblock",
+      "label": ".CalculateIncomingBlock()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "RoundToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L64"
+          },
+          {
+            "callee": "FloorToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L66"
+          },
+          {
+            "callee": "Max",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L67"
+          }
+        ]
+      },
+      "norm_label": ".calculateincomingblock()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L62"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_calculateoutgoingdamage",
+      "label": ".CalculateOutgoingDamage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "RoundToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L49"
+          },
+          {
+            "callee": "FloorToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L51"
+          }
+        ]
+      },
+      "norm_label": ".calculateoutgoingdamage()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L47"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_getstacks",
+      "label": ".GetStacks()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "TryGetValue",
+            "receiver_type": "Dictionary",
+            "lang": "csharp",
+            "line": "L26"
+          }
+        ]
+      },
+      "norm_label": ".getstacks()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L24"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_heal",
+      "label": ".Heal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Min",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L72"
+          }
+        ]
+      },
+      "norm_label": ".heal()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L70"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_onpointerclick",
+      "label": ".OnPointerClick()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": ".onpointerclick()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L19"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_removestacks",
+      "label": ".RemoveStacks()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Max",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L44"
+          }
+        ]
+      },
+      "norm_label": ".removestacks()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L42"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_takedamage",
+      "label": ".TakeDamage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Invoke",
+            "receiver_type": "OnDeath?",
+            "lang": "csharp",
+            "line": "L85"
+          }
+        ]
+      },
+      "norm_label": ".takedamage()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L77"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy_trigger",
+      "label": ".Trigger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L30"
+          }
+        ]
+      },
+      "norm_label": ".trigger()",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L25"
+    },
+    {
+      "id": "mbscripts_combatants_player_player_takedamage",
+      "label": ".TakeDamage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Min",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L14"
+          }
+        ]
+      },
+      "norm_label": ".takedamage()",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L12"
+    },
+    {
+      "id": "notmbclasses_cardeffects_damageeffect_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L18"
+          }
+        ]
+      },
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L14"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy_applystagger",
+      "label": ".ApplyStagger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": ".applystagger()",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L16"
+    },
+    {
+      "id": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L51"
+          }
+        ]
+      },
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L45"
+    },
+    {
+      "id": "notmbclasses_cardactions_instantactionentry_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L26"
+          }
+        ]
+      },
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L16"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "label": ".RegisterScheduledEvent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Add",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L34"
+          }
+        ]
+      },
+      "norm_label": ".registerscheduledevent()",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L32"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "label": ".AddEffectStacks()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Contains",
+            "receiver_type": "HashSet",
+            "lang": "csharp",
+            "line": "L33"
+          },
+          {
+            "callee": "Add",
+            "receiver_type": "HashSet",
+            "lang": "csharp",
+            "line": "L36"
+          }
+        ]
+      },
+      "norm_label": ".addeffectstacks()",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L29"
+    },
+    {
+      "id": "notmbclasses_cardeffects_applystatuseffect_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L43"
+          }
+        ]
+      },
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L40"
+    },
+    {
+      "id": "notmbclasses_timedeffects_oneshotevent_trigger",
+      "label": ".Trigger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": ".trigger()",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L37"
+    },
+    {
+      "id": "notmbclasses_timedeffects_periodiceffectevent_trigger",
+      "label": ".Trigger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": ".trigger()",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L17"
+    },
+    {
+      "id": "notmbclasses_timedeffects_statuseffectrules_trygetperiodicbehavior",
+      "label": ".TryGetPeriodicBehavior()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "RoundToInt",
+            "receiver_type": "Mathf",
+            "lang": "csharp",
+            "line": "L67"
+          }
+        ]
+      },
+      "norm_label": ".trygetperiodicbehavior()",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L46"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_discard",
+      "label": ".Discard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Add",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L66"
+          },
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L67"
+          }
+        ]
+      },
+      "norm_label": ".discard()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L62"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_drawcard",
+      "label": ".DrawCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L47"
+          },
+          {
+            "callee": "AddRange",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L50"
+          },
+          {
+            "callee": "Clear",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L51"
+          },
+          {
+            "callee": "RemoveAt",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L57"
+          }
+        ]
+      },
+      "norm_label": ".drawcard()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L41"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_movefrontofdrawtoend",
+      "label": ".MoveFrontOfDrawToEnd()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "FindAll",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L24"
+          },
+          {
+            "callee": "Remove",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L27"
+          },
+          {
+            "callee": "Add",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L28"
+          }
+        ]
+      },
+      "norm_label": ".movefrontofdrawtoend()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L22"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_shuffle",
+      "label": ".Shuffle()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Range",
+            "receiver_type": "Random",
+            "lang": "csharp",
+            "line": "L36"
+          }
+        ]
+      },
+      "norm_label": ".shuffle()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L32"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_startcombat",
+      "label": ".StartCombat()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Clear",
+            "receiver_type": "List",
+            "lang": "csharp",
+            "line": "L17"
+          },
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L19"
+          }
+        ]
+      },
+      "norm_label": ".startcombat()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L12"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_testdrawcard",
+      "label": ".TestDrawCard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": ".testdrawcard()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L79"
+    },
+    {
+      "id": "managers_deckmanager_deckmanager_teststartcombat",
+      "label": ".TestStartCombat()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": ".teststartcombat()",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L76"
+    },
+    {
+      "id": "managers_handmanager_handmanager_start",
+      "label": ".Start()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": ".start()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L23"
+    },
+    {
+      "id": "managers_handmanager_handmanager_trydrawtohand",
+      "label": ".TryDrawToHand()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L43"
+          },
+          {
+            "callee": "GetComponent",
+            "receiver_type": "GameObject",
+            "lang": "csharp",
+            "line": "L51"
+          }
+        ]
+      },
+      "norm_label": ".trydrawtohand()",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L34"
+    },
+    {
+      "id": "mbscripts_effectstacksdisplay_effectstacksdisplay_appendifpresent",
+      "label": ".AppendIfPresent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": ".appendifpresent()",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L28"
+    },
+    {
+      "id": "mbscripts_effectstacksdisplay_effectstacksdisplay_update",
+      "label": ".Update()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": ".update()",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L9"
+    },
+    {
+      "id": "notmbclasses_cardeffects_blockeffect_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "metadata": {
+        "unresolved_calls": [
+          {
+            "callee": "Log",
+            "receiver_type": "Debug",
+            "lang": "csharp",
+            "line": "L30"
+          }
+        ]
+      },
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L27"
+    },
+    {
+      "id": "notmbclasses_cardeffects_cardeffect_apply",
+      "label": ".Apply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": ".apply()",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L6"
+    },
+    {
+      "id": "mbscripts_hpbardisplay_hpbardisplay_start",
+      "label": ".Start()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "HP Bar Display",
+      "file_type": "code",
+      "norm_label": ".start()",
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L10"
+    },
+    {
+      "id": "mbscripts_hpbardisplay_hpbardisplay_update",
+      "label": ".Update()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "HP Bar Display",
+      "file_type": "code",
+      "norm_label": ".update()",
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L16"
+    },
+    {
+      "id": "managers_combatmanager",
+      "label": "CombatManager.cs",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "combatmanager.cs",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "managers_combatmanager_combatmanager_currenttime",
+      "label": "CurrentTime",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "currenttime",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L12"
+    },
+    {
+      "id": "managers_combatmanager_cs_list",
+      "label": "List",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "list",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_combatmanager_cs_tmp_text",
+      "label": "TMP_Text",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "tmp_text",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_encountermanager",
+      "label": "EncounterManager.cs",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "encountermanager.cs",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "managers_encountermanager_cs_gameobject",
+      "label": "GameObject",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "gameobject",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_encountermanager_cs_list",
+      "label": "List",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "list",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_encountermanager_cs_recttransform",
+      "label": "RectTransform",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "recttransform",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "mbscripts_combatants_enemy",
+      "label": "Enemy.cs",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "enemy.cs",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy_nexttime",
+      "label": "NextTime",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "nexttime",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L10"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy_priority",
+      "label": "Priority",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "priority",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L11"
+    },
+    {
+      "id": "mbscripts_combatants_enemy_enemy_staggerdisplay",
+      "label": "StaggerDisplay",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "staggerdisplay",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L23"
+    },
+    {
+      "id": "mbscripts_combatants_player",
+      "label": "Player.cs",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "player.cs",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_combatants_player_player_currentblock",
+      "label": "CurrentBlock",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "currentblock",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "mbscripts_enemyattacktimerdisplay",
+      "label": "EnemyAttackTimerDisplay.cs",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "enemyattacktimerdisplay.cs",
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_enemyattacktimerdisplay_cs_tmp_text",
+      "label": "TMP_Text",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "Combat Loop & Encounter Spawning",
+      "file_type": "code",
+      "norm_label": "tmp_text",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_handmanager",
+      "label": "HandManager.cs",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "handmanager.cs",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "managers_handmanager_cs_contextmenu",
+      "label": "ContextMenu",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "contextmenu",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_handmanager_cs_gameobject",
+      "label": "GameObject",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "gameobject",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_handmanager_cs_recttransform",
+      "label": "RectTransform",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "recttransform",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_handmanager_handmanager_instance",
+      "label": "Instance",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "instance",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L9"
+    },
+    {
+      "id": "managers_targetselectionmanager",
+      "label": "TargetSelectionManager.cs",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "targetselectionmanager.cs",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "managers_targetselectionmanager_targetselectionmanager_instance",
+      "label": "Instance",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "instance",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "mbscripts_cards_card",
+      "label": "Card.cs",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "card.cs",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_cards_card_card_data",
+      "label": "data",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "data",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L11"
+    },
+    {
+      "id": "mbscripts_cards_card_card_requirestarget",
+      "label": "RequiresTarget",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "requirestarget",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L24"
+    },
+    {
+      "id": "mbscripts_cards_card_cs_pointereventdata",
+      "label": "PointerEventData",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "pointereventdata",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "mbscripts_cards_card_cs_tmp_text",
+      "label": "TMP_Text",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "tmp_text",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "monobehaviour",
+      "label": "MonoBehaviour",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "Card Play & Input Routing",
+      "file_type": "code",
+      "norm_label": "monobehaviour",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "dictionary",
+      "label": "Dictionary",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "dictionary",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "hashset",
+      "label": "HashSet",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "hashset",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "ipointerclickhandler",
+      "label": "IPointerClickHandler",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "ipointerclickhandler",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "mbscripts_combatants_combatant",
+      "label": "Combatant.cs",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "combatant.cs",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_combatant_currenthp",
+      "label": "CurrentHP",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "currenthp",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L8"
+    },
+    {
+      "id": "mbscripts_combatants_combatant_cs_pointereventdata",
+      "label": "PointerEventData",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "Combatant Damage/Block Core",
+      "file_type": "code",
+      "norm_label": "pointereventdata",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "enums_cardtype",
+      "label": "CardType.cs",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "cardtype.cs",
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "enums_cardtype_cardtype_attack",
+      "label": "Attack",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "attack",
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "enums_cardtype_cardtype_power",
+      "label": "Power",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "power",
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "enums_cardtype_cardtype_skill",
+      "label": "Skill",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "skill",
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "notmbclasses_cardactions",
+      "label": "CardActions.cs",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "cardactions.cs",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_cardactions_cardpropertyflags_exhaust",
+      "label": "Exhaust",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "exhaust",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L64"
+    },
+    {
+      "id": "notmbclasses_cardactions_cardpropertyflags_frontofdraw",
+      "label": "FrontOfDraw",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "frontofdraw",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L65"
+    },
+    {
+      "id": "notmbclasses_cardactions_cardpropertyflags_none",
+      "label": "None",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "none",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L63"
+    },
+    {
+      "id": "notmbclasses_cardactions_instantactionkind_block",
+      "label": "Block",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "block",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L6"
+    },
+    {
+      "id": "notmbclasses_cardactions_instantactionkind_damage",
+      "label": "Damage",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "damage",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "notmbclasses_carddata",
+      "label": "CardData.cs",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "carddata.cs",
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_carddata_cs_list",
+      "label": "List",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "list",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "scriptableobject",
+      "label": "ScriptableObject",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "Card Data & Action Definitions",
+      "file_type": "code",
+      "norm_label": "scriptableobject",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "action",
+      "label": "Action",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "action",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "interfaces_ischeduledevent",
+      "label": "IScheduledEvent.cs",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "ischeduledevent.cs",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "interfaces_ischeduledevent_ischeduledevent_nexttime",
+      "label": "NextTime",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "nexttime",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "interfaces_ischeduledevent_ischeduledevent_priority",
+      "label": "Priority",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "priority",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "notmbclasses_timedeffects",
+      "label": "TimedEffects.cs",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "timedeffects.cs",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_timedeffects_oneshotevent_nexttime",
+      "label": "NextTime",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "nexttime",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L26"
+    },
+    {
+      "id": "notmbclasses_timedeffects_oneshotevent_priority",
+      "label": "Priority",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "priority",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L27"
+    },
+    {
+      "id": "notmbclasses_timedeffects_periodiceffectevent_nexttime",
+      "label": "NextTime",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "nexttime",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L7"
+    },
+    {
+      "id": "notmbclasses_timedeffects_periodiceffectevent_priority",
+      "label": "Priority",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "Scheduled Event System",
+      "file_type": "code",
+      "norm_label": "priority",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L8"
+    },
+    {
+      "id": "managers_deckmanager",
+      "label": "DeckManager.cs",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "deckmanager.cs",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "managers_deckmanager_cs_contextmenu",
+      "label": "ContextMenu",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "contextmenu",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "managers_deckmanager_cs_list",
+      "label": "List",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "list",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "notmbclasses_cardinstance",
+      "label": "CardInstance.cs",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "cardinstance.cs",
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "notmbclasses_cardinstance_cardinstance_effectiveproperties",
+      "label": "EffectiveProperties",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Deck/Hand Draw Pipeline",
+      "file_type": "code",
+      "norm_label": "effectiveproperties",
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L12"
+    },
+    {
+      "id": "enums_statuseffecttype",
+      "label": "StatuseffectType.cs",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "statuseffecttype.cs",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_frailty",
+      "label": "Frailty",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "frailty",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L7"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_regen",
+      "label": "Regen",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "regen",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L5"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_stagger",
+      "label": "Stagger",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "stagger",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L9"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_strength",
+      "label": "Strength",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "strength",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L3"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_toughness",
+      "label": "Toughness",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "toughness",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L6"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_vulnerable",
+      "label": "Vulnerable",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "vulnerable",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L8"
+    },
+    {
+      "id": "enums_statuseffecttype_statuseffecttype_weak",
+      "label": "Weak",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "weak",
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L4"
+    },
+    {
+      "id": "mbscripts_effectstacksdisplay",
+      "label": "EffectStacksDisplay.cs",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "effectstacksdisplay.cs",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_effectstacksdisplay_cs_tmp_text",
+      "label": "TMP_Text",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "Status Effect Type & Display",
+      "file_type": "code",
+      "norm_label": "tmp_text",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "notmbclasses_cardeffects",
+      "label": "CardEffects.cs",
+      "_origin": "ast",
+      "community": 7,
+      "community_name": "Card Effect Base Classes",
+      "file_type": "code",
+      "norm_label": "cardeffects.cs",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "mbscripts_hpbardisplay",
+      "label": "HPBarDisplay.cs",
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "HP Bar Display",
+      "file_type": "code",
+      "norm_label": "hpbardisplay.cs",
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L1"
+    },
+    {
+      "id": "slider",
+      "label": "Slider",
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "HP Bar Display",
+      "file_type": "code",
+      "norm_label": "slider",
+      "source_file": "",
+      "source_location": ""
+    }
+  ],
+  "links": [
+    {
+      "source": "managers_deckmanager_deckmanager_testdrawcard",
+      "target": "managers_deckmanager_cs_contextmenu",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "ContextMenu"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_teststartcombat",
+      "target": "managers_deckmanager_cs_contextmenu",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "ContextMenu"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_testdraw",
+      "target": "managers_handmanager_cs_contextmenu",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "ContextMenu"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_testplayfirst",
+      "target": "managers_handmanager_cs_contextmenu",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "attribute",
+      "metadata": {
+        "ref_token": "ContextMenu"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_advancetime",
+      "target": "managers_combatmanager_combatmanager_updatebudgettext",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_handleenemydeath",
+      "target": "managers_combatmanager_combatmanager_endcombat",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_handleplayerdeath",
+      "target": "managers_combatmanager_combatmanager_endcombat",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_start",
+      "target": "managers_combatmanager_combatmanager_updatebudgettext",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_drawcard",
+      "target": "managers_deckmanager_deckmanager_shuffle",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_startcombat",
+      "target": "managers_deckmanager_cs_list",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_startcombat",
+      "target": "managers_deckmanager_deckmanager_shuffle",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_startcombat",
+      "target": "managers_deckmanager_deckmanager_movefrontofdrawtoend",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_testdrawcard",
+      "target": "managers_deckmanager_deckmanager_drawcard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_teststartcombat",
+      "target": "managers_deckmanager_deckmanager_startcombat",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "managers_encountermanager_cs_list",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_oncardplayed",
+      "target": "managers_handmanager_handmanager_removefromhand",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_start",
+      "target": "managers_handmanager_handmanager_trydrawtohand",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_testdraw",
+      "target": "managers_handmanager_handmanager_trydrawtohand",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_testplayfirst",
+      "target": "managers_handmanager_handmanager_oncardplayed",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_trydrawtohand",
+      "target": "managers_handmanager_handmanager_findfirstemptyslot",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "mbscripts_cards_card_card_applyalleffects",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "target": "notmbclasses_timedeffects_statuseffectrules_trygetperiodicbehavior",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_applyincomingdamagemodifiers",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_calculateincomingblock",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_calculateoutgoingdamage",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_removestacks",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player_player_takedamage",
+      "target": "mbscripts_combatants_combatant_combatant_takedamage",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay_update",
+      "target": "mbscripts_effectstacksdisplay_effectstacksdisplay_appendifpresent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_oneshotevent",
+      "target": "action",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Action",
+        "qualified": true,
+        "ref_qualifier": "System"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_periodiceffectevent",
+      "target": "action",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Action",
+        "qualified": true,
+        "ref_qualifier": "System"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "notmbclasses_carddata_carddata",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardData"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardinstance_cardinstance",
+      "target": "notmbclasses_carddata_carddata",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardData"
+      },
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardInstance"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "notmbclasses_cardactions_cardpropertyflags",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardPropertyFlags"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardinstance_cardinstance",
+      "target": "notmbclasses_cardactions_cardpropertyflags",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardPropertyFlags"
+      },
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "enums_cardtype_cardtype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CardType"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_deckmanager_deckmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "DeckManager"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "dictionary",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Dictionary"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "target": "mbscripts_combatants_enemy_enemy",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Enemy"
+      },
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_cs_gameobject",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "GameObject"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "hashset",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "HashSet"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry",
+      "target": "notmbclasses_cardactions_instantactionkind",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "InstantActionKind"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "managers_encountermanager_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "notmbclasses_carddata_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "mbscripts_combatants_player_player",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Player"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "mbscripts_combatants_player_player",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Player"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_player_player",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Player"
+      },
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "managers_encountermanager_cs_recttransform",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "RectTransform"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_cs_recttransform",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "RectTransform"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay",
+      "target": "slider",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "Slider"
+      },
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_cs_tmp_text",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "TMP_Text"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_cs_tmp_text",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "TMP_Text"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "target": "mbscripts_effectstacksdisplay_cs_tmp_text",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "TMP_Text"
+      },
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "target": "mbscripts_enemyattacktimerdisplay_cs_tmp_text",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "metadata": {
+        "ref_token": "TMP_Text"
+      },
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "interfaces_ischeduledevent_ischeduledevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent_nexttime",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "interfaces_ischeduledevent_ischeduledevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent_priority",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_currenttime",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_instance",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager_instance",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_data",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_requirestarget",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_currenthp",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_enemy_enemy_nexttime",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_enemy_enemy_priority",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_enemy_enemy_staggerdisplay",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player_player",
+      "target": "mbscripts_combatants_player_player_currentblock",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardinstance_cardinstance",
+      "target": "notmbclasses_cardinstance_cardinstance_effectiveproperties",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_oneshotevent",
+      "target": "notmbclasses_timedeffects_oneshotevent_nexttime",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_oneshotevent",
+      "target": "notmbclasses_timedeffects_oneshotevent_priority",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_periodiceffectevent",
+      "target": "notmbclasses_timedeffects_periodiceffectevent_nexttime",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_periodiceffectevent",
+      "target": "notmbclasses_timedeffects_periodiceffectevent_priority",
+      "relation": "defines",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "notmbclasses_cardactions_appliedeffectentry",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "AppliedEffectEntry"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_trydrawtohand",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "CardInstance"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_shuffle",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "CardInstance"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "mbscripts_combatants_enemy_enemy",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "Enemy"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_registerenemies",
+      "target": "mbscripts_combatants_enemy_enemy",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "Enemy"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "mbscripts_combatants_enemy_enemy",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "Enemy"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "EnemyAttackTimerDisplay"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "managers_encountermanager_cs_gameobject",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "GameObject"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "IScheduledEvent"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "notmbclasses_cardactions_instantactionentry",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "InstantActionEntry"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "managers_encountermanager_cs_recttransform",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "RectTransform"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay_start",
+      "target": "slider",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "Slider"
+      },
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_statuseffectrules_trygetperiodicbehavior",
+      "target": "action",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Action",
+        "qualified": true,
+        "ref_qualifier": "System"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_oncardplayed",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_removefromhand",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager_selectcard",
+      "target": "mbscripts_cards_card_card",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Card"
+      },
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_discard",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CardInstance"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_blockeffect_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_cardeffect_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_damageeffect_apply",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "CombatManager"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager_selecttarget",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_applyalleffects",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_isvalidtarget",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_blockeffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_cardeffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_damageeffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "IScheduledEvent"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_registerenemies",
+      "target": "managers_combatmanager_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_shuffle",
+      "target": "managers_deckmanager_cs_list",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "List"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_onpointerclick",
+      "target": "mbscripts_cards_card_cs_pointereventdata",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "PointerEventData"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_onpointerclick",
+      "target": "mbscripts_combatants_combatant_cs_pointereventdata",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "PointerEventData"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_getstacks",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_removestacks",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay_appendifpresent",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_statuseffectrules_trygetperiodicbehavior",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "metadata": {
+        "ref_token": "StatusEffectType"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager_drawcard",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "return_type",
+      "metadata": {
+        "ref_token": "CardInstance"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect",
+      "target": "notmbclasses_cardeffects_cardeffect",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "CardEffect"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_blockeffect",
+      "target": "notmbclasses_cardeffects_cardeffect",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "CardEffect"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_damageeffect",
+      "target": "notmbclasses_cardeffects_cardeffect",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "CardEffect"
+      },
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player_player",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "Combatant"
+      },
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "ipointerclickhandler",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "IPointerClickHandler"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "ipointerclickhandler",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "IPointerClickHandler"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "IScheduledEvent"
+      },
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_oneshotevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "IScheduledEvent"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_periodiceffectevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "IScheduledEvent"
+      },
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay",
+      "target": "monobehaviour",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "MonoBehaviour"
+      },
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata_carddata",
+      "target": "scriptableobject",
+      "relation": "inherits",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "metadata": {
+        "ref_token": "ScriptableObject"
+      },
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_cardtype_cardtype",
+      "target": "enums_cardtype_cardtype_attack",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_cardtype_cardtype",
+      "target": "enums_cardtype_cardtype_skill",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_cardtype_cardtype",
+      "target": "enums_cardtype_cardtype_power",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_strength",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_weak",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_regen",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_toughness",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_frailty",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_vulnerable",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype_stagger",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_cardpropertyflags",
+      "target": "notmbclasses_cardactions_cardpropertyflags_none",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_cardpropertyflags",
+      "target": "notmbclasses_cardactions_cardpropertyflags_exhaust",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_cardpropertyflags",
+      "target": "notmbclasses_cardactions_cardpropertyflags_frontofdraw",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionkind",
+      "target": "notmbclasses_cardactions_instantactionkind_damage",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionkind",
+      "target": "notmbclasses_cardactions_instantactionkind_block",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_cardtype",
+      "target": "enums_cardtype_cardtype",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/CardType.cs",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "enums_statuseffecttype",
+      "target": "enums_statuseffecttype_statuseffecttype",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Enums/StatuseffectType.cs",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "interfaces_ischeduledevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager",
+      "target": "managers_combatmanager_combatmanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager",
+      "target": "managers_deckmanager_deckmanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager",
+      "target": "managers_encountermanager_encountermanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager",
+      "target": "managers_handmanager_handmanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card",
+      "target": "mbscripts_cards_card_card",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant",
+      "target": "mbscripts_combatants_combatant_combatant",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy",
+      "target": "mbscripts_combatants_enemy_enemy",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player",
+      "target": "mbscripts_combatants_player_player",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay",
+      "target": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay",
+      "target": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay",
+      "target": "mbscripts_hpbardisplay_hpbardisplay",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions",
+      "target": "notmbclasses_cardactions_instantactionkind",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions",
+      "target": "notmbclasses_cardactions_appliedeffectentry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions",
+      "target": "notmbclasses_cardactions_cardpropertyflags",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions",
+      "target": "notmbclasses_cardactions_instantactionentry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_carddata",
+      "target": "notmbclasses_carddata_carddata",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardData.cs",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects",
+      "target": "notmbclasses_cardeffects_blockeffect",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects",
+      "target": "notmbclasses_cardeffects_cardeffect",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects",
+      "target": "notmbclasses_cardeffects_applystatuseffect",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects",
+      "target": "notmbclasses_cardeffects_damageeffect",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardinstance",
+      "target": "notmbclasses_cardinstance_cardinstance",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardInstance.cs",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects",
+      "target": "notmbclasses_timedeffects_oneshotevent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects",
+      "target": "notmbclasses_timedeffects_periodiceffectevent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects",
+      "target": "notmbclasses_timedeffects_statuseffectrules",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "interfaces_ischeduledevent_ischeduledevent",
+      "target": "interfaces_ischeduledevent_ischeduledevent_trigger",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Interfaces/IScheduledEvent.cs",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_start",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_registerenemies",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_advancetime",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_resolveupto",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_handleplayerdeath",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_handleenemydeath",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_endcombat",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager",
+      "target": "managers_combatmanager_combatmanager_updatebudgettext",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_startcombat",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_movefrontofdrawtoend",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_shuffle",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_drawcard",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_discard",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_teststartcombat",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_deckmanager_deckmanager",
+      "target": "managers_deckmanager_deckmanager_testdrawcard",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/DeckManager.cs",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager",
+      "target": "managers_encountermanager_encountermanager_start",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_awake",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_start",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_trydrawtohand",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_oncardplayed",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_removefromhand",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_findfirstemptyslot",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_testdraw",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager",
+      "target": "managers_handmanager_handmanager_testplayfirst",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager_awake",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager_lockinput",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager_selectcard",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager",
+      "target": "managers_targetselectionmanager_targetselectionmanager_selecttarget",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_awake",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_onpointerclick",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_isvalidtarget",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_play",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card",
+      "target": "mbscripts_cards_card_card_applyalleffects",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_awake",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_onpointerclick",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_removestacks",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_calculateoutgoingdamage",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_applyincomingdamagemodifiers",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_calculateincomingblock",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_heal",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L70",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant",
+      "target": "mbscripts_combatants_combatant_combatant_takedamage",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_enemy_enemy_applystagger",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy",
+      "target": "mbscripts_combatants_enemy_enemy_trigger",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player_player",
+      "target": "mbscripts_combatants_player_player_takedamage",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_player_player",
+      "target": "mbscripts_combatants_player_player_gainblock",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/Combatants/Player.cs",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "target": "mbscripts_effectstacksdisplay_effectstacksdisplay_appendifpresent",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay",
+      "target": "mbscripts_effectstacksdisplay_effectstacksdisplay_update",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay",
+      "target": "mbscripts_enemyattacktimerdisplay_enemyattacktimerdisplay_update",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/EnemyAttackTimerDisplay.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay",
+      "target": "mbscripts_hpbardisplay_hpbardisplay_start",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_hpbardisplay_hpbardisplay",
+      "target": "mbscripts_hpbardisplay_hpbardisplay_update",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MBScripts/HPBarDisplay.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry",
+      "target": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry",
+      "target": "notmbclasses_cardactions_instantactionentry_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect",
+      "target": "notmbclasses_cardeffects_applystatuseffect_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_blockeffect",
+      "target": "notmbclasses_cardeffects_blockeffect_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_cardeffect",
+      "target": "notmbclasses_cardeffects_cardeffect_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_damageeffect",
+      "target": "notmbclasses_cardeffects_damageeffect_apply",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_oneshotevent",
+      "target": "notmbclasses_timedeffects_oneshotevent_trigger",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_periodiceffectevent",
+      "target": "notmbclasses_timedeffects_periodiceffectevent_trigger",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_timedeffects_statuseffectrules",
+      "target": "notmbclasses_timedeffects_statuseffectrules_trygetperiodicbehavior",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "NotMBclasses/TimedEffects.cs",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_combatmanager_combatmanager_resolveupto",
+      "target": "interfaces_ischeduledevent_ischeduledevent_trigger",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/CombatManager.cs",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_encountermanager_encountermanager_start",
+      "target": "managers_combatmanager_combatmanager_registerenemies",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/EncounterManager.cs",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_oncardplayed",
+      "target": "managers_deckmanager_deckmanager_discard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_start",
+      "target": "managers_deckmanager_deckmanager_startcombat",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_start",
+      "target": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_trydrawtohand",
+      "target": "managers_deckmanager_deckmanager_drawcard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_trydrawtohand",
+      "target": "managers_deckmanager_deckmanager_discard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager_selectcard",
+      "target": "mbscripts_cards_card_card_play",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager_selecttarget",
+      "target": "mbscripts_cards_card_card_isvalidtarget",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_targetselectionmanager_targetselectionmanager_selecttarget",
+      "target": "mbscripts_cards_card_card_play",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "Managers/TargetSelectionManager.cs",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "managers_combatmanager_combatmanager_advancetime",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "managers_combatmanager_combatmanager_resolveupto",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "target": "managers_combatmanager_combatmanager_registerscheduledevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy_trigger",
+      "target": "mbscripts_combatants_combatant_combatant_applyincomingdamagemodifiers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy_trigger",
+      "target": "mbscripts_combatants_player_player_takedamage",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_effectstacksdisplay_effectstacksdisplay_appendifpresent",
+      "target": "mbscripts_combatants_combatant_combatant_getstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "MBScripts/EffectStacksDisplay.cs",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "target": "mbscripts_combatants_enemy_enemy_applystagger",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_appliedeffectentry_apply",
+      "target": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry_apply",
+      "target": "mbscripts_combatants_combatant_combatant_applyincomingdamagemodifiers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardactions_instantactionentry_apply",
+      "target": "mbscripts_combatants_combatant_combatant_takedamage",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardActions.cs",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_applystatuseffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "notmbclasses_cardeffects_damageeffect_apply",
+      "target": "mbscripts_combatants_combatant_combatant_takedamage",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "NotMBclasses/CardEffects.cs",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "managers_handmanager_handmanager_start",
+      "target": "notmbclasses_timedeffects_periodiceffectevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "Managers/HandManager.cs",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_cards_card_card_play",
+      "target": "notmbclasses_timedeffects_oneshotevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "MBScripts/Cards/Card.cs",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_combatant_combatant_addeffectstacks",
+      "target": "notmbclasses_timedeffects_periodiceffectevent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Combatant.cs",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "mbscripts_combatants_enemy_enemy_trigger",
+      "target": "mbscripts_combatants_combatant_combatant_calculateoutgoingdamage",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "call",
+      "source_file": "MBScripts/Combatants/Enemy.cs",
+      "source_location": "L27",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "a1f45b8f683b6f06aaa8e79cda69f0f108cc5ef5"
+}

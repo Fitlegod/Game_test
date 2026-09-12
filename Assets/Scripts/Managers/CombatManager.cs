@@ -9,6 +9,7 @@ public class CombatManager : MonoBehaviour
     public Player player;
 
     private List<Enemy> enemies = new List<Enemy>();
+    public IReadOnlyList<Enemy> Enemies => enemies;
     public float CurrentTime { get; private set; }
 
     private List<IScheduledEvent> scheduledEvents = new List<IScheduledEvent>();
@@ -32,6 +33,11 @@ public class CombatManager : MonoBehaviour
     public void RegisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
         scheduledEvents.Add(scheduledEvent);
+    }
+
+    public void UnregisterScheduledEvent(IScheduledEvent scheduledEvent)
+    {
+        scheduledEvents.Remove(scheduledEvent);
     }
 
     public void AdvanceTime(float amount)

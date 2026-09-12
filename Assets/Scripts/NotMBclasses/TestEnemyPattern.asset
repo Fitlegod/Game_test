@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3faa281b4f4799749aab3497c21b4c16, type: 3}
+  m_Name: TestEnemyPattern
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPatternData
+  steps:
+  - stepName: Self Block
+    delaySeconds: 2
+    target: 2
+    targetEnemyIndex: 0
+    instantActions:
+    - kind: 1
+      amount: 4
+      hitCount: 1
+    appliedEffects: []
+  - stepName: Attack Player
+    delaySeconds: 2
+    target: 1
+    targetEnemyIndex: 0
+    instantActions:
+    - kind: 0
+      amount: 10
+      hitCount: 1
+    appliedEffects: []
+  - stepName: Heal Lowest Ally
+    delaySeconds: 2
+    target: 3
+    targetEnemyIndex: 0
+    instantActions:
+    - kind: 2
+      amount: 6
+      hitCount: 1
+    appliedEffects: []
+  - stepName: Rally All Allies
+    delaySeconds: 2
+    target: 2
+    targetEnemyIndex: 0
+    instantActions: []
+    appliedEffects:
+    - statusType: 0
+      stacks: 2
+  - stepName: Strike Index 2 (fallback to Player)
+    delaySeconds: 2
+    target: 4
+    targetEnemyIndex: 2
+    instantActions:
+    - kind: 0
+      amount: 7
+      hitCount: 1
+    appliedEffects: []

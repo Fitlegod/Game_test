@@ -20,4 +20,5 @@ MonoBehaviour:
   appliedEffects:
   - statusType: 0
     stacks: 3
+    targetTag: 0
   properties: 0

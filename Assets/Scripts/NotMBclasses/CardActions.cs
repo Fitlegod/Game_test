@@ -3,7 +3,8 @@ using UnityEngine;
 public enum InstantActionKind
 {
     Damage,
-    Block
+    Block,
+    Heal
 }
 
 [System.Serializable]
@@ -11,20 +12,35 @@ public class InstantActionEntry
 {
     public InstantActionKind kind;
     public int amount;
+    public int hitCount = 1;
+    public EffectTargetTag targetTag;
 
-    public void Apply(CombatManager combatManager, Combatant target)
+    public void Apply(CombatManager combatManager, Combatant source, Combatant target)
     {
-        switch (kind)
+        for (int i = 0; i < hitCount; i++)
         {
-            case InstantActionKind.Damage:
-                int finalDamage = combatManager.player.CalculateOutgoingDamage(amount);
-                target.TakeDamage(finalDamage);
-                Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
-                break;
-            case InstantActionKind.Block:
-                combatManager.player.GainBlock(amount);
-                Debug.Log("Даёт " + amount + " блока игроку");
-                break;
+            switch (kind)
+            {
+                case InstantActionKind.Damage:
+                    int finalDamage = source.CalculateOutgoingDamage(amount);
+                    finalDamage = target.ApplyIncomingDamageModifiers(finalDamage);
+                    target.TakeDamage(finalDamage);
+                    Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
+                    break;
+
+                case InstantActionKind.Block:
+                    Combatant blockRecipient = target ?? source;
+                    int finalBlock = blockRecipient.CalculateIncomingBlock(amount);
+                    blockRecipient.GainBlock(finalBlock);
+                    Debug.Log("Даёт " + finalBlock + " блока цели " + blockRecipient.name + " (база " + amount + ")");
+                    break;
+
+                case InstantActionKind.Heal:
+                    Combatant healRecipient = target ?? source;
+                    healRecipient.Heal(amount);
+                    Debug.Log("Лечит " + amount + " HP цели " + healRecipient.name);
+                    break;
+            }
         }
     }
 }
@@ -33,10 +49,19 @@ public class InstantActionEntry
 public class AppliedEffectEntry
 {
     public StatusEffectType statusType;
-    public int stacks;
+    public float stacks;
+    public EffectTargetTag targetTag;
 
-    public void Apply(CombatManager combatManager, Combatant target)
+    public void Apply(CombatManager combatManager, Combatant source, Combatant target)
     {
+        if (statusType == StatusEffectType.Stagger)
+        {
+            if (target is Enemy enemy)
+                enemy.ApplyStagger(stacks);
+            Debug.Log("Накладывает Пошатывание на " + stacks + " сек. цели " + target.name);
+            return;
+        }
+
         target.AddEffectStacks(statusType, stacks);
         Debug.Log("Применяет " + stacks + " стаков " + statusType + " цели " + target.name);
     }
