@@ -11,6 +11,7 @@ public class Enemy : Combatant, IScheduledEvent
 
     public float NextTime => nextActionTime;
     public int Priority => 1;
+    public int CurrentStepIndex => currentStepIndex;
 
     private float staggerAppliedAt = float.NegativeInfinity;
     private float staggerAmount;
@@ -53,7 +54,7 @@ public class Enemy : Combatant, IScheduledEvent
         }
     }
 
-    private List<Combatant> ResolveTargets(EnemyActionTarget target, int specificIndex)
+    public List<Combatant> ResolveTargets(EnemyActionTarget target, int specificIndex)
     {
         switch (target)
         {

@@ -99,7 +99,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         effectLabel.text = string.Join("\n", lines);
     }
 
-    private int ComputePreviewAmount(InstantActionEntry action, Combatant previewTarget)
+    private string DescribeInstantAction(InstantActionEntry action, Combatant previewTarget)
     {
         Combatant recipient = action.targetTag switch
         {
@@ -107,32 +107,8 @@ public class Card : MonoBehaviour, IPointerClickHandler
             EffectTargetTag.Enemy => previewTarget,
             _ => null
         };
-
-        switch (action.kind)
-        {
-            case InstantActionKind.Damage:
-                int dmg = combatManager.player.CalculateOutgoingDamage(action.amount);
-                if (recipient != null) dmg = recipient.ApplyIncomingDamageModifiers(dmg);
-                return dmg;
-            case InstantActionKind.Block:
-                return recipient != null ? recipient.CalculateIncomingBlock(action.amount) : action.amount;
-            default:
-                return action.amount;
-        }
-    }
-
-    private string HitCountSuffix(int hitCount)
-    {
-        if (hitCount <= 1) return "";
-        if (hitCount == 2) return " дважды";
-        if (hitCount <= 4) return " " + hitCount + " раза";
-        return " " + hitCount + " раз";
-    }
-
-    private string DescribeInstantAction(InstantActionEntry action, Combatant previewTarget)
-    {
-        int value = ComputePreviewAmount(action, previewTarget);
-        string hitSuffix = HitCountSuffix(action.hitCount);
+        int value = action.ComputePreviewAmount(combatManager.player, recipient);
+        string hitSuffix = InstantActionEntry.HitCountSuffix(action.hitCount);
 
         switch (action.kind)
         {
@@ -156,26 +132,12 @@ public class Card : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    private bool IsPositiveEffect(AppliedEffectEntry effect)
-    {
-        switch (effect.statusType)
-        {
-            case StatusEffectType.Strength:
-            case StatusEffectType.Regen:
-                return true;
-            case StatusEffectType.Toughness:
-                return effect.stacks >= 0;
-            default:
-                return false;
-        }
-    }
-
     private string DescribeAppliedEffect(AppliedEffectEntry effect)
     {
-        string name = GetGenitiveName(effect.statusType);
+        string name = AppliedEffectEntry.GetGenitiveName(effect.statusType);
         string n = effect.stacks.ToString("0.##");
 
-        if (IsPositiveEffect(effect))
+        if (effect.IsPositive())
         {
             if (effect.targetTag == EffectTargetTag.Enemy) return "Даёт " + n + " " + name + " врагу";
             if (effect.targetTag == EffectTargetTag.AllEnemies) return "Даёт " + n + " " + name + " всем врагам";
@@ -186,21 +148,6 @@ public class Card : MonoBehaviour, IPointerClickHandler
             if (effect.targetTag == EffectTargetTag.Enemy) return "Накладывает " + n + " " + name;
             if (effect.targetTag == EffectTargetTag.AllEnemies) return "Накладывает " + n + " " + name + " всем врагам";
             return "Даёт " + n + " " + name;
-        }
-    }
-
-    private static string GetGenitiveName(StatusEffectType type)
-    {
-        switch (type)
-        {
-            case StatusEffectType.Strength: return "Силы";
-            case StatusEffectType.Weak: return "Слабости";
-            case StatusEffectType.Toughness: return "Крепкости";
-            case StatusEffectType.Frailty: return "Хрупкости";
-            case StatusEffectType.Vulnerable: return "Уязвимости";
-            case StatusEffectType.Stagger: return "Пошатывания";
-            case StatusEffectType.Regen: return "Лечения";
-            default: return type.ToString();
         }
     }
 

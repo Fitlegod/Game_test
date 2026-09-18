@@ -19,8 +19,9 @@ MonoBehaviour:
   instantActions:
   - kind: 0
     amount: 6
-    hitCount: 1
+    hitCount: 3
     targetTag: 1
+  drawCardsOnPlay: 0
   appliedEffects:
   - statusType: 1
     stacks: 1
