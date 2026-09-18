@@ -9,6 +9,11 @@ public class DeckManager : MonoBehaviour
     private List<CardInstance> discardPile = new List<CardInstance>();
     private List<CardInstance> exhaustPile = new List<CardInstance>();
 
+    public IReadOnlyList<CardInstance> CharacterDeck => characterDeck;
+    public IReadOnlyList<CardInstance> DrawPile => drawPile;
+    public IReadOnlyList<CardInstance> DiscardPile => discardPile;
+    public IReadOnlyList<CardInstance> ExhaustPile => exhaustPile;
+
     public void StartCombat()
     {
         drawPile = new List<CardInstance>(characterDeck);

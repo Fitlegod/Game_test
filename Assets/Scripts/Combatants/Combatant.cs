@@ -91,6 +91,11 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         CurrentBlock += amount;
     }
 
+    public void SetCurrentHP(int hp)
+    {
+        CurrentHP = Mathf.Clamp(hp, 0, maxHP);
+    }
+
     public event System.Action OnDeath;
 
     public virtual void TakeDamage(int amount)

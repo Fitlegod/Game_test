@@ -19,6 +19,11 @@ public class TargetSelectionManager : MonoBehaviour
         inputLocked = true;
     }
 
+    public void UnlockInput()
+    {
+        inputLocked = false;
+    }
+
     public void SetHoveredTarget(Combatant target) => HoveredTarget = target;
     public void ClearHoveredTarget(Combatant target)
     {

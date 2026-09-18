@@ -58,6 +58,6 @@
 
 Каждое из `hitCount` повторений заново проходит **весь** конвейер выше с нуля — Сила/Слабость/Уязвимость пересчитываются на каждый удар отдельно, а не применяются один раз к заранее просуммированному числу. Сейчас в рамках одного синхронного вызова `Apply` стаки между повторами не меняются, но раздельный пересчёт — сознательное архитектурное решение под будущие взаимодействия, завязанные на стеки (см. корневой `CLAUDE.md`).
 
-## UI-потребитель: `EffectStacksDisplay`
+## UI-потребитель: `CombatantStatusDisplay.BuildEffectsText()`
 
-`UI/EffectStacksDisplay.cs` — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StaggerDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`.
+`UI/CombatantStatusDisplay.cs` (бывший отдельный `EffectStacksDisplay.cs`, слит в общий дисплей бойца — см. [combat-core.md](combat-core.md)) — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StaggerDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`; код метода перенесён из старого файла буквально, без переписывания.

@@ -90,65 +90,22 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
         var lines = new List<string>();
         foreach (var action in data.instantActions)
-            lines.Add(DescribeInstantAction(action, previewTarget));
+        {
+            Combatant recipient = action.targetTag switch
+            {
+                EffectTargetTag.Player => combatManager.player,
+                EffectTargetTag.Enemy => previewTarget,
+                _ => null
+            };
+            int value = action.ComputePreviewAmount(combatManager.player, recipient);
+            lines.Add(action.Describe(value));
+        }
         foreach (var effect in data.appliedEffects)
-            lines.Add(DescribeAppliedEffect(effect));
+            lines.Add(effect.Describe());
         if (data.drawCardsOnPlay > 0)
             lines.Add("Добор: " + data.drawCardsOnPlay);
 
         effectLabel.text = string.Join("\n", lines);
-    }
-
-    private string DescribeInstantAction(InstantActionEntry action, Combatant previewTarget)
-    {
-        Combatant recipient = action.targetTag switch
-        {
-            EffectTargetTag.Player => combatManager.player,
-            EffectTargetTag.Enemy => previewTarget,
-            _ => null
-        };
-        int value = action.ComputePreviewAmount(combatManager.player, recipient);
-        string hitSuffix = InstantActionEntry.HitCountSuffix(action.hitCount);
-
-        switch (action.kind)
-        {
-            case InstantActionKind.Damage:
-                if (action.targetTag == EffectTargetTag.Enemy) return "Наносит " + value + " урона" + hitSuffix;
-                if (action.targetTag == EffectTargetTag.AllEnemies) return "Наносит " + value + " урона" + hitSuffix + " всем врагам";
-                return "Наносит " + value + " урона" + hitSuffix + " себе";
-
-            case InstantActionKind.Block:
-                if (action.targetTag == EffectTargetTag.Enemy) return "Даёт " + value + " блока" + hitSuffix + " врагу";
-                if (action.targetTag == EffectTargetTag.AllEnemies) return "Даёт " + value + " блока" + hitSuffix + " всем врагам";
-                return "Даёт " + value + " блока" + hitSuffix;
-
-            case InstantActionKind.Heal:
-                if (action.targetTag == EffectTargetTag.Enemy) return "Восстанавливает " + value + " HP врагу";
-                if (action.targetTag == EffectTargetTag.AllEnemies) return "Восстанавливает " + value + " HP всем врагам";
-                return "Восстанавливает " + value + " HP";
-
-            default:
-                return "";
-        }
-    }
-
-    private string DescribeAppliedEffect(AppliedEffectEntry effect)
-    {
-        string name = AppliedEffectEntry.GetGenitiveName(effect.statusType);
-        string n = effect.stacks.ToString("0.##");
-
-        if (effect.IsPositive())
-        {
-            if (effect.targetTag == EffectTargetTag.Enemy) return "Даёт " + n + " " + name + " врагу";
-            if (effect.targetTag == EffectTargetTag.AllEnemies) return "Даёт " + n + " " + name + " всем врагам";
-            return "Даёт " + n + " " + name;
-        }
-        else
-        {
-            if (effect.targetTag == EffectTargetTag.Enemy) return "Накладывает " + n + " " + name;
-            if (effect.targetTag == EffectTargetTag.AllEnemies) return "Накладывает " + n + " " + name + " всем врагам";
-            return "Даёт " + n + " " + name;
-        }
     }
 
     private void UpdatePropertiesText()

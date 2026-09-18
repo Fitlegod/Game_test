@@ -15,12 +15,30 @@ public class CombatManager : MonoBehaviour
     private List<IScheduledEvent> scheduledEvents = new List<IScheduledEvent>();
     private bool combatOver;
 
+    public event System.Action OnVictory;
+
     void Start()
     {
         UpdateBudgetText();
-        player.OnDeath += HandlePlayerDeath;
         if (combatResultText != null)
             combatResultText.text = "";
+    }
+
+    public void SetPlayer(Player newPlayer)
+    {
+        player = newPlayer;
+        player.OnDeath += HandlePlayerDeath;
+    }
+
+    public void ResetForNewCombat()
+    {
+        scheduledEvents.Clear();
+        CurrentTime = 0f;
+        combatOver = false;
+        enemies.Clear();
+        UpdateBudgetText();
+        if (combatResultText != null) combatResultText.text = "";
+        TargetSelectionManager.Instance.UnlockInput();
     }
 
     public void RegisterEnemies(List<Enemy> spawnedEnemies)
@@ -68,7 +86,10 @@ public class CombatManager : MonoBehaviour
     private void HandleEnemyDeath()
     {
         if (enemies.TrueForAll(e => e.CurrentHP <= 0))
+        {
             EndCombat("Победа");
+            OnVictory?.Invoke();
+        }
     }
 
     private void EndCombat(string message)

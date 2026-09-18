@@ -59,12 +59,30 @@ public class InstantActionEntry
         }
     }
 
-    public static string HitCountSuffix(int hitCount)
+    public string Describe(int displayValue)
     {
-        if (hitCount <= 1) return "";
-        if (hitCount == 2) return " дважды";
-        if (hitCount <= 4) return " " + hitCount + " раза";
-        return " " + hitCount + " раз";
+        string hitSuffix = CardTextHelpers.HitCountSuffix(hitCount);
+
+        switch (kind)
+        {
+            case InstantActionKind.Damage:
+                if (targetTag == EffectTargetTag.Enemy) return "Наносит " + displayValue + " урона" + hitSuffix;
+                if (targetTag == EffectTargetTag.AllEnemies) return "Наносит " + displayValue + " урона" + hitSuffix + " всем врагам";
+                return "Наносит " + displayValue + " урона" + hitSuffix + " себе";
+
+            case InstantActionKind.Block:
+                if (targetTag == EffectTargetTag.Enemy) return "Даёт " + displayValue + " блока" + hitSuffix + " врагу";
+                if (targetTag == EffectTargetTag.AllEnemies) return "Даёт " + displayValue + " блока" + hitSuffix + " всем врагам";
+                return "Даёт " + displayValue + " блока" + hitSuffix;
+
+            case InstantActionKind.Heal:
+                if (targetTag == EffectTargetTag.Enemy) return "Восстанавливает " + displayValue + " HP врагу";
+                if (targetTag == EffectTargetTag.AllEnemies) return "Восстанавливает " + displayValue + " HP всем врагам";
+                return "Восстанавливает " + displayValue + " HP";
+
+            default:
+                return "";
+        }
     }
 }
 
@@ -103,18 +121,22 @@ public class AppliedEffectEntry
         }
     }
 
-    public static string GetGenitiveName(StatusEffectType type)
+    public string Describe()
     {
-        switch (type)
+        string name = CardTextHelpers.GetGenitiveName(statusType);
+        string n = stacks.ToString("0.##");
+
+        if (IsPositive())
         {
-            case StatusEffectType.Strength: return "Силы";
-            case StatusEffectType.Weak: return "Слабости";
-            case StatusEffectType.Toughness: return "Крепкости";
-            case StatusEffectType.Frailty: return "Хрупкости";
-            case StatusEffectType.Vulnerable: return "Уязвимости";
-            case StatusEffectType.Stagger: return "Пошатывания";
-            case StatusEffectType.Regen: return "Лечения";
-            default: return type.ToString();
+            if (targetTag == EffectTargetTag.Enemy) return "Даёт " + n + " " + name + " врагу";
+            if (targetTag == EffectTargetTag.AllEnemies) return "Даёт " + n + " " + name + " всем врагам";
+            return "Даёт " + n + " " + name;
+        }
+        else
+        {
+            if (targetTag == EffectTargetTag.Enemy) return "Накладывает " + n + " " + name;
+            if (targetTag == EffectTargetTag.AllEnemies) return "Накладывает " + n + " " + name + " всем врагам";
+            return "Даёт " + n + " " + name;
         }
     }
 }

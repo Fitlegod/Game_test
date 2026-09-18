@@ -22,6 +22,11 @@ public class HandManager : MonoBehaviour
 
     void Start()
     {
+    }
+
+    public void BeginNewHand()
+    {
+        ClearHand();
         deckManager.StartCombat();
 
         for (int i = 0; i < InitialHandSize; i++)
@@ -29,6 +34,18 @@ public class HandManager : MonoBehaviour
 
         var drawEvent = new PeriodicEffectEvent(combatManager.CurrentTime, DrawIntervalSeconds, () => TryDrawToHand());
         combatManager.RegisterScheduledEvent(drawEvent);
+    }
+
+    private void ClearHand()
+    {
+        for (int i = 0; i < MaxHandSize; i++)
+        {
+            if (cardsInSlots[i] != null)
+            {
+                Destroy(cardsInSlots[i].gameObject);
+                cardsInSlots[i] = null;
+            }
+        }
     }
 
     public bool TryDrawToHand()
