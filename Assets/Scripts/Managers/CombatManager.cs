@@ -16,6 +16,7 @@ public class CombatManager : MonoBehaviour
     private bool combatOver;
 
     public event System.Action OnVictory;
+    public event System.Action OnDefeat;
 
     void Start()
     {
@@ -81,10 +82,15 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private void HandlePlayerDeath() => EndCombat("Поражение");
+    private void HandlePlayerDeath()
+    {
+        EndCombat("Поражение");
+        OnDefeat?.Invoke();
+    }
 
     private void HandleEnemyDeath()
     {
+        if (combatOver) return; // бой уже закончен (например, поражением) — второго исхода не будет
         if (enemies.TrueForAll(e => e.CurrentHP <= 0))
         {
             EndCombat("Победа");

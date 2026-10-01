@@ -3,29 +3,35 @@ using UnityEngine;
 
 public class EncounterManager : MonoBehaviour
 {
-    public List<EncounterData> encounters;
     public GameObject playerPrefab;
     public RectTransform playerSpawnPoint;
     public RectTransform enemiesArea;
     public CombatManager combatManager;
     public DeckManager deckManager;
     public HandManager handManager;
+    public MapManager mapManager;
 
-    private int currentEncounterIndex = -1;
     private Player currentPlayer;
     private List<Enemy> currentEnemies = new List<Enemy>();
 
     void Start()
     {
         combatManager.OnVictory += HandleVictory;
-        StartNextEncounter();
+        combatManager.OnDefeat += HandleDefeat;
     }
 
     private void HandleVictory()
     {
         PlayerRunState.PersistedHP = currentPlayer.CurrentHP;
         CleanupCombatants();
-        StartNextEncounter();
+        mapManager.OnCombatEnded(true);
+    }
+
+    private void HandleDefeat()
+    {
+        PlayerRunState.PersistedHP = null; // следующий бой — с полным HP
+        CleanupCombatants();
+        mapManager.OnCombatEnded(false);
     }
 
     private void CleanupCombatants()
@@ -36,11 +42,8 @@ public class EncounterManager : MonoBehaviour
         currentEnemies.Clear();
     }
 
-    private void StartNextEncounter()
+    public void StartEncounter(EncounterData encounter)
     {
-        currentEncounterIndex = (currentEncounterIndex + 1) % encounters.Count;
-        EncounterData encounter = encounters[currentEncounterIndex];
-
         combatManager.ResetForNewCombat();
 
         SpawnPlayer();

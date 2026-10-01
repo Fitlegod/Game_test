@@ -4,7 +4,7 @@
 
 Файлы: `Combatants/Enemy.cs`, `Combatants/EnemyActionStep.cs`, `Combatants/EnemyPatternData.cs`, `Encounters/EncounterData.cs`, `Managers/EncounterManager.cs`, `Enums/EnemyActionTarget.cs`, `UI/CombatantStatusDisplay.cs` (телеграф — часть общего дисплея, не отдельный класс).
 
-См. также: [combat-core.md](combat-core.md) — `IScheduledEvent`, в реестр которого встаёт сам `Enemy`, а также `CombatManager.OnVictory`/`SetPlayer`/`ResetForNewCombat` и `PlayerRunState`, на которых держится смена боёв, описанная в этом файле; [cards.md](cards.md)/[effects.md](effects.md) — те же `InstantActionEntry`/`AppliedEffectEntry`, что использует `EnemyActionStep`; [deck-hand.md](deck-hand.md) — `HandManager.BeginNewHand`, которую `EncounterManager` вызывает на каждый новый бой.
+См. также: [combat-core.md](combat-core.md) — `IScheduledEvent`, в реестр которого встаёт сам `Enemy`, а также `CombatManager.OnVictory`/`OnDefeat`/`SetPlayer`/`ResetForNewCombat` и `PlayerRunState`, на которых держится исход боя, описанный в этом файле; [map.md](map.md) — `MapManager`, который запускает `StartEncounter` и принимает исход боя; [cards.md](cards.md)/[effects.md](effects.md) — те же `InstantActionEntry`/`AppliedEffectEntry`, что использует `EnemyActionStep`; [deck-hand.md](deck-hand.md) — `HandManager.BeginNewHand`, которую `EncounterManager` вызывает на каждый новый бой.
 
 ## `Enemy` — `Combatant` + `IScheduledEvent`
 
@@ -36,22 +36,22 @@
 ## `EnemyPatternData` / `EncounterData` (ScriptableObject)
 
 - **`EnemyPatternData`** — просто `List<EnemyActionStep> steps`; один ассет на отдельный узнаваемый паттерн поведения, назначается на `Enemy.pattern` конкретного префаба врага.
-- **`EncounterData`** — просто `List<GameObject> enemyPrefabs`; один ассет на конкретный бой, читает его `EncounterManager`.
+- **`EncounterData`** — просто `List<GameObject> enemyPrefabs`; один ассет на конкретный бой. Ссылка на него лежит на боевом узле карты (`MapNode.encounter`), оттуда `MapManager` передаёт его в `EncounterManager.StartEncounter`.
 
-## `EncounterManager` — оркестратор цикла боёв: динамический спавн игрока и врагов, смена энкаунтеров
+## `EncounterManager` — спавн игрока и врагов на один бой
 
-С переходом на полностью динамический спавн игрока `EncounterManager` перестал быть «спавнер на один бой при старте сцены» — теперь это менеджер всего цикла забега: список энкаунтеров, спавн игрока и врагов на каждый из них, и переход к следующему при победе.
+`EncounterManager` больше не крутит энкаунтеры по кругу и не стартует бой сам: списка `encounters` и `currentEncounterIndex` в нём нет. Бой начинается только по вызову `StartEncounter(encounter)` — его делает `MapManager`, когда игрок кликнул боевой узел карты ([map.md](map.md)).
 
-- `encounters` (`List<EncounterData>`) — весь список боёв забега в фиксированном порядке (в текущей сцене — `TestEncounter_1Enemy`/`_2Enemies`/`_3Enemies`, в этом порядке).
-- `playerPrefab`/`playerSpawnPoint` — префаб игрока (см. ниже про `PlayerPrefab`) и `RectTransform`-точка на Canvas, где он появляется; сам объект `Player` с этой точки убран — раньше он стоял на сцене статично, теперь спавнится в неё как дочерний.
-- `currentEncounterIndex` — индекс текущего боя в `encounters`; начинается с `-1`, чтобы первый же `StartNextEncounter()` увеличил его до `0`.
-- `currentPlayer`/`currentEnemies` — собственные ссылки менеджера на объекты **текущего** боя, нужны, чтобы было что уничтожить в `CleanupCombatants()` при переходе к следующему.
-- `Start()` — подписывается на `combatManager.OnVictory` (см. [combat-core.md](combat-core.md)) и сразу запускает первый бой через `StartNextEncounter()`.
-- **`HandleVictory()`** — обработчик `OnVictory`: сохраняет `currentPlayer.CurrentHP` в `PlayerRunState.PersistedHP` **до** уничтожения игрока, уничтожает всех участников только что законченного боя (`CleanupCombatants`), и сразу запускает следующий (`StartNextEncounter`). Поражение (`CombatManager.OnDeath` игрока, не `OnVictory`) сюда не ведёт вообще — `EncounterManager` не подписан на смерть игрока, поэтому после «Поражение» никакой следующий бой не стартует, а `TargetSelectionManager` остаётся заблокированным `LockInput()`-ом до конца сцены.
-- **`StartNextEncounter()`** — `currentEncounterIndex = (currentEncounterIndex + 1) % encounters.Count`: индекс закольцован по модулю размера списка, поэтому после последнего энкаунтера в списке следующий вызов возвращается к нулевому — цикл бесконечный, не одноразовый прогон списка. Далее: `combatManager.ResetForNewCombat()` (обнуляет секундомер/расписание/блокировку ввода — см. [combat-core.md](combat-core.md)), затем спавн игрока, спавн врагов, и в самом конце `handManager.BeginNewHand()` (см. [deck-hand.md](deck-hand.md)) — рука собирается только после того, как оба участника боя уже существуют.
-- **`SpawnPlayer()`** — `Instantiate(playerPrefab, playerSpawnPoint)`, проставляет `player.combatManager`, накатывает `PlayerRunState.PersistedHP` через `SetCurrentHP`, если оно задано (первый бой забега — `PersistedHP == null`, игрок остаётся на полном HP из `Awake()`), и регистрирует его на `CombatManager` через `SetPlayer(player)` — это же вызов подписывает `HandlePlayerDeath` на его `OnDeath`.
-- **`SpawnEnemies(encounter)`** — та же логика равномерного распределения по ширине `enemiesArea`, что была раньше (`spacing = width / (count + 1)`, позиции `-width/2 + spacing * (i + 1)`), только теперь `enemy.player = currentPlayer` берётся из только что заспавненного в этом же вызове игрока, а не из инспекторной ссылки. Для каждого врага настраивает `combatManager`/`player`, регистрирует его на `CombatManager` как `IScheduledEvent`, подписывает отписку на `OnDeath`, и отдельно проставляет `combatManager` на его `CombatantStatusDisplay` (`GetComponentInChildren`) — этому конкретному полю дисплея, как раньше `EnemyAttackTimerDisplay.combatManager`, нужна прямая ссылка на менеджер для чтения `CurrentTime` в телеграфе, и она не часть префаба (см. [combat-core.md](combat-core.md)). В конце — `combatManager.RegisterEnemies(spawned)`.
-- «Кто регистрирует, тот и отписывает» из корневого `CLAUDE.md` по-прежнему в силе: регистрация/отписка `Enemy` как `IScheduledEvent` целиком в руках `EncounterManager`, не `Enemy`/`Combatant`.
+- `playerPrefab`/`playerSpawnPoint` — префаб игрока (см. ниже про `PlayerPrefab`) и `RectTransform`-точка на Canvas, где он появляется.
+- `mapManager` — обратная ссылка, по которой менеджер сообщает исход боя (`OnCombatEnded`).
+- `currentPlayer`/`currentEnemies` — ссылки на объекты **текущего** боя, нужны, чтобы было что уничтожить в `CleanupCombatants()`.
+- `Start()` — только подписки: `combatManager.OnVictory += HandleVictory`, `combatManager.OnDefeat += HandleDefeat` (см. [combat-core.md](combat-core.md)).
+- **`StartEncounter(EncounterData)`** — то, что раньше делал `StartNextEncounter`, но для переданного энкаунтера: `combatManager.ResetForNewCombat()`, спавн игрока, спавн врагов, и в самом конце `handManager.BeginNewHand()` ([deck-hand.md](deck-hand.md)) — рука собирается, когда оба участника боя уже существуют.
+- **`HandleVictory()`** — сохраняет `currentPlayer.CurrentHP` в `PlayerRunState.PersistedHP` **до** уничтожения игрока, уничтожает участников (`CleanupCombatants`), вызывает `mapManager.OnCombatEnded(true)`.
+- **`HandleDefeat()`** — `PlayerRunState.PersistedHP = null` (следующий бой — с полным HP), `CleanupCombatants`, `mapManager.OnCombatEnded(false)`. Узел поражения считается пройденным.
+- **`SpawnPlayer()`** — `Instantiate(playerPrefab, playerSpawnPoint)`, проставляет `player.combatManager`, накатывает `PersistedHP` через `SetCurrentHP`, если оно задано, и регистрирует игрока через `combatManager.SetPlayer(player)` (это же подписывает `HandlePlayerDeath` на его `OnDeath`).
+- **`SpawnEnemies(encounter)`** — равномерное распределение по ширине `enemiesArea` (`spacing = width / (count + 1)`, позиции `-width/2 + spacing * (i + 1)`), `enemy.player = currentPlayer`. Для каждого врага настраивает `combatManager`/`player`, регистрирует его на `CombatManager` как `IScheduledEvent`, подписывает отписку на `OnDeath`, отдельно проставляет `combatManager` на его `CombatantStatusDisplay` (`GetComponentInChildren`; поле нужно телеграфу для `CurrentTime` и не часть префаба). В конце — `combatManager.RegisterEnemies(spawned)`.
+- «Кто регистрирует, тот и отписывает» из корневого `CLAUDE.md` по-прежнему в силе: регистрация/отписка `Enemy` как `IScheduledEvent` целиком в руках `EncounterManager`.
 
 ## `PlayerPrefab` — игрок собран по образцу `EnemyPrefab`
 
@@ -60,3 +60,5 @@
 ## Телеграф атаки — часть `CombatantStatusDisplay`
 
 Раньше отдельный `EnemyAttackTimerDisplay`, теперь — `BuildTelegraphText()` внутри `UI/CombatantStatusDisplay.cs` (код перенесён буквально, без переписывания; подробности и сигнатура полей — в [combat-core.md](combat-core.md)). Коротко: обратный отсчёт до атаки (`enemyForTelegraph.NextTime - combatManager.CurrentTime`), название текущего шага и построчное описание каждого его действия/эффекта через тот же `ComputePreviewAmount` из `CardActions.cs`, `CardTextHelpers.HitCountSuffix` и `EnemyActionStep.DescribeTarget` для суффикса цели, что и текст карты игрока ([cards.md](cards.md)). Если у шага сейчас нет резолвящейся цели, для каждого действия печатает «(нет цели)» вместо числа.
+
+**Сверено с кодом:** `EncounterManager.StartEncounter(EncounterData)` — `Managers/EncounterManager.cs:45`; `HandleVictory` пишет `PersistedHP` (`:25`), `HandleDefeat` обнуляет его (`:32`); `Enemy.Priority => 1` — `Combatants/Enemy.cs:13`.

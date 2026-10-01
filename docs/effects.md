@@ -61,3 +61,5 @@
 ## UI-потребитель: `CombatantStatusDisplay.BuildEffectsText()`
 
 `UI/CombatantStatusDisplay.cs` (бывший отдельный `EffectStacksDisplay.cs`, слит в общий дисплей бойца — см. [combat-core.md](combat-core.md)) — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StaggerDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`; код метода перенесён из старого файла буквально, без переписывания.
+
+**Сверено с кодом:** `GetStacks` возвращает `0f`, если ключа нет (`Combatants/Combatant.cs:30`); `RemoveStacks` не опускает стаки ниже нуля через `Mathf.Max(0f, …)` (`Combatants/Combatant.cs:57`); `AddEffectStacks` у мёртвого — no-op (`Combatants/Combatant.cs:35`).
