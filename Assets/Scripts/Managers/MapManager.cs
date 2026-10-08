@@ -5,7 +5,8 @@ public class MapManager : MonoBehaviour
 {
     public MapGenerationConfig config;
     public string seed;
-    public MapScreen mapScreen;
+    public MapView mapScreen;  // главный экран выбора комнаты (ScreenRoot Map)
+    public MapView mapOverlay; // просмотр карты в бою (OverlayRoot), только чтение
     public EncounterManager encounterManager;
     public Button viewMapButton; // HUD-кнопка «Карта» во время боя
 
@@ -43,7 +44,7 @@ public class MapManager : MonoBehaviour
         if (node.IsCombat)
         {
             selecting = false;
-            mapScreen.Close();
+            ScreenManager.Instance.ShowScreen(ScreenManager.Combat);
             encounterManager.StartEncounter(node.encounter);
         }
         else
@@ -58,6 +59,7 @@ public class MapManager : MonoBehaviour
         {
             RunState.IsFinished = true;
             selecting = false;
+            ScreenManager.Instance.ShowScreen(ScreenManager.Map);
             mapScreen.Show(CurrentMap, RunState, MapScreenMode.Finished);
             return;
         }
@@ -67,12 +69,20 @@ public class MapManager : MonoBehaviour
     private void OpenSelection()
     {
         selecting = true;
+        ScreenManager.Instance.ShowScreen(ScreenManager.Map);
         mapScreen.Show(CurrentMap, RunState, MapScreenMode.Select);
+    }
+
+    public void ToggleMapView()
+    {
+        if (ScreenManager.Instance.IsOverlayOpen(mapOverlay.gameObject)) mapOverlay.Close();
+        else OpenView();
     }
 
     private void OpenView()
     {
         if (selecting || RunState.IsFinished) return;
-        mapScreen.Show(CurrentMap, RunState, MapScreenMode.View);
+        mapOverlay.Show(CurrentMap, RunState, MapScreenMode.View);
+        ScreenManager.Instance.OpenOverlay(mapOverlay.gameObject);
     }
 }

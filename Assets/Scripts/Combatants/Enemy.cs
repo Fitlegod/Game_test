@@ -27,6 +27,12 @@ public class Enemy : Combatant, IScheduledEvent
 
     public void ScheduleFirstAction()
     {
+        if (pattern == null || pattern.steps.Count == 0)
+        {
+            Debug.LogError("Враг " + name + ": пустой паттерн, враг не будет действовать", this);
+            nextActionTime = float.PositiveInfinity;
+            return;
+        }
         nextActionTime = combatManager.CurrentTime + pattern.steps[0].delaySeconds;
     }
 
@@ -34,26 +40,30 @@ public class Enemy : Combatant, IScheduledEvent
     {
         if (CurrentHP <= 0) return;
 
-        var step = pattern.steps[currentStepIndex];
-        if (!TryExecute(step.target, step.targetEnemyIndex, step.instantActions, step.appliedEffects) && step.hasFallback)
-            TryExecute(step.fallback.target, step.fallback.targetEnemyIndex, step.fallback.instantActions, step.fallback.appliedEffects);
+        var plan = GetPlannedStep();
+        foreach (var target in plan.targets)
+        {
+            foreach (var action in plan.instantActions)
+                action.Apply(combatManager, this, target);
+            foreach (var effect in plan.appliedEffects)
+                effect.Apply(combatManager, this, target);
+        }
         currentStepIndex = (currentStepIndex + 1) % pattern.steps.Count;
         nextActionTime += pattern.steps[currentStepIndex].delaySeconds;
     }
 
-    private bool TryExecute(EnemyActionTarget targetKind, int targetIndex, List<InstantActionEntry> instantActions, List<AppliedEffectEntry> appliedEffects)
+    // Что враг сделает на текущем шаге: основной шаг или, если у него нет цели, запасной.
+    // Единственное место, где это решается, — и Trigger, и телеграф берут план отсюда.
+    public PlannedStep GetPlannedStep()
     {
-        List<Combatant> targets = ResolveTargets(targetKind, targetIndex);
-        if (targets.Count == 0) return false;
-
-        foreach (var target in targets)
+        var step = pattern.steps[currentStepIndex];
+        var targets = ResolveTargets(step.target, step.targetEnemyIndex);
+        if (targets.Count == 0 && step.hasFallback)
         {
-            foreach (var action in instantActions)
-                action.Apply(combatManager, this, target);
-            foreach (var effect in appliedEffects)
-                effect.Apply(combatManager, this, target);
+            var fb = step.fallback;
+            return new PlannedStep(fb.stepNameKey, fb.target, ResolveTargets(fb.target, fb.targetEnemyIndex), fb.instantActions, fb.appliedEffects);
         }
-        return true;
+        return new PlannedStep(step.stepNameKey, step.target, targets, step.instantActions, step.appliedEffects);
     }
 
     public List<Combatant> ResolveTargets(EnemyActionTarget target, int specificIndex)

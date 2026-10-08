@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774f86fc026ee884da2cf72e1ec34d87, type: 3}
   m_Name: Embark_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C"
+  nameKey: card.embark.name
   timeCostSeconds: 1
   effectDelaySeconds: 0
   cardType: 2
   instantActions: []
+  drawCardsOnPlay: 0
   appliedEffects:
   - statusType: 0
     stacks: 3

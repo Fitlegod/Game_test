@@ -5,7 +5,9 @@ using TMPro;
 
 public enum MapScreenMode { Select, View, Finished }
 
-public class MapScreen : MonoBehaviour
+// Общая отрисовка карты забега. Два экземпляра в сцене:
+// MapScreen (ScreenRoot, режимы Select/Finished, без кнопки «Закрыть») и MapOverlay (OverlayRoot, режим View, только чтение, с кнопкой «Закрыть»).
+public class MapView : MonoBehaviour
 {
     const float ColSpacing = 130f, RowSpacing = 100f, Pad = 80f;
 
@@ -15,7 +17,7 @@ public class MapScreen : MonoBehaviour
     public GameObject nodePrefab; // корень: Image + Button + Outline; дети: Icon (Image), Label (TMP_Text)
     public TMP_Text seedText;
     public TMP_Text statusText;
-    public Button closeButton;
+    public Button closeButton; // только у оверлея; у экрана MapScreen пусто
     public Sprite skullSprite;
 
     public Action<int> onNodeClicked;
@@ -28,21 +30,21 @@ public class MapScreen : MonoBehaviour
 
     void Awake()
     {
-        closeButton.onClick.AddListener(Close);
+        if (closeButton != null) closeButton.onClick.AddListener(Close);
     }
 
-    public void Close() => panelRoot.SetActive(false);
+    public void Close() => ScreenManager.Instance.CloseOverlay(gameObject);
 
     public void Show(MapData map, MapRunState run, MapScreenMode mode)
     {
         panelRoot.SetActive(true);
-        closeButton.gameObject.SetActive(mode == MapScreenMode.View);
-        seedText.text = "Сид: " + map.seed;
+        if (closeButton != null) closeButton.gameObject.SetActive(mode == MapScreenMode.View);
+        seedText.text = Loc.Format("map.seed", map.seed);
         statusText.text = mode switch
         {
-            MapScreenMode.Select => "Выберите следующую комнату",
-            MapScreenMode.View => "Просмотр карты",
-            _ => "Локация пройдена"
+            MapScreenMode.Select => Loc.Get("map.status.select"),
+            MapScreenMode.View => Loc.Get("map.status.view"),
+            _ => Loc.Get("map.status.finished")
         };
 
         for (int i = content.childCount - 1; i >= 0; i--)
@@ -105,16 +107,7 @@ public class MapScreen : MonoBehaviour
         icon.gameObject.SetActive(node.IsCombat);
         icon.sprite = skullSprite;
         label.gameObject.SetActive(!node.IsCombat);
-        label.text = node.type switch
-        {
-            RoomType.Event => "Событие",
-            RoomType.RiskyEvent => "Риск",
-            RoomType.CardMerchant => "Карты",
-            RoomType.EnchantMerchant => "Чары",
-            RoomType.Campfire => "Костёр",
-            RoomType.Chest => "Сундук",
-            _ => ""
-        };
+        label.text = node.IsCombat ? "" : Loc.Get("map.room." + node.type);
 
         bool current = run.CurrentNodeId == node.id;
         bool visited = run.Visited.Contains(node.id);

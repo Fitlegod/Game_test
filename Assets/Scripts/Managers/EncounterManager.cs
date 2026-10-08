@@ -57,6 +57,7 @@ public class EncounterManager : MonoBehaviour
         GameObject obj = Instantiate(playerPrefab, playerSpawnPoint);
         Player player = obj.GetComponent<Player>();
         player.combatManager = combatManager;
+        player.Init();
         if (PlayerRunState.PersistedHP.HasValue)
             player.SetCurrentHP(PlayerRunState.PersistedHP.Value);
         combatManager.SetPlayer(player);
@@ -76,6 +77,7 @@ public class EncounterManager : MonoBehaviour
 
             Enemy enemy = obj.GetComponent<Enemy>();
             enemy.combatManager = combatManager;
+            enemy.Init();
             enemy.player = currentPlayer;
             enemy.ScheduleFirstAction();
             combatManager.RegisterScheduledEvent(enemy);

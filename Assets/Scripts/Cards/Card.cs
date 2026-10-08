@@ -17,7 +17,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     void Awake()
     {
         if (instance != null && instance.data != null && nameLabel != null)
-            nameLabel.text = data.cardName;
+            nameLabel.text = data.DisplayName;
         UpdatePropertiesText();
     }
 
@@ -109,7 +109,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         foreach (var effect in data.appliedEffects)
             lines.Add(effect.Describe());
         if (data.drawCardsOnPlay > 0)
-            lines.Add("Добор: " + data.drawCardsOnPlay);
+            lines.Add(Loc.Format("card.draw", data.drawCardsOnPlay));
 
         effectLabel.text = string.Join("\n", lines);
     }
@@ -119,8 +119,8 @@ public class Card : MonoBehaviour, IPointerClickHandler
         if (propertiesLabel == null || instance == null || instance.data == null) return;
         var props = new List<string>();
         var effective = instance.EffectiveProperties;
-        if ((effective & CardPropertyFlags.Exhaust) != 0) props.Add("Сжигаемое");
-        if ((effective & CardPropertyFlags.FrontOfDraw) != 0) props.Add("Впереди");
+        if ((effective & CardPropertyFlags.Exhaust) != 0) props.Add(Loc.Get("card.property.exhaust"));
+        if ((effective & CardPropertyFlags.FrontOfDraw) != 0) props.Add(Loc.Get("card.property.frontOfDraw"));
         propertiesLabel.text = string.Join(", ", props);
     }
 }

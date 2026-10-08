@@ -50,7 +50,21 @@ Unity 6000.3.23f1, 2D, карточный рогалик. Весь интерф�
 - Поле `[Serializable]`-класса в Unity не бывает `null`, а поле своего же типа даёт рекурсию вложенных пустых объектов до глубины сериализации 10 (предупреждения в Console). «Необязательное» вложенное значение — это `bool hasX` + поле другого (не рекурсивного) типа, как `EnemyActionStep.hasFallback`/`EnemyFallbackStep`.
 - Смена только регистра в имени файла на Windows не видна git (`StatuseffectType.cs` так и остался в репозитории). Переименовывать в два шага через временное имя: `git mv A tmp && git mv tmp B`, вместе с `.meta`.
 - Окончания строк нормализует git через `* text=auto` первой строкой `.gitattributes` (LFS-типы остаются бинарными через `-text` в макросе `lfs`). Не менять `core.autocrlf` и не убирать это правило.
+- Объекты под неактивным родителем не получают `Awake` (и `OnEnable`/`Start`). Инициализацию при спавне делать явно: `Combatant.Init()` вызывает `EncounterManager`, а не `Awake`.
+- Сцену менять только в Edit Mode, в Play Mode — никогда: правки в Play Mode откатываются при выходе, а `SaveScene` в Play Mode не работает. После правок: `EditorSceneManager.SaveScene` → закрыть сцену → открыть заново с диска → сверить `activeSelf` с `m_IsActive` в файле. Перед коммитом `git status` не должен показывать ни несохранённых, ни незакоммиченных изменений сцены (сцена не dirty).
+- Объект не может быть одновременно `ScreenRoot` и `OverlayRoot` (экран и оверлей — разные роли). Начальное состояние сцены для Edit Mode: все экраны и оверлеи выключены (включаются только при правке UI и перед коммитом возвращаются выключенными); `SceneStateTests` это проверяет.
 - Динамические шрифтовые ассеты (`LiberationSans SDF - Fallback.asset` и подобные) нельзя держать вне git — у других участников команды (свежий клон) пропадает текст, кириллица превращается в квадратики. Проект использует только статичный `Assets/Fonts/GameFont SDF.asset` (ASCII + U+0400–U+04FF + «», –, —, ×, …), он назначен шрифтом по умолчанию в TMP Settings и на всех TMP-текстах сцены/префабов. Нужен новый не-ASCII символ вне этого набора — пересоздать/дополнить `GameFont SDF` в Font Asset Creator (Static) и закоммитить.
+
+## Работа в команде
+
+- Одна задача роадмапы — одна git-ветка от свежего main, имя с номером задачи (`a5-formuly`).
+- Никогда не коммитить и не пушить в main.
+- Менять минимум файлов, не рефакторить соседний код; проблемы вне задачи — в отчёт, не чинить.
+- Сцену `SampleScene.unity` одновременно правит один человек; новый интерфейс — отдельными префабами.
+- Файлы перемещать и переименовывать только вместе с `.meta`.
+- В коммит — только файлы задачи (смотреть `git status`).
+
+- Новый текст для игрока — только через `Assets/Resources/Strings/ru.txt` (`Loc.Get`/`Loc.Format`, `LocalizedText` в сцене), не литералом в коде или сцене. Новая карта или шаг врага = ассет + строка в `ru.txt`. Новый экран регистрируется в `ScreenManager` (компонент `ScreenRoot`). Клавиши — только через общий компонент ввода `GameInput`, не `Keyboard.current` в игровом коде.
 
 ## Поддержание документации docs/
 
@@ -60,6 +74,7 @@ Unity 6000.3.23f1, 2D, карточный рогалик. Весь интерф�
 - docs/effects.md — StatusEffectType, StatusEffectRules, формулы на Combatant
 - docs/deck-hand.md — DeckManager, HandManager
 - docs/enemies.md — Enemy, EnemyPatternData, EnemyActionStep, EncounterData, EncounterManager, EnemyActionTarget
-- docs/map.md — MapGenerator, MapGenerationConfig, MapData, MapRunState, MapManager, MapScreen, цикл «карта → бой → карта»
+- docs/ui.md — ScreenManager, оверлеи, ввод и горячие клавиши, таблица строк
+- docs/map.md — MapGenerator, MapGenerationConfig, MapData, MapRunState, MapManager, MapView, цикл «карта → бой → карта»
 
 Периодически (не обязательно на каждую мелкую правку) перепрогоняй Graphify и сверяй, что каждый класс графа упомянут хотя бы в одном файле docs/ — новый класс без упоминания означает, что документация отстала.

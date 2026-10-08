@@ -1,25 +1,13 @@
 public static class CardTextHelpers
 {
+    // Суффикс с ведущим пробелом или пустая строка; вставляется в фразу как {1}
     public static string HitCountSuffix(int hitCount)
     {
         if (hitCount <= 1) return "";
-        if (hitCount == 2) return " дважды";
-        if (hitCount <= 4) return " " + hitCount + " раза";
-        return " " + hitCount + " раз";
+        if (hitCount == 2) return " " + Loc.Get("card.hits.twice");
+        if (hitCount <= 4) return " " + Loc.Format("card.hits.few", hitCount);
+        return " " + Loc.Format("card.hits.many", hitCount);
     }
 
-    public static string GetGenitiveName(StatusEffectType type)
-    {
-        switch (type)
-        {
-            case StatusEffectType.Strength: return "Силы";
-            case StatusEffectType.Weak: return "Слабости";
-            case StatusEffectType.Toughness: return "Крепкости";
-            case StatusEffectType.Frailty: return "Хрупкости";
-            case StatusEffectType.Vulnerable: return "Уязвимости";
-            case StatusEffectType.Stagger: return "Пошатывания";
-            case StatusEffectType.Regen: return "Лечения";
-            default: return type.ToString();
-        }
-    }
+    public static string GetGenitiveName(StatusEffectType type) => Loc.Get("effect.genitive." + type);
 }

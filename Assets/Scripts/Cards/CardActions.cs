@@ -61,28 +61,15 @@ public class InstantActionEntry
 
     public string Describe(int displayValue)
     {
-        string hitSuffix = CardTextHelpers.HitCountSuffix(hitCount);
+        return Loc.Format("card.action." + kind + "." + TagGroup(targetTag), displayValue, CardTextHelpers.HitCountSuffix(hitCount));
+    }
 
-        switch (kind)
-        {
-            case InstantActionKind.Damage:
-                if (targetTag == EffectTargetTag.Enemy) return "Наносит " + displayValue + " урона" + hitSuffix;
-                if (targetTag == EffectTargetTag.AllEnemies) return "Наносит " + displayValue + " урона" + hitSuffix + " всем врагам";
-                return "Наносит " + displayValue + " урона" + hitSuffix + " себе";
-
-            case InstantActionKind.Block:
-                if (targetTag == EffectTargetTag.Enemy) return "Даёт " + displayValue + " блока" + hitSuffix + " врагу";
-                if (targetTag == EffectTargetTag.AllEnemies) return "Даёт " + displayValue + " блока" + hitSuffix + " всем врагам";
-                return "Даёт " + displayValue + " блока" + hitSuffix;
-
-            case InstantActionKind.Heal:
-                if (targetTag == EffectTargetTag.Enemy) return "Восстанавливает " + displayValue + " HP врагу";
-                if (targetTag == EffectTargetTag.AllEnemies) return "Восстанавливает " + displayValue + " HP всем врагам";
-                return "Восстанавливает " + displayValue + " HP";
-
-            default:
-                return "";
-        }
+    // Enemy / AllEnemies / Player (всё остальное — действие на себя)
+    public static string TagGroup(EffectTargetTag tag)
+    {
+        if (tag == EffectTargetTag.Enemy) return "Enemy";
+        if (tag == EffectTargetTag.AllEnemies) return "AllEnemies";
+        return "Player";
     }
 }
 
@@ -125,19 +112,7 @@ public class AppliedEffectEntry
     {
         string name = CardTextHelpers.GetGenitiveName(statusType);
         string n = stacks.ToString("0.##");
-
-        if (IsPositive())
-        {
-            if (targetTag == EffectTargetTag.Enemy) return "Даёт " + n + " " + name + " врагу";
-            if (targetTag == EffectTargetTag.AllEnemies) return "Даёт " + n + " " + name + " всем врагам";
-            return "Даёт " + n + " " + name;
-        }
-        else
-        {
-            if (targetTag == EffectTargetTag.Enemy) return "Накладывает " + n + " " + name;
-            if (targetTag == EffectTargetTag.AllEnemies) return "Накладывает " + n + " " + name + " всем врагам";
-            return "Даёт " + n + " " + name;
-        }
+        return Loc.Format("card.effect." + (IsPositive() ? "positive." : "negative.") + InstantActionEntry.TagGroup(targetTag), n, name);
     }
 }
 

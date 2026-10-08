@@ -12,7 +12,8 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     private Dictionary<StatusEffectType, float> effectStacks = new Dictionary<StatusEffectType, float>();
     private Dictionary<StatusEffectType, PeriodicEffectEvent> activeScheduledEffects = new Dictionary<StatusEffectType, PeriodicEffectEvent>();
 
-    protected virtual void Awake()
+    // Явная инициализация при спавне: Awake не вызывается под неактивным родителем, поэтому HP нельзя ставить там.
+    public void Init()
     {
         CurrentHP = maxHP;
     }

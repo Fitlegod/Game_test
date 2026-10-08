@@ -60,7 +60,7 @@ public class DeckManager : MonoBehaviour
 
         CardInstance drawn = drawPile[drawPile.Count - 1];
         drawPile.RemoveAt(drawPile.Count - 1);
-        Debug.Log("Добрана карта: " + drawn.data.cardName);
+        Debug.Log("Добрана карта: " + drawn.data.DisplayName);
         return drawn;
     }
 
@@ -69,12 +69,12 @@ public class DeckManager : MonoBehaviour
         if ((instance.EffectiveProperties & CardPropertyFlags.Exhaust) != 0)
         {
             exhaustPile.Add(instance);
-            Debug.Log(instance.data.cardName + " уходит в сжигание");
+            Debug.Log(instance.data.DisplayName + " уходит в сжигание");
         }
         else
         {
             discardPile.Add(instance);
-            Debug.Log(instance.data.cardName + " уходит в сброс");
+            Debug.Log(instance.data.DisplayName + " уходит в сброс");
         }
     }
 

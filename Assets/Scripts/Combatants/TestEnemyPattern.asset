@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestEnemyPattern
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPatternData
   steps:
-  - stepName: Self Block
+  - stepNameKey: enemy.test.self_block
     delaySeconds: 2
     target: 2
     targetEnemyIndex: 0
@@ -22,7 +22,7 @@ MonoBehaviour:
       amount: 4
       hitCount: 1
     appliedEffects: []
-  - stepName: Attack Player
+  - stepNameKey: enemy.test.attack_player
     delaySeconds: 2
     target: 1
     targetEnemyIndex: 0
@@ -31,7 +31,7 @@ MonoBehaviour:
       amount: 10
       hitCount: 1
     appliedEffects: []
-  - stepName: Heal Lowest Ally
+  - stepNameKey: enemy.test.heal_lowest_ally
     delaySeconds: 2
     target: 3
     targetEnemyIndex: 0
@@ -40,7 +40,7 @@ MonoBehaviour:
       amount: 6
       hitCount: 1
     appliedEffects: []
-  - stepName: Rally All Allies
+  - stepNameKey: enemy.test.rally_all_allies
     delaySeconds: 2
     target: 2
     targetEnemyIndex: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
     appliedEffects:
     - statusType: 0
       stacks: 2
-  - stepName: Strike Index 2 (fallback to Player)
+  - stepNameKey: enemy.test.strike_index2
     delaySeconds: 2
     target: 4
     targetEnemyIndex: 2
@@ -59,7 +59,7 @@ MonoBehaviour:
     appliedEffects: []
     hasFallback: 1
     fallback:
-      stepName: Strike Player
+      stepNameKey: enemy.test.strike_player
       target: 1
       targetEnemyIndex: 0
       instantActions:

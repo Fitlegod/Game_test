@@ -37,13 +37,18 @@ public class TargetSelectionManager : MonoBehaviour
         if (card.RequiresTarget)
         {
             PendingCard = card;
-            Debug.Log(card.data.cardName + ": выбери цель");
+            Debug.Log(card.data.DisplayName + ": выбери цель");
         }
         else
         {
             PendingCard = null;
             card.Play(null);
         }
+    }
+
+    public void CancelSelection()
+    {
+        PendingCard = null;
     }
 
     public void SelectTarget(Combatant target)
