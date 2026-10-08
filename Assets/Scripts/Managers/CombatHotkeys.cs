@@ -28,7 +28,7 @@ public class CombatHotkeys : MonoBehaviour
 
     private void HandleSlot(int slot)
     {
-        if (!InCombat || ScreenManager.Instance.HasOverlay) return;
+        if (!InCombat) return;
         Card card = handManager.GetCardInSlot(slot);
         if (card != null) TargetSelectionManager.Instance.SelectCard(card);
     }

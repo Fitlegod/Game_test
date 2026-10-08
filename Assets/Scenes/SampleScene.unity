@@ -4296,6 +4296,7 @@ RectTransform:
   m_Children:
   - {fileID: 1603255612}
   - {fileID: 1083949727}
+  - {fileID: 1940112764}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5266,7 +5267,6 @@ RectTransform:
   - {fileID: 1453427410}
   - {fileID: 2041836377}
   - {fileID: 1058605781}
-  - {fileID: 1940112764}
   - {fileID: 876401533}
   - {fileID: 231932797}
   m_Father: {fileID: 1093323831}
@@ -6369,13 +6369,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1940112764}
   - component: {fileID: 1940112765}
+  - component: {fileID: 1940112766}
   m_Layer: 0
   m_Name: DeckPileOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1940112764
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6389,7 +6390,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 915373432}
-  m_Father: {fileID: 1603255612}
+  m_Father: {fileID: 1093323831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -6416,6 +6417,18 @@ MonoBehaviour:
   discardPileTab: {fileID: 680392776}
   exhaustPileTab: {fileID: 1312141962}
   closeButton: {fileID: 1758468894}
+--- !u!114 &1940112766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1940112763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c48d800c0de6764e9e757e4002de14b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::OverlayRoot
 --- !u!1 &2041836376
 GameObject:
   m_ObjectHideFlags: 0

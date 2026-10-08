@@ -13,9 +13,11 @@ public class ScreenManager : MonoBehaviour
     private readonly Dictionary<string, GameObject> screens = new Dictionary<string, GameObject>();
     private readonly List<GameObject> overlays = new List<GameObject>(); // последний = верхний
 
+    private readonly List<GameObject> registeredOverlays = new List<GameObject>();
+
     public string CurrentScreenId { get; private set; }
-    public bool HasOverlay => overlays.Count > 0;
-    public GameObject TopOverlay => overlays.Count > 0 ? overlays[overlays.Count - 1] : null;
+    public bool HasOverlay { get { PruneHidden(); return overlays.Count > 0; } }
+    public GameObject TopOverlay { get { PruneHidden(); return overlays.Count > 0 ? overlays[overlays.Count - 1] : null; } }
 
     void Awake()
     {
@@ -24,6 +26,11 @@ public class ScreenManager : MonoBehaviour
         {
             Register(root.screenId, root.gameObject);
             root.gameObject.SetActive(false); // до первого ShowScreen не активен ни один
+        }
+        foreach (var overlay in FindObjectsByType<OverlayRoot>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            registeredOverlays.Add(overlay.gameObject);
+            overlay.gameObject.SetActive(false); // оверлей открывается только явным OpenOverlay
         }
     }
 
@@ -45,18 +52,21 @@ public class ScreenManager : MonoBehaviour
             return;
         }
         CloseAllOverlays();
+        foreach (var overlay in registeredOverlays) overlay.SetActive(false);
         foreach (var kv in screens)
             if (kv.Value != target) kv.Value.SetActive(false);
         target.SetActive(true);
         CurrentScreenId = id;
     }
 
-    public bool IsOverlayOpen(GameObject root) => overlays.Contains(root);
+    public bool IsOverlayOpen(GameObject root) { PruneHidden(); return overlays.Contains(root); }
 
     public void OpenOverlay(GameObject root)
     {
+        PruneHidden();
         if (overlays.Contains(root)) return;
         overlays.Add(root);
+        root.transform.SetAsLastSibling(); // порядок отрисовки = порядок открытия
         root.SetActive(true);
     }
 
@@ -73,8 +83,14 @@ public class ScreenManager : MonoBehaviour
 
     public void ToggleOverlay(GameObject root)
     {
-        if (overlays.Contains(root)) CloseOverlay(root);
+        if (IsOverlayOpen(root)) CloseOverlay(root);
         else OpenOverlay(root);
+    }
+
+    // «Открыт» не должен расходиться с реальной видимостью: если объект кто-то выключил в обход менеджера, забываем его.
+    private void PruneHidden()
+    {
+        overlays.RemoveAll(o => o == null || !o.activeSelf);
     }
 
     private void CloseAllOverlays()

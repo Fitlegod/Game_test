@@ -7,8 +7,9 @@
 - **Экран** — корневой объект с компонентом `ScreenRoot` (`screenId`). Одновременно активен ровно один. Сейчас два: `Map` (`MapOverlay`, выбор узла) и `Combat` (`CombatRoot` — весь бой: HUD, рука, враги, кнопки стопок и «Карта»).
 - Регистрация: `ScreenManager.Awake` находит все `ScreenRoot` в сцене (включая выключенные) и регистрирует по `screenId`, все выключает. Новый экран = новый корень с `ScreenRoot`, менеджер править не нужно. Дубль id — ошибка в Console.
 - `ShowScreen(id)` — закрывает все оверлеи, выключает остальные экраны, включает нужный. Первый `ShowScreen(Map)` делает `MapManager.Start`.
-- **Оверлей** — любой объект, открытый поверх экрана, не выключая его: `OpenOverlay(root)`, `CloseOverlay(root)`, `CloseTopOverlay()`, `ToggleOverlay(root)`. Закрывается верхний (последний открытый). Сейчас: `DeckPileOverlay` (экран стопок, внутри `CombatRoot`) и `MapOverlay` (`MapScreen` в режиме `View`, тот же объект, что и экран `Map`).
-- Порядок отрисовки оверлеев задаёт иерархия, а не порядок открытия: `MapOverlay` лежит после `CombatRoot` и всегда выше стопок.
+- **Оверлей** — любой объект, открытый поверх экрана, не выключая его: `OpenOverlay(root)`, `CloseOverlay(root)`, `CloseTopOverlay()`, `ToggleOverlay(root)`. Закрывается верхний (последний открытый). Сейчас: `DeckPileOverlay` (экран стопок, лежит прямо под `Canvas`, на нём `OverlayRoot`) и `MapOverlay` (`MapScreen` в режиме `View`, тот же объект, что и экран `Map`).
+- **Оверлеи на старте скрыты, видимостью управляет только `ScreenManager`.** Компонент `OverlayRoot` помечает оверлей: `ScreenManager.Awake` выключает все такие объекты, а каждый `ShowScreen` закрывает открытые и принудительно выключает помеченные. Открывать и закрывать оверлей можно только через `OpenOverlay/CloseOverlay/ToggleOverlay`; `SetActive` в обход менеджера запрещён. Состояние «открыт» не может разойтись с видимостью: `HasOverlay/TopOverlay/IsOverlayOpen` сначала выбрасывают из списка объекты с `activeSelf == false`. (Баг, ради которого это сделано: панель была включена в сцене по умолчанию, но менеджер о ней не знал — «Закрыть» и хоткеи смотрели в пустой реестр.)
+- `OpenOverlay` делает `SetAsLastSibling()`, поэтому порядок отрисовки = порядок открытия. Для этого оверлеи лежат под одним родителем (`Canvas`), а не внутри `CombatRoot`.
 - Секундомер боя оверлеи не трогают — `CombatManager` на `Managers`, а не на экране.
 
 ## Кто что переключает
@@ -18,9 +19,9 @@
 ## Ввод и горячие клавиши
 
 - `Assets/Settings/GameInput.inputactions` — карта `Game`: `Slot1`–`Slot7` (клавиши 1–7), `Wait` (Пробел), `Cancel` (Esc), `ToggleMap` (M), `ToggleDeck` (D).
-- `GameInput` (`Managers/GameInput.cs`) — единственный компонент, который читает действия. Раздаёт C#-события `OnSlot(int 0..6)`, `OnWait`, `OnCancel`, `OnToggleMap`, `OnToggleDeck`. Остальной код клавиатуру не читает, а подписывается на события.
+- `GameInput` (`Managers/GameInput.cs`) — единственный компонент, который читает действия (работает с копией ассета действий — `Instantiate`, иначе состояние ассета переживает выход из Play Mode). Боевые действия (`OnSlot`, `OnWait`) не доходят до подписчиков, пока открыт любой оверлей; `OnCancel`, `OnToggleMap`, `OnToggleDeck` работают всегда. Раздаёт C#-события `OnSlot(int 0..6)`, `OnWait`, `OnCancel`, `OnToggleMap`, `OnToggleDeck`. Остальной код клавиатуру не читает, а подписывается на события.
 - `CombatHotkeys` (`Managers/CombatHotkeys.cs`) — подписчик с правилами контекста:
-  - 1–7: только на экране `Combat` и без открытых оверлеев; `HandManager.GetCardInSlot(i)` → `TargetSelectionManager.SelectCard` (как клик). Пустой слот — ничего.
+  - 1–7: только на экране `Combat` (открытые оверлеи отсекает `GameInput`); `HandManager.GetCardInSlot(i)` → `TargetSelectionManager.SelectCard` (как клик). Пустой слот — ничего.
   - Esc: если ждёт цель карта — `TargetSelectionManager.CancelSelection()` (карта остаётся в руке), иначе `ScreenManager.CloseTopOverlay()`.
   - M: только в бою — `MapManager.ToggleMapView()` (оверлей просмотра карты). На экране `Map` ничего.
   - D: только в бою — открыть/закрыть оверлей стопок (`DeckPileScreen.Open/Close`).
