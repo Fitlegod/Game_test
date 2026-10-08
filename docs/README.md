@@ -8,6 +8,7 @@
 
 | Файл | Что внутри | Ключевые классы |
 |---|---|---|
+| [roadmap.md](roadmap.md) | Роадмапа MVP: задачи по веткам, вехи, сверка с кодом, открытые ошибки и расхождения | — |
 | [combat-core.md](combat-core.md) | Виртуальный секундомер боя, реестр расписания, резолвер, правило ничьей, единая точка кликов, базовый участник боя, смена боёв и перенос HP между ними | `CombatManager`, `IScheduledEvent`, `OneShotEvent`, `PeriodicEffectEvent`, `TargetSelectionManager`, `Combatant`, `Player`, `PlayerRunState`, `CombatantStatusDisplay` |
 | [cards.md](cards.md) | Три уровня данных карты (шаблон/копия/объект в руке), розыгрыш карты, действия карты, форматирование текста рядом с `Apply()`, статичная карточка-превью | `Card`, `CardData`, `CardInstance`, `InstantActionEntry`, `AppliedEffectEntry`, `InstantActionKind`, `CardPropertyFlags`, `CardTextHelpers`, `CardPreviewDisplay`, `EffectTargetTag`, `CardType` |
 | [effects.md](effects.md) | Все 7 статус-эффектов с точными формулами, порядком применения, округлением и распадом; хранилище стаков; особый случай Пошатывания | `StatusEffectType`, `StatusEffectRules`, формулы на `Combatant`, `CombatantStatusDisplay` |
