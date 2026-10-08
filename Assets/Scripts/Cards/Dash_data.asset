@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774f86fc026ee884da2cf72e1ec34d87, type: 3}
   m_Name: Dash_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: "\u0420\u044B\u0432\u043E\u043A"
+  nameKey: card.dash.name
   timeCostSeconds: 1
   effectDelaySeconds: 0
   cardType: 0

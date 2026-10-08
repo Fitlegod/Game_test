@@ -61,9 +61,9 @@ public class Enemy : Combatant, IScheduledEvent
         if (targets.Count == 0 && step.hasFallback)
         {
             var fb = step.fallback;
-            return new PlannedStep(fb.stepName, fb.target, ResolveTargets(fb.target, fb.targetEnemyIndex), fb.instantActions, fb.appliedEffects);
+            return new PlannedStep(fb.stepNameKey, fb.target, ResolveTargets(fb.target, fb.targetEnemyIndex), fb.instantActions, fb.appliedEffects);
         }
-        return new PlannedStep(step.stepName, step.target, targets, step.instantActions, step.appliedEffects);
+        return new PlannedStep(step.stepNameKey, step.target, targets, step.instantActions, step.appliedEffects);
     }
 
     public List<Combatant> ResolveTargets(EnemyActionTarget target, int specificIndex)

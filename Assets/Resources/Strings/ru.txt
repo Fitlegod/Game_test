@@ -1,0 +1,127 @@
+# Таблица строк (ru). Формат: ключ = текст. Комментарии с #. Перенос строки в тексте пишется как backslash-n.
+# Подстановки {0}, {1} — через string.Format. Фраза хранится целиком, одна фраза — один ключ.
+
+# Интерфейс
+ui.combat.time = Прошло времени: {0} с
+ui.map.button = Карта
+ui.map.close = Закрыть
+ui.deck.close = Закрыть X
+ui.deck.tab.character = Колода
+ui.deck.tab.draw = Добор
+ui.deck.tab.discard = Сброс
+ui.deck.tab.exhaust = Сжигание
+ui.key.slot1 = 1
+ui.key.slot2 = 2
+ui.key.slot3 = 3
+ui.key.slot4 = 4
+ui.key.slot5 = 5
+ui.key.slot6 = 6
+ui.key.slot7 = 7
+
+# Исход боя
+combat.victory = Победа
+combat.defeat = Поражение
+
+# Карта забега
+map.seed = Сид: {0}
+map.status.select = Выберите следующую комнату
+map.status.view = Просмотр карты
+map.status.finished = Локация пройдена
+map.room.Event = Событие
+map.room.RiskyEvent = Риск
+map.room.CardMerchant = Карты
+map.room.EnchantMerchant = Чары
+map.room.Campfire = Костёр
+map.room.Chest = Сундук
+
+# Свойства карт и добор
+card.property.exhaust = Сжигаемое
+card.property.frontOfDraw = Впереди
+card.draw = Добор: {0}
+
+# Число ударов: {0} подставляется числом
+card.hits.twice = дважды
+card.hits.few = {0} раза
+card.hits.many = {0} раз
+
+# Действия карты ({0} — число, {1} — число ударов или пусто)
+card.action.Damage.Enemy = Наносит {0} урона{1}
+card.action.Damage.AllEnemies = Наносит {0} урона{1} всем врагам
+card.action.Damage.Player = Наносит {0} урона{1} себе
+card.action.Block.Enemy = Даёт {0} блока{1} врагу
+card.action.Block.AllEnemies = Даёт {0} блока{1} всем врагам
+card.action.Block.Player = Даёт {0} блока{1}
+card.action.Heal.Enemy = Восстанавливает {0} HP врагу
+card.action.Heal.AllEnemies = Восстанавливает {0} HP всем врагам
+card.action.Heal.Player = Восстанавливает {0} HP
+
+# Накладываемые эффекты карты ({0} — стаки, {1} — название в родительном падеже)
+card.effect.positive.Enemy = Даёт {0} {1} врагу
+card.effect.positive.AllEnemies = Даёт {0} {1} всем врагам
+card.effect.positive.Player = Даёт {0} {1}
+card.effect.negative.Enemy = Накладывает {0} {1}
+card.effect.negative.AllEnemies = Накладывает {0} {1} всем врагам
+card.effect.negative.Player = Даёт {0} {1}
+
+# Статус-эффекты
+effect.genitive.Strength = Силы
+effect.name.Strength = Сила
+effect.genitive.Weak = Слабости
+effect.name.Weak = Слабость
+effect.genitive.Regen = Лечения
+effect.name.Regen = Лечение
+effect.genitive.Toughness = Крепкости
+effect.name.Toughness = Крепкость
+effect.genitive.Frailty = Хрупкости
+effect.name.Frailty = Хрупкость
+effect.genitive.Vulnerable = Уязвимости
+effect.name.Vulnerable = Уязвимость
+effect.genitive.Stagger = Пошатывания
+effect.name.Stagger = Пошатывание
+effect.stacks = {0} x{1}
+effect.join = {0} | {1}
+
+# Телеграф врага
+combat.telegraph.time = Атака через: {0} с
+combat.telegraph.notarget = (нет цели)
+combat.action.Damage.Self = Наносит {0} урона{1}
+combat.action.Damage.Player = Наносит {0} урона{1} по игроку
+combat.action.Damage.AllOtherEnemies = Наносит {0} урона{1} союзникам
+combat.action.Damage.LowestHpOtherEnemy = Наносит {0} урона{1} самому слабому союзнику
+combat.action.Damage.SpecificEnemyIndex = Наносит {0} урона{1} союзнику
+combat.action.Block.Self = Даёт {0} блока{1}
+combat.action.Block.Player = Даёт {0} блока{1} по игроку
+combat.action.Block.AllOtherEnemies = Даёт {0} блока{1} союзникам
+combat.action.Block.LowestHpOtherEnemy = Даёт {0} блока{1} самому слабому союзнику
+combat.action.Block.SpecificEnemyIndex = Даёт {0} блока{1} союзнику
+combat.action.Heal.Self = Восстанавливает {0} HP
+combat.action.Heal.Player = Восстанавливает {0} HP по игроку
+combat.action.Heal.AllOtherEnemies = Восстанавливает {0} HP союзникам
+combat.action.Heal.LowestHpOtherEnemy = Восстанавливает {0} HP самому слабому союзнику
+combat.action.Heal.SpecificEnemyIndex = Восстанавливает {0} HP союзнику
+combat.effect.Give.Self = Даёт {0} {1}
+combat.effect.Give.Player = Даёт {0} {1} по игроку
+combat.effect.Give.AllOtherEnemies = Даёт {0} {1} союзникам
+combat.effect.Give.LowestHpOtherEnemy = Даёт {0} {1} самому слабому союзнику
+combat.effect.Give.SpecificEnemyIndex = Даёт {0} {1} союзнику
+combat.effect.Apply.Self = Накладывает {0} {1}
+combat.effect.Apply.Player = Накладывает {0} {1} по игроку
+combat.effect.Apply.AllOtherEnemies = Накладывает {0} {1} союзникам
+combat.effect.Apply.LowestHpOtherEnemy = Накладывает {0} {1} самому слабому союзнику
+combat.effect.Apply.SpecificEnemyIndex = Накладывает {0} {1} союзнику
+
+# Названия карт
+card.jab.name = Тычок
+card.kick.name = Подножка
+card.stand_still.name = Стойка смирно
+card.embark.name = Отметить
+card.nova.name = Волна
+card.dash.name = Рывок
+
+# Шаги врагов
+enemy.test.self_block = Self Block
+enemy.test.attack_player = Attack Player
+enemy.test.heal_lowest_ally = Heal Lowest Ally
+enemy.test.rally_all_allies = Rally All Allies
+enemy.test.strike_index2 = Strike Index 2 (fallback to Player)
+enemy.test.strike_player = Strike Player

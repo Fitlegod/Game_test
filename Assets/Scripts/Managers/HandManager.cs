@@ -59,7 +59,7 @@ public class HandManager : MonoBehaviour
         int emptySlot = FindFirstEmptySlot();
         if (emptySlot == -1)
         {
-            Debug.Log("Рука полна — " + instance.data.cardName + " сразу уходит в сброс");
+            Debug.Log("Рука полна — " + instance.data.DisplayName + " сразу уходит в сброс");
             deckManager.Discard(instance);
             return false;
         }
@@ -71,7 +71,7 @@ public class HandManager : MonoBehaviour
         card.instance = instance;
         card.combatManager = combatManager;
         if (card.nameLabel != null)
-            card.nameLabel.text = instance.data.cardName;
+            card.nameLabel.text = instance.data.DisplayName;
 
         cardsInSlots[emptySlot] = card;
         return true;

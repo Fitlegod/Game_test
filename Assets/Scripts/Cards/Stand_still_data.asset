@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774f86fc026ee884da2cf72e1ec34d87, type: 3}
   m_Name: Stand_still_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: "\u0421\u0442\u043E\u0439\u043A\u0430 \u0441\u043C\u0438\u0440\u043D\u043E"
+  nameKey: card.stand_still.name
   timeCostSeconds: 2
   effectDelaySeconds: 0
   cardType: 1

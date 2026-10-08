@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewCard", menuName = "Cards/Card Data")]
 public class CardData : ScriptableObject
 {
-    public string cardName;
+    public string nameKey; // ключ в Resources/Strings/ru.txt: card.<id>.name
     public float timeCostSeconds;
     public float effectDelaySeconds;
     public CardType cardType;
@@ -21,8 +21,12 @@ public class CardData : ScriptableObject
     [Header("Свойства карты")]
     public CardPropertyFlags properties;
 
+    public string DisplayName => Loc.Get(nameKey);
+
     void OnValidate()
     {
+        if (!Loc.Has(nameKey))
+            Debug.LogWarning(name + ": нет строки для ключа названия [" + nameKey + "]", this);
         if (timeCostSeconds != Mathf.Round(timeCostSeconds) || effectDelaySeconds != Mathf.Round(effectDelaySeconds))
             Debug.LogWarning(name + ": время должно быть целым (timeCostSeconds=" + timeCostSeconds + ", effectDelaySeconds=" + effectDelaySeconds + ")", this);
         if (timeCostSeconds < 1)

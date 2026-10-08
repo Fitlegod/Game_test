@@ -85,7 +85,7 @@ public class CombatManager : MonoBehaviour
 
     private void HandlePlayerDeath()
     {
-        EndCombat("Поражение");
+        EndCombat("combat.defeat");
         OnDefeat?.Invoke();
     }
 
@@ -94,22 +94,22 @@ public class CombatManager : MonoBehaviour
         if (combatOver) return; // бой уже закончен (например, поражением) — второго исхода не будет
         if (enemies.TrueForAll(e => e.CurrentHP <= 0))
         {
-            EndCombat("Победа");
+            EndCombat("combat.victory");
             OnVictory?.Invoke();
         }
     }
 
-    private void EndCombat(string message)
+    private void EndCombat(string messageKey)
     {
         if (combatOver) return;
         combatOver = true;
         if (combatResultText != null)
-            combatResultText.text = message;
+            combatResultText.text = Loc.Get(messageKey);
         TargetSelectionManager.Instance.LockInput();
     }
 
     private void UpdateBudgetText()
     {
-        budgetText.text = "Прошло времени: " + CurrentTime.ToString("0.0") + " с";
+        budgetText.text = Loc.Format("ui.combat.time", CurrentTime.ToString("0.0"));
     }
 }

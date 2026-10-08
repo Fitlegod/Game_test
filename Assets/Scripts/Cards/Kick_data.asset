@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774f86fc026ee884da2cf72e1ec34d87, type: 3}
   m_Name: Kick_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: "\u041F\u043E\u0434\u043D\u043E\u0436\u043A\u0430"
+  nameKey: card.kick.name
   timeCostSeconds: 1
   effectDelaySeconds: 1
   cardType: 0
