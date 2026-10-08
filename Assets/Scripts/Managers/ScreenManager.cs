@@ -29,6 +29,8 @@ public class ScreenManager : MonoBehaviour
         }
         foreach (var overlay in FindObjectsByType<OverlayRoot>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
+            if (overlay.GetComponent<ScreenRoot>() != null)
+                Debug.LogError("ScreenManager: " + overlay.name + " одновременно ScreenRoot и OverlayRoot — это противоречивые роли", overlay);
             registeredOverlays.Add(overlay.gameObject);
             overlay.gameObject.SetActive(false); // оверлей открывается только явным OpenOverlay
         }

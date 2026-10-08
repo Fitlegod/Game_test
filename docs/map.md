@@ -1,8 +1,8 @@
 # Карта локации и цикл «карта → бой → карта»
 
-Классы: `RoomType`, `MapGenerationConfig`/`RoomQuota`, `MapData`/`MapNode`/`MapEdge`, `MapGenerator`, `MapRunState`, `MapManager`, `MapScreen`/`MapScreenMode`.
+Классы: `RoomType`, `MapGenerationConfig`/`RoomQuota`, `MapData`/`MapNode`/`MapEdge`, `MapGenerator`, `MapRunState`, `MapManager`, `MapView`/`MapScreenMode`.
 
-Файлы: `Map/RoomType.cs`, `Map/MapGenerationConfig.cs`, `Map/MapData.cs`, `Map/MapGenerator.cs`, `Map/MapRunState.cs`, `Managers/MapManager.cs`, `UI/MapScreen.cs`; ассеты `Map/DefaultMapConfig.asset`, `Map/MapNode.prefab`; тесты `Assets/Tests/EditMode/MapGeneratorTests.cs`.
+Файлы: `Map/RoomType.cs`, `Map/MapGenerationConfig.cs`, `Map/MapData.cs`, `Map/MapGenerator.cs`, `Map/MapRunState.cs`, `Managers/MapManager.cs`, `UI/MapView.cs`; ассеты `Map/DefaultMapConfig.asset`, `Map/MapNode.prefab`; тесты `Assets/Tests/EditMode/MapGeneratorTests.cs`.
 
 См. также: [enemies.md](enemies.md) — `EncounterManager.StartEncounter` и `EncounterData`; [combat-core.md](combat-core.md) — `CombatManager.OnVictory`/`OnDefeat`, `PlayerRunState`.
 
@@ -35,7 +35,7 @@
 - `OnCombatEnded(victory)` — победа над Boss: `IsFinished = true`, карта с надписью «Локация пройдена», ничего не кликабельно. Иначе (победа над не-Boss или любое поражение) — карта в режиме выбора; узел поражения считается пройденным.
 - Кнопка «Карта» открывает просмотр (`MapScreenMode.View`), только если не идёт выбор и забег не завершён.
 
-## `MapScreen` (`UI/MapScreen.cs`)
+## `MapView` (`UI/MapView.cs`)
 
 Полноэкранная панель поверх всего Canvas (`MapOverlay` — последний ребёнок Canvas), вертикальный `ScrollRect`. `Show(map, run, mode)` каждый раз перестраивает содержимое с нуля. Старые дети удаляются обходом с конца (`:48`): удаление из `content` во время `foreach` по нему пропускало бы каждого второго — этот баг был найден живой проверкой и исправлен.
 

@@ -110,7 +110,7 @@ public class LocTests
         var keys = new List<string>();
         foreach (RoomType type in Enum.GetValues(typeof(RoomType)))
             if (!new MapNode { type = type }.IsCombat)
-                keys.Add("map.room." + type); // MapScreen.CreateNode
+                keys.Add("map.room." + type); // MapView.CreateNode
         AssertKeysExist(keys, "типы комнат");
     }
 

@@ -1,20 +1,23 @@
 # Экраны, ввод, строки
 
-Классы: `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapScreen` (оверлеи/экраны), см. также [map.md](map.md) — цикл «карта → бой → карта».
+Классы: `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapView` (экземпляры `MapScreen` и `MapOverlay`), см. также [map.md](map.md) — цикл «карта → бой → карта».
 
 ## ScreenManager (`Managers/ScreenManager.cs`)
 
-- **Экран** — корневой объект с компонентом `ScreenRoot` (`screenId`). Одновременно активен ровно один. Сейчас два: `Map` (`MapOverlay`, выбор узла) и `Combat` (`CombatRoot` — весь бой: HUD, рука, враги, кнопки стопок и «Карта»).
+- **Экран** — корневой объект с компонентом `ScreenRoot` (`screenId`). Одновременно активен ровно один. Сейчас два: `Map` (объект `MapScreen`, выбор узла) и `Combat` (`CombatRoot` — весь бой: HUD, рука, враги, кнопки стопок и «Карта»).
 - Регистрация: `ScreenManager.Awake` находит все `ScreenRoot` в сцене (включая выключенные) и регистрирует по `screenId`, все выключает. Новый экран = новый корень с `ScreenRoot`, менеджер править не нужно. Дубль id — ошибка в Console.
 - `ShowScreen(id)` — закрывает все оверлеи, выключает остальные экраны, включает нужный. Первый `ShowScreen(Map)` делает `MapManager.Start`.
-- **Оверлей** — любой объект, открытый поверх экрана, не выключая его: `OpenOverlay(root)`, `CloseOverlay(root)`, `CloseTopOverlay()`, `ToggleOverlay(root)`. Закрывается верхний (последний открытый). Сейчас: `DeckPileOverlay` (экран стопок, лежит прямо под `Canvas`) и `MapOverlay` (`MapScreen` в режиме `View`, тот же объект, что и экран `Map`: на нём и `ScreenRoot`, и `OverlayRoot`). В сцене все объекты с `OverlayRoot` сохранены выключенными (`m_IsActive: 0`), чтобы в Edit Mode Game view показывал экран боя, а не оверлей поверх; `ScreenManager` находит их через `FindObjectsByType(..., FindObjectsInactive.Include)`.
+- **Оверлей** — любой объект, открытый поверх экрана, не выключая его: `OpenOverlay(root)`, `CloseOverlay(root)`, `CloseTopOverlay()`, `ToggleOverlay(root)`. Закрывается верхний (последний открытый). Сейчас: `DeckPileOverlay` (экран стопок, лежит прямо под `Canvas`) и `MapOverlay` (просмотр карты в бою). В сцене все объекты с `OverlayRoot` сохранены выключенными (`m_IsActive: 0`), чтобы в Edit Mode Game view показывал экран боя, а не оверлей поверх; `ScreenManager` находит их через `FindObjectsByType(..., FindObjectsInactive.Include)`.
 - **Оверлеи на старте скрыты, видимостью управляет только `ScreenManager`.** Компонент `OverlayRoot` помечает оверлей: `ScreenManager.Awake` выключает все такие объекты, а каждый `ShowScreen` закрывает открытые и принудительно выключает помеченные. Открывать и закрывать оверлей можно только через `OpenOverlay/CloseOverlay/ToggleOverlay`; `SetActive` в обход менеджера запрещён. Состояние «открыт» не может разойтись с видимостью: `HasOverlay/TopOverlay/IsOverlayOpen` сначала выбрасывают из списка объекты с `activeSelf == false`. (Баг, ради которого это сделано: панель была включена в сцене по умолчанию, но менеджер о ней не знал — «Закрыть» и хоткеи смотрели в пустой реестр.)
 - `OpenOverlay` делает `SetAsLastSibling()`, поэтому порядок отрисовки = порядок открытия. Для этого оверлеи лежат под одним родителем (`Canvas`), а не внутри `CombatRoot`.
+- **Запрет: `ScreenRoot` и `OverlayRoot` на одном объекте.** Это противоречивые роли (экран — взаимоисключающий, оверлей — поверх экрана). `ScreenManager.Awake` пишет `Debug.LogError`, если нашёл такой объект; `SceneStateTests` проверяют сцену.
+- **`MapScreen` и `MapOverlay` — два разных объекта с одним компонентом `MapView`** (общая отрисовка узлов, без дублирования логики). `MapScreen` — `ScreenRoot(Map)`, режимы `Select`/`Finished`, кнопки «Закрыть» нет, клики по узлам уходят в `MapManager.OnNodeClicked` (`MapManager.mapScreen`). `MapOverlay` — `OverlayRoot`, режим `View`, только чтение (`onNodeClicked` не задан, узлы не интерактивны), с кнопкой «Закрыть» (`MapManager.mapOverlay`).
+- **Что хранится в сцене для Edit Mode:** виден экран боя (`CombatRoot` — `m_IsActive: 1`, это единственный включённый `ScreenRoot`), `MapScreen`, `MapOverlay` и `DeckPileOverlay` выключены (`m_IsActive: 0`). В Play Mode `ScreenManager` сам выключает всё и показывает нужный экран. Синий фон в Edit Mode — это фон камеры (`Camera.backgroundColor`), а не панель оверлея; тексты вида «Прошло времени: 0,0 с» — примеры, в игре их перезаписывает код.
 - Секундомер боя оверлеи не трогают — `CombatManager` на `Managers`, а не на экране.
 
 ## Кто что переключает
 
-`MapManager`: клик по боевому узлу → `ShowScreen(Combat)` + `StartEncounter`; конец боя → `ShowScreen(Map)` + `MapScreen.Show(Select | Finished)`; кнопка «Карта» → `MapScreen.Show(View)` + `OpenOverlay`. `DeckPileScreen.OpenToPile` → `OpenOverlay`, `Close` → `CloseOverlay`. `MapScreen.Close` → `CloseOverlay`.
+`MapManager`: клик по боевому узлу → `ShowScreen(Combat)` + `StartEncounter`; конец боя → `ShowScreen(Map)` + `mapScreen.Show(Select | Finished)`; кнопка «Карта» / `M` → `mapOverlay.Show(View)` + `OpenOverlay`. `DeckPileScreen.OpenToPile` → `OpenOverlay`, `Close` → `CloseOverlay`. `MapView.Close` (кнопка оверлея) → `CloseOverlay`.
 
 ## Ввод и горячие клавиши
 

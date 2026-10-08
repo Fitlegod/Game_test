@@ -5,7 +5,9 @@ using TMPro;
 
 public enum MapScreenMode { Select, View, Finished }
 
-public class MapScreen : MonoBehaviour
+// Общая отрисовка карты забега. Два экземпляра в сцене:
+// MapScreen (ScreenRoot, режимы Select/Finished, без кнопки «Закрыть») и MapOverlay (OverlayRoot, режим View, только чтение, с кнопкой «Закрыть»).
+public class MapView : MonoBehaviour
 {
     const float ColSpacing = 130f, RowSpacing = 100f, Pad = 80f;
 
@@ -15,7 +17,7 @@ public class MapScreen : MonoBehaviour
     public GameObject nodePrefab; // корень: Image + Button + Outline; дети: Icon (Image), Label (TMP_Text)
     public TMP_Text seedText;
     public TMP_Text statusText;
-    public Button closeButton;
+    public Button closeButton; // только у оверлея; у экрана MapScreen пусто
     public Sprite skullSprite;
 
     public Action<int> onNodeClicked;
@@ -28,7 +30,7 @@ public class MapScreen : MonoBehaviour
 
     void Awake()
     {
-        closeButton.onClick.AddListener(Close);
+        if (closeButton != null) closeButton.onClick.AddListener(Close);
     }
 
     public void Close() => ScreenManager.Instance.CloseOverlay(gameObject);
@@ -36,7 +38,7 @@ public class MapScreen : MonoBehaviour
     public void Show(MapData map, MapRunState run, MapScreenMode mode)
     {
         panelRoot.SetActive(true);
-        closeButton.gameObject.SetActive(mode == MapScreenMode.View);
+        if (closeButton != null) closeButton.gameObject.SetActive(mode == MapScreenMode.View);
         seedText.text = Loc.Format("map.seed", map.seed);
         statusText.text = mode switch
         {
