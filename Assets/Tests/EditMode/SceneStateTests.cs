@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Стартовое состояние SampleScene (как она лежит на диске): в Edit Mode виден экран боя, все оверлеи выключены.
+// Стартовое состояние SampleScene (как она лежит на диске): в Edit Mode выключены все экраны и оверлеи (виден только фон камеры).
 public class SceneStateTests
 {
     const string ScenePath = "Assets/Scenes/SampleScene.unity";
@@ -44,13 +44,14 @@ public class SceneStateTests
     }
 
     [Test]
-    public void OnlyCombatScreenIsSavedActive()
+    public void AllScreensAreSavedInactive()
     {
         WithScene(scene =>
         {
             var screens = All<ScreenRoot>(scene);
+            Assert.Greater(screens.Length, 0);
             var active = screens.Where(s => s.gameObject.activeSelf).Select(s => s.screenId).ToList();
-            CollectionAssert.AreEqual(new List<string> { ScreenManager.Combat }, active, "в Edit Mode должен быть виден только экран боя");
+            Assert.IsEmpty(active, "в Edit Mode не должно быть видно ни одного экрана; включены: " + string.Join(", ", active));
         });
     }
 
