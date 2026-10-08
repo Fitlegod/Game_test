@@ -75,12 +75,6 @@ public class HandManager : MonoBehaviour
         return true;
     }
 
-    public void OnCardPlayed(Card card)
-    {
-        deckManager.Discard(card.instance);
-        RemoveFromHand(card);
-    }
-
     public void RemoveFromHand(Card card)
     {
         int index = System.Array.IndexOf(cardsInSlots, card);
@@ -112,17 +106,4 @@ public class HandManager : MonoBehaviour
 
     [ContextMenu("Тест: добрать в руку")]
     private void TestDraw() => TryDrawToHand();
-
-    [ContextMenu("Тест: сыграть первую карту в руке")]
-    private void TestPlayFirst()
-    {
-        foreach (var card in cardsInSlots)
-        {
-            if (card != null)
-            {
-                OnCardPlayed(card);
-                break;
-            }
-        }
-    }
 }
