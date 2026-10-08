@@ -27,6 +27,6 @@ public class DeckPileCountDisplay : MonoBehaviour
             PileKind.Exhaust => deckManager.ExhaustPile.Count,
             _ => 0
         };
-        if (countLabel != null) countLabel.text = count.ToString();
+        if (countLabel != null) countLabel.text = Loc.Format("ui.deck.count." + pile, count);
     }
 }

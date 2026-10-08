@@ -115,6 +115,15 @@ public class LocTests
     }
 
     [Test]
+    public void DynamicKeys_DeckPileLabels()
+    {
+        var keys = new List<string>();
+        foreach (PileKind pile in Enum.GetValues(typeof(PileKind)))
+            keys.Add("ui.deck.count." + pile); // DeckPileCountDisplay.Update
+        AssertKeysExist(keys, "подписи стопок");
+    }
+
+    [Test]
     public void AllCardDataAssets_HaveNameKeyInTable()
     {
         var keys = new List<string>();
