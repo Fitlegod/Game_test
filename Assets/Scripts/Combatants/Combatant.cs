@@ -62,14 +62,14 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         int result = baseDamage + Mathf.RoundToInt(GetStacks(StatusEffectType.Strength));
         if (GetStacks(StatusEffectType.Weak) > 0)
             result = Mathf.FloorToInt(result * 0.5f);
-        return result;
+        return Mathf.Max(0, result);
     }
 
     public int ApplyIncomingDamageModifiers(int damage)
     {
         if (GetStacks(StatusEffectType.Vulnerable) > 0)
             damage = Mathf.FloorToInt(damage * 1.5f);
-        return damage;
+        return Mathf.Max(0, damage);
     }
 
     public int CalculateIncomingBlock(int baseAmount)
@@ -100,7 +100,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
 
     public virtual void TakeDamage(int amount)
     {
-        if (CurrentHP <= 0) return;
+        if (CurrentHP <= 0 || amount <= 0) return;
 
         int absorbed = Mathf.Min(CurrentBlock, amount);
         CurrentBlock -= absorbed;

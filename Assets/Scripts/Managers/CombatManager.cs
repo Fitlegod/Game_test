@@ -79,6 +79,7 @@ public class CombatManager : MonoBehaviour
             }
             if (next == null) break;
             next.Trigger();
+            if (float.IsPositiveInfinity(next.NextTime)) scheduledEvents.Remove(next); // отработавшее одноразовое событие
         }
     }
 

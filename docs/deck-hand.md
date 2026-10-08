@@ -20,7 +20,7 @@
 
 ## `HandManager` — рука на 7 явных слотов
 
-- Константы: `MaxHandSize = 7`, `InitialHandSize = 4`, `DrawIntervalSeconds = 1.5f` — пока не настраиваются на персонажа (YAGNI).
+- Константы: `MaxHandSize = 7`, `InitialHandSize = 4`, `DrawIntervalSeconds = 2f` — пока не настраиваются на персонажа (YAGNI).
 - `slots` (`RectTransform[7]`) — заданы в инспекторе. Осознанный выбор вместо `Horizontal Layout Group` (см. корневой `CLAUDE.md`) — сдвиг карт при уходе одной из них делается вручную, а не автолэйаутом.
 - `cardsInSlots` (`Card[7]`) — параллельный массив: занятое место `i` соответствует `slots[i]`; `null` — слот пуст.
 - `Start()` — пустой. С циклом боёв (`EncounterManager`, см. [enemies.md](enemies.md)) руку нужно собирать заново перед **каждым** боем, не только один раз при загрузке сцены, поэтому вся прежняя логика `Start()` переехала в публичный `BeginNewHand()`.
@@ -28,7 +28,7 @@
 - `ClearHand()` — проходит все `MaxHandSize` слотов, для каждого занятого уничтожает `GameObject` и обнуляет ячейку `cardsInSlots[i]`. Не различает, была ли карта уже сыграна или просто добрана — на старте нового боя обе категории одинаково не нужны.
 - `TryDrawToHand()` — если у колоды реально нечего дать, тихо возвращает `false`. Если карта добралась, но рука полна (`FindFirstEmptySlot()` вернул `-1`), карта **сразу** уходит обратно в `DeckManager.Discard`, ни разу не появившись в руке — переполненная рука не блокирует добор из колоды, она просто впустую тратит добранную карту.
 - Создание карты: `Instantiate(cardPrefab, slots[emptySlot])`, затем вручную проставляются `instance`/`combatManager`/`nameLabel` — та же грабля с порядком `Awake()`, что задокументирована в корневом `CLAUDE.md`: к моменту этих присвоений `Card.Awake()` уже отработал, поэтому сам `Card.Awake()` защищается null-проверками.
-- `OnCardPlayed(card)` — сбрасывает `card.instance` через `DeckManager.Discard`, затем `RemoveFromHand(card)`.
+- `OnCardPlayed(card)` — сбрасывает `card.instance` через `DeckManager.Discard`, затем `RemoveFromHand(card)`; используется только тестовой context-menu кнопкой. `Card.Play` вызывает `RemoveFromHand` в начале розыгрыша (слот освобождается на время каста), а `Discard` — после разрешения событий.
 - `RemoveFromHand(card)` — уничтожает `GameObject`, обнуляет его слот, затем вручную сдвигает все последующие занятые слоты на одну позицию влево (перепривязывает `transform.SetParent` к более раннему `RectTransform`, сбрасывает `localPosition` в ноль) — тот самый «ручной перебор массива вместо автолэйаута» из корневого `CLAUDE.md`.
 - `FindFirstEmptySlot()` — простой линейный поиск первого `null`; рука всегда уплотняется к слоту `0`.
 
@@ -44,4 +44,4 @@
   - Оверлей **не блокирует и не ставит на паузу бой**: не трогает `TargetSelectionManager.LockInput`, не останавливает `CombatManager` — секундомер и розыгрыш карт продолжают работать, даже пока панель открыта (закрыть её можно в любой момент, ничего не потеряв).
 - **`DeckPileCountDisplay`** (`UI/DeckPileCountDisplay.cs`) — маленькая HUD-кнопка на конкретную стопку: `pile` (`PileKind`: `CharacterDeck`/`Draw`/`Discard`/`Exhaust`), `countLabel` (число карт, обновляется каждый `Update()` чтением соответствующего геттера `DeckManager`), `button` (по клику вызывает `screen.OpenToPile(pile)` — открывает именно СВОЮ стопку, а не всегда «Колоду персонажа») и общая ссылка на один `DeckPileScreen`. Четыре экземпляра на HUD (по одному на `PileKind`) делят один и тот же экран, каждый передаёт свой `pile` при открытии.
 
-**Сверено с кодом:** константы руки `MaxHandSize = 7`, `InitialHandSize = 4`, `DrawIntervalSeconds = 1.5f` — `Managers/HandManager.cs:5-7`; рука создаёт массив слотов по `MaxHandSize` (`Managers/HandManager.cs:16`); `DeckManager.Shuffle` — `Managers/DeckManager.cs:37`.
+**Сверено с кодом:** константы руки `MaxHandSize = 7`, `InitialHandSize = 4`, `DrawIntervalSeconds = 2f` — `Managers/HandManager.cs:5-7`; рука создаёт массив слотов по `MaxHandSize` (`Managers/HandManager.cs:16`); `DeckManager.Shuffle` — `Managers/DeckManager.cs:37`.

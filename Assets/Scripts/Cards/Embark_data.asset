@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Embark_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C"
-  timeCostSeconds: 0
+  timeCostSeconds: 1
   effectDelaySeconds: 0
   cardType: 2
   instantActions: []

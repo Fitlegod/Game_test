@@ -77,6 +77,7 @@ public class EncounterManager : MonoBehaviour
             Enemy enemy = obj.GetComponent<Enemy>();
             enemy.combatManager = combatManager;
             enemy.player = currentPlayer;
+            enemy.ScheduleFirstAction();
             combatManager.RegisterScheduledEvent(enemy);
             enemy.OnDeath += () => combatManager.UnregisterScheduledEvent(enemy);
 

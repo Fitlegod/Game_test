@@ -57,3 +57,13 @@ MonoBehaviour:
       amount: 7
       hitCount: 1
     appliedEffects: []
+    hasFallback: 1
+    fallback:
+      stepName: Strike Player
+      target: 1
+      targetEnemyIndex: 0
+      instantActions:
+      - kind: 0
+        amount: 7
+        hitCount: 1
+      appliedEffects: []

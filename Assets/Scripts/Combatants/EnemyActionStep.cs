@@ -1,5 +1,16 @@
 using System.Collections.Generic;
 
+// Запасной шаг: срабатывает в момент основного, поэтому без delaySeconds и без собственного запасного
+[System.Serializable]
+public class EnemyFallbackStep
+{
+    public string stepName;
+    public EnemyActionTarget target;
+    public int targetEnemyIndex;
+    public List<InstantActionEntry> instantActions = new List<InstantActionEntry>();
+    public List<AppliedEffectEntry> appliedEffects = new List<AppliedEffectEntry>();
+}
+
 [System.Serializable]
 public class EnemyActionStep
 {
@@ -9,7 +20,8 @@ public class EnemyActionStep
     public int targetEnemyIndex; // используется только при target == SpecificEnemyIndex
     public List<InstantActionEntry> instantActions = new List<InstantActionEntry>();
     public List<AppliedEffectEntry> appliedEffects = new List<AppliedEffectEntry>();
-    public EnemyActionStep fallback; // null = при отсутствии цели шаг просто пропускается
+    public bool hasFallback; // false = при отсутствии цели шаг просто пропускается
+    public EnemyFallbackStep fallback; // используется только при hasFallback
 
     public static string DescribeTarget(EnemyActionTarget target)
     {

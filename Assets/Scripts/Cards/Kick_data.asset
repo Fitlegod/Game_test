@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: "\u041F\u043E\u0434\u043D\u043E\u0436\u043A\u0430"
   timeCostSeconds: 1
-  effectDelaySeconds: 0.5
+  effectDelaySeconds: 1
   cardType: 0
   instantActions:
   - kind: 0

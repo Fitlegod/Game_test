@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stand_still_data
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: "\u0421\u0442\u043E\u0439\u043A\u0430 \u0441\u043C\u0438\u0440\u043D\u043E"
-  timeCostSeconds: 1.5
+  timeCostSeconds: 2
   effectDelaySeconds: 0
   cardType: 1
   instantActions:

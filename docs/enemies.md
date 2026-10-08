@@ -12,8 +12,9 @@
 
 - `pattern` (`EnemyPatternData`) — назначается на префабе конкретного врага; зацикленный список `EnemyActionStep`.
 - `currentStepIndex` — какой шаг сработает следующим; продвигается по модулю `pattern.steps.Count` — паттерн крутится бесконечно.
+- **`ScheduleFirstAction()`** — ставит таймер первого действия: `nextActionTime = CurrentTime + steps[0].delaySeconds`. `EncounterManager` вызывает её при спавне до `RegisterScheduledEvent`; задержка шага — это время *перед* этим шагом, поэтому первое действие не происходит в 0 с.
 - **`Trigger()`** (вызывается `CombatManager.ResolveUpTo`, когда наступает `NextTime`): если исполнитель уже мёртв (`CurrentHP <= 0`) — не делает вообще ничего, даже не продвигает `currentStepIndex` и не планирует следующий удар (мёртвый враг уже должен быть отписан `EncounterManager`-ом, но проверка остаётся на всякий случай). Иначе: выполняет **текущий** шаг (`ExecuteStep`), продвигает `currentStepIndex` на следующий (с обёрткой по модулю), и сдвигает `nextActionTime` вперёд на `delaySeconds` **нового** текущего шага — то есть задержка читается с шага, который наступит **после** только что сработавшего, а не с только что сработавшего.
-- **`ExecuteStep(step)`** — резолвит цели через `ResolveTargets(step.target, step.targetEnemyIndex)`; если список пуст — при наличии `step.fallback` рекурсивно вызывает `ExecuteStep(step.fallback)` (тот же тип, `EnemyActionStep`); если и `fallback` не задан или тоже не находит цель — шаг молча пропускается. Если цели нашлись — на каждой из них по очереди применяются все `instantActions`, затем все `appliedEffects` шага, тем же явным `Apply(combatManager, this, target)` (враг — `source`), что и у карт.
+- **`TryExecute(...)`** — резолвит цели через `ResolveTargets`; если список пуст — возвращает `false`, и при `step.hasFallback` `Trigger()` пробует запасной шаг (`step.fallback`, один уровень, без рекурсии); если и у него нет цели — шаг молча пропускается. Если цели нашлись — на каждой из них по очереди применяются все `instantActions`, затем все `appliedEffects` шага, тем же явным `Apply(combatManager, this, target)` (враг — `source`), что и у карт.
 - **`ApplyStagger(seconds)`** — см. подробную формулу и обоснование `float` в [effects.md](effects.md); коротко: мгновенно двигает `nextActionTime` вперёд, `StaggerDisplay` — чисто отображаемый обратный отсчёт. Применить Пошатывание к `Player` нельзя — `AppliedEffectEntry.Apply` проверяет `target is Enemy` и молча ничего не делает иначе.
 
 ## `ResolveTargets` — 5 видов `EnemyActionTarget`
@@ -30,7 +31,7 @@
 - `delaySeconds` — интервал от **предыдущего** сработавшего шага до этого (читается с нового текущего шага внутри `Enemy.Trigger`, см. выше).
 - `target`/`targetEnemyIndex` — какой вид `EnemyActionTarget` и (только для `SpecificEnemyIndex`) какой индекс.
 - `instantActions`/`appliedEffects` — те же списки `InstantActionEntry`/`AppliedEffectEntry`, что и у карт игрока ([cards.md](cards.md), [effects.md](effects.md)) — шаг паттерна врага и карта используют полностью одинаковую форму данных действия.
-- `fallback` — необязательный `EnemyActionStep` той же формы, используется, только если `target` не резолвится ни в одну цель; `null` означает «шаг просто пропускается».
+- `hasFallback` + `fallback` (`EnemyFallbackStep`: `stepName`, `target`, `targetEnemyIndex`, `instantActions`, `appliedEffects` — без `delaySeconds` и без своего запасного шага, срабатывает в момент основного) — используется, только если `target` основного шага не резолвится ни в одну цель; `hasFallback == false` — «шаг просто пропускается». Отдельный флаг нужен, потому что поле `[Serializable]`-класса Unity никогда не хранит как `null`.
 - `DescribeTarget(target)` — статический хелпер, даёт русский суффикс цели (" по игроку", " союзникам", " самому слабому союзнику" и т. д.) для текста телеграфа; используется только UI, на логику не влияет.
 
 ## `EnemyPatternData` / `EncounterData` (ScriptableObject)

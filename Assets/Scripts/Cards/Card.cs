@@ -39,24 +39,30 @@ public class Card : MonoBehaviour, IPointerClickHandler
 
     public void Play(Combatant target)
     {
-        float effectTime = combatManager.CurrentTime + data.effectDelaySeconds;
-        combatManager.RegisterScheduledEvent(new OneShotEvent(effectTime, priority: 0, () => ApplyAllEffects(target)));
-
-        combatManager.AdvanceTime(data.timeCostSeconds);
-        combatManager.ResolveUpTo(combatManager.CurrentTime);
+        // Событие не держит ссылку на this: объект карты уничтожается сразу, а эффект может сработать позже
+        CardInstance playedInstance = instance;
+        CombatManager cm = combatManager;
+        float effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
+        cm.RegisterScheduledEvent(new OneShotEvent(effectTime, priority: 0, () => ApplyAllEffects(playedInstance.data, cm, target)));
 
         if (HandManager.Instance != null)
-            HandManager.Instance.OnCardPlayed(this);
+            HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
+
+        cm.AdvanceTime(playedInstance.data.timeCostSeconds);
+        cm.ResolveUpTo(cm.CurrentTime);
+
+        if (HandManager.Instance != null)
+            HandManager.Instance.deckManager.Discard(playedInstance); // сброс или сжигание по EffectiveProperties
     }
 
-    private void ApplyAllEffects(Combatant chosenTarget)
+    private static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget)
     {
         foreach (var action in data.instantActions)
-            foreach (var target in ResolveTargets(action.targetTag, chosenTarget))
+            foreach (var target in ResolveTargets(combatManager, action.targetTag, chosenTarget))
                 action.Apply(combatManager, combatManager.player, target);
 
         foreach (var effect in data.appliedEffects)
-            foreach (var target in ResolveTargets(effect.targetTag, chosenTarget))
+            foreach (var target in ResolveTargets(combatManager, effect.targetTag, chosenTarget))
                 effect.Apply(combatManager, combatManager.player, target);
 
         if (data.drawCardsOnPlay > 0 && HandManager.Instance != null)
@@ -64,7 +70,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
                 HandManager.Instance.TryDrawToHand();
     }
 
-    private List<Combatant> ResolveTargets(EffectTargetTag tag, Combatant chosenTarget)
+    private static List<Combatant> ResolveTargets(CombatManager combatManager, EffectTargetTag tag, Combatant chosenTarget)
     {
         switch (tag)
         {

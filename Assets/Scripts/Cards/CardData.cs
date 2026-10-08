@@ -20,4 +20,14 @@ public class CardData : ScriptableObject
 
     [Header("Свойства карты")]
     public CardPropertyFlags properties;
+
+    void OnValidate()
+    {
+        if (timeCostSeconds != Mathf.Round(timeCostSeconds) || effectDelaySeconds != Mathf.Round(effectDelaySeconds))
+            Debug.LogWarning(name + ": время должно быть целым (timeCostSeconds=" + timeCostSeconds + ", effectDelaySeconds=" + effectDelaySeconds + ")", this);
+        if (timeCostSeconds < 1)
+            Debug.LogWarning(name + ": timeCostSeconds должен быть >= 1 (сейчас " + timeCostSeconds + ")", this);
+        if (effectDelaySeconds < 0)
+            Debug.LogWarning(name + ": effectDelaySeconds должен быть >= 0 (сейчас " + effectDelaySeconds + ")", this);
+    }
 }

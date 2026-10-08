@@ -25,33 +25,35 @@ public class Enemy : Combatant, IScheduledEvent
 
     public float StaggerDisplay => Mathf.Max(0f, staggerAmount - (combatManager.CurrentTime - staggerAppliedAt));
 
+    public void ScheduleFirstAction()
+    {
+        nextActionTime = combatManager.CurrentTime + pattern.steps[0].delaySeconds;
+    }
+
     public void Trigger()
     {
         if (CurrentHP <= 0) return;
 
-        ExecuteStep(pattern.steps[currentStepIndex]);
+        var step = pattern.steps[currentStepIndex];
+        if (!TryExecute(step.target, step.targetEnemyIndex, step.instantActions, step.appliedEffects) && step.hasFallback)
+            TryExecute(step.fallback.target, step.fallback.targetEnemyIndex, step.fallback.instantActions, step.fallback.appliedEffects);
         currentStepIndex = (currentStepIndex + 1) % pattern.steps.Count;
         nextActionTime += pattern.steps[currentStepIndex].delaySeconds;
     }
 
-    private void ExecuteStep(EnemyActionStep step)
+    private bool TryExecute(EnemyActionTarget targetKind, int targetIndex, List<InstantActionEntry> instantActions, List<AppliedEffectEntry> appliedEffects)
     {
-        List<Combatant> targets = ResolveTargets(step.target, step.targetEnemyIndex);
-
-        if (targets.Count == 0)
-        {
-            if (step.fallback != null)
-                ExecuteStep(step.fallback);
-            return;
-        }
+        List<Combatant> targets = ResolveTargets(targetKind, targetIndex);
+        if (targets.Count == 0) return false;
 
         foreach (var target in targets)
         {
-            foreach (var action in step.instantActions)
+            foreach (var action in instantActions)
                 action.Apply(combatManager, this, target);
-            foreach (var effect in step.appliedEffects)
+            foreach (var effect in appliedEffects)
                 effect.Apply(combatManager, this, target);
         }
+        return true;
     }
 
     public List<Combatant> ResolveTargets(EnemyActionTarget target, int specificIndex)

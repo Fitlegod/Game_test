@@ -39,9 +39,9 @@
 
 ## Полный конвейер урона (`InstantActionEntry.Apply`, `kind == Damage`)
 
-1. `source.CalculateOutgoingDamage(baseAmount)`: `baseAmount + round(Strength)`, затем `× 0.5` (floor), если `Weak > 0`.
-2. `target.ApplyIncomingDamageModifiers(damage)`: `× 1.5` (floor), если `Vulnerable > 0`.
-3. `target.TakeDamage(damage)`: сначала поглощение блоком — `absorbed = min(CurrentBlock, damage)`, `CurrentBlock -= absorbed`, `damage -= absorbed`; остаток вычитается из `CurrentHP`, зажимается снизу нулём. Если HP дошло ровно до `0` — вызывается `ClearAllScheduledEvents()` и стреляет `OnDeath`.
+1. `source.CalculateOutgoingDamage(baseAmount)`: `baseAmount + round(Strength)`, затем `× 0.5` (floor), если `Weak > 0`; итог не ниже `0`.
+2. `target.ApplyIncomingDamageModifiers(damage)`: `× 1.5` (floor), если `Vulnerable > 0`; итог не ниже `0`.
+3. `target.TakeDamage(damage)`: при `damage <= 0` ничего не делает (отрицательная сумма не должна давать блок); иначе сначала поглощение блоком — `absorbed = min(CurrentBlock, damage)`, `CurrentBlock -= absorbed`, `damage -= absorbed`; остаток вычитается из `CurrentHP`, зажимается снизу нулём. Если HP дошло ровно до `0` — вызывается `ClearAllScheduledEvents()` и стреляет `OnDeath`.
 
 ## Конвейер блока (`kind == Block`)
 
