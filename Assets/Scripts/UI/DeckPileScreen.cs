@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class DeckPileScreen : MonoBehaviour
 {
-    public GameObject panelRoot;
     public Transform cardContainer;
     public GameObject cardPreviewPrefab;
     public DeckManager deckManager;
@@ -15,21 +14,19 @@ public class DeckPileScreen : MonoBehaviour
     public Button exhaustPileTab;
     public Button closeButton;
 
-    void Start()
+    void Awake()
     {
         characterDeckTab.onClick.AddListener(() => ShowPile(deckManager.CharacterDeck));
         drawPileTab.onClick.AddListener(() => ShowPile(deckManager.DrawPile));
         discardPileTab.onClick.AddListener(() => ShowPile(deckManager.DiscardPile));
         exhaustPileTab.onClick.AddListener(() => ShowPile(deckManager.ExhaustPile));
         closeButton.onClick.AddListener(Close);
-        panelRoot.SetActive(false);
     }
 
     public void Open() => OpenToPile(PileKind.CharacterDeck);
 
     public void OpenToPile(PileKind pile)
     {
-        panelRoot.SetActive(true);
         switch (pile)
         {
             case PileKind.CharacterDeck: ShowPile(deckManager.CharacterDeck); break;
@@ -37,9 +34,10 @@ public class DeckPileScreen : MonoBehaviour
             case PileKind.Discard: ShowPile(deckManager.DiscardPile); break;
             case PileKind.Exhaust: ShowPile(deckManager.ExhaustPile); break;
         }
+        ScreenManager.Instance.OpenOverlay(gameObject);
     }
 
-    public void Close() => panelRoot.SetActive(false);
+    public void Close() => ScreenManager.Instance.CloseOverlay(gameObject);
 
     private void ShowPile(IReadOnlyList<CardInstance> pile)
     {

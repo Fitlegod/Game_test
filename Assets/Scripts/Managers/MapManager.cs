@@ -43,7 +43,7 @@ public class MapManager : MonoBehaviour
         if (node.IsCombat)
         {
             selecting = false;
-            mapScreen.Close();
+            ScreenManager.Instance.ShowScreen(ScreenManager.Combat);
             encounterManager.StartEncounter(node.encounter);
         }
         else
@@ -58,6 +58,7 @@ public class MapManager : MonoBehaviour
         {
             RunState.IsFinished = true;
             selecting = false;
+            ScreenManager.Instance.ShowScreen(ScreenManager.Map);
             mapScreen.Show(CurrentMap, RunState, MapScreenMode.Finished);
             return;
         }
@@ -67,6 +68,7 @@ public class MapManager : MonoBehaviour
     private void OpenSelection()
     {
         selecting = true;
+        ScreenManager.Instance.ShowScreen(ScreenManager.Map);
         mapScreen.Show(CurrentMap, RunState, MapScreenMode.Select);
     }
 
@@ -74,5 +76,6 @@ public class MapManager : MonoBehaviour
     {
         if (selecting || RunState.IsFinished) return;
         mapScreen.Show(CurrentMap, RunState, MapScreenMode.View);
+        ScreenManager.Instance.OpenOverlay(mapScreen.gameObject);
     }
 }

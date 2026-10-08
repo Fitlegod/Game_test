@@ -31,7 +31,7 @@ public class MapScreen : MonoBehaviour
         closeButton.onClick.AddListener(Close);
     }
 
-    public void Close() => panelRoot.SetActive(false);
+    public void Close() => ScreenManager.Instance.CloseOverlay(gameObject);
 
     public void Show(MapData map, MapRunState run, MapScreenMode mode)
     {

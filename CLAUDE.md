@@ -69,6 +69,7 @@ Unity 6000.3.23f1, 2D, карточный рогалик. Весь интерф�
 - docs/effects.md — StatusEffectType, StatusEffectRules, формулы на Combatant
 - docs/deck-hand.md — DeckManager, HandManager
 - docs/enemies.md — Enemy, EnemyPatternData, EnemyActionStep, EncounterData, EncounterManager, EnemyActionTarget
+- docs/ui.md — ScreenManager, оверлеи, ввод и горячие клавиши, таблица строк
 - docs/map.md — MapGenerator, MapGenerationConfig, MapData, MapRunState, MapManager, MapScreen, цикл «карта → бой → карта»
 
 Периодически (не обязательно на каждую мелкую правку) перепрогоняй Graphify и сверяй, что каждый класс графа упомянут хотя бы в одном файле docs/ — новый класс без упоминания означает, что документация отстала.
