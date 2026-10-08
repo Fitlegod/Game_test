@@ -2,7 +2,7 @@
 
 Классы: `RoomType`, `MapGenerationConfig`/`RoomQuota`, `MapData`/`MapNode`/`MapEdge`, `MapGenerator`, `MapRunState`, `MapManager`, `MapView`/`MapScreenMode`.
 
-Файлы: `Map/RoomType.cs`, `Map/MapGenerationConfig.cs`, `Map/MapData.cs`, `Map/MapGenerator.cs`, `Map/MapRunState.cs`, `Managers/MapManager.cs`, `UI/MapView.cs`; ассеты `Map/DefaultMapConfig.asset`, `Map/MapNode.prefab`; тесты `Assets/Tests/EditMode/MapGeneratorTests.cs`.
+Файлы: `Map/RoomType.cs`, `Map/MapGenerationConfig.cs`, `Map/MapData.cs`, `Map/MapGenerator.cs`, `Map/MapRunState.cs`, `Managers/MapManager.cs`, `UI/MapView.cs`; ассеты `Assets/Data/Map/DefaultMapConfig.asset`, `Assets/Prefabs/Map/MapNode.prefab`; тесты `Assets/Tests/EditMode/MapGeneratorTests.cs`.
 
 См. также: [enemies.md](enemies.md) — `EncounterManager.StartEncounter` и `EncounterData`; [combat-core.md](combat-core.md) — `CombatManager.OnVictory`/`OnDefeat`, `PlayerRunState`.
 
