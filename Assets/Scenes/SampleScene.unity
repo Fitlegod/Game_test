@@ -4073,13 +4073,14 @@ GameObject:
   - component: {fileID: 1083949727}
   - component: {fileID: 1083949728}
   - component: {fileID: 1083949729}
+  - component: {fileID: 1083949730}
   m_Layer: 0
   m_Name: MapOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1083949727
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4133,6 +4134,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::ScreenRoot
   screenId: Map
+--- !u!114 &1083949730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1083949726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c48d800c0de6764e9e757e4002de14b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::OverlayRoot
 --- !u!1 &1086074435
 GameObject:
   m_ObjectHideFlags: 0
