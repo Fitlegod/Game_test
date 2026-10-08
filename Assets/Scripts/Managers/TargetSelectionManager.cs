@@ -46,6 +46,11 @@ public class TargetSelectionManager : MonoBehaviour
         }
     }
 
+    public void CancelSelection()
+    {
+        PendingCard = null;
+    }
+
     public void SelectTarget(Combatant target)
     {
         if (inputLocked) return;

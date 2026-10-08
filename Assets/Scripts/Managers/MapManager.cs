@@ -72,6 +72,12 @@ public class MapManager : MonoBehaviour
         mapScreen.Show(CurrentMap, RunState, MapScreenMode.Select);
     }
 
+    public void ToggleMapView()
+    {
+        if (ScreenManager.Instance.IsOverlayOpen(mapScreen.gameObject)) mapScreen.Close();
+        else OpenView();
+    }
+
     private void OpenView()
     {
         if (selecting || RunState.IsFinished) return;

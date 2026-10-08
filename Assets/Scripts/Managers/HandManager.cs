@@ -48,6 +48,8 @@ public class HandManager : MonoBehaviour
         }
     }
 
+    public Card GetCardInSlot(int slot) => cardsInSlots[slot];
+
     public bool TryDrawToHand()
     {
         CardInstance instance = deckManager.DrawCard();
