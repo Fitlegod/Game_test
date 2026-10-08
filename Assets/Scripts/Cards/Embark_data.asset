@@ -17,6 +17,7 @@ MonoBehaviour:
   effectDelaySeconds: 0
   cardType: 2
   instantActions: []
+  drawCardsOnPlay: 0
   appliedEffects:
   - statusType: 0
     stacks: 3

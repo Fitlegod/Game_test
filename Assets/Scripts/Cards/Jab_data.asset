@@ -21,5 +21,6 @@ MonoBehaviour:
     amount: 16
     hitCount: 1
     targetTag: 1
+  drawCardsOnPlay: 0
   appliedEffects: []
   properties: 0
