@@ -1,5 +1,23 @@
 using System.Collections.Generic;
 
+public class PlannedStep
+{
+    public readonly string stepName;
+    public readonly EnemyActionTarget target;
+    public readonly List<Combatant> targets;
+    public readonly List<InstantActionEntry> instantActions;
+    public readonly List<AppliedEffectEntry> appliedEffects;
+
+    public PlannedStep(string stepName, EnemyActionTarget target, List<Combatant> targets, List<InstantActionEntry> instantActions, List<AppliedEffectEntry> appliedEffects)
+    {
+        this.stepName = stepName;
+        this.target = target;
+        this.targets = targets;
+        this.instantActions = instantActions;
+        this.appliedEffects = appliedEffects;
+    }
+}
+
 // Запасной шаг: срабатывает в момент основного, поэтому без delaySeconds и без собственного запасного
 [System.Serializable]
 public class EnemyFallbackStep

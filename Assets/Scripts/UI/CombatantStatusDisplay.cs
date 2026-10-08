@@ -60,14 +60,13 @@ public class CombatantStatusDisplay : MonoBehaviour
 
         if (enemyForTelegraph.pattern != null && enemyForTelegraph.pattern.steps.Count > 0)
         {
-            EnemyActionStep step = enemyForTelegraph.pattern.steps[enemyForTelegraph.CurrentStepIndex];
-            List<Combatant> targets = enemyForTelegraph.ResolveTargets(step.target, step.targetEnemyIndex);
+            PlannedStep step = enemyForTelegraph.GetPlannedStep();
 
             text += "\n" + step.stepName;
             foreach (var action in step.instantActions)
-                text += "\n" + DescribeInstantAction(action, targets, step.target);
+                text += "\n" + DescribeInstantAction(action, step.targets, step.target);
             foreach (var effect in step.appliedEffects)
-                text += "\n" + DescribeAppliedEffect(effect, targets, step.target);
+                text += "\n" + DescribeAppliedEffect(effect, step.targets, step.target);
         }
 
         return text;
