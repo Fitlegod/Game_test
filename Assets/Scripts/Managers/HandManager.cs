@@ -36,7 +36,7 @@ public class HandManager : MonoBehaviour
         combatManager.RegisterScheduledEvent(drawEvent);
     }
 
-    private void ClearHand()
+    public void ClearHand()
     {
         for (int i = 0; i < MaxHandSize; i++)
         {

@@ -36,6 +36,8 @@ public class EncounterManager : MonoBehaviour
 
     private void CleanupCombatants()
     {
+        handManager.ClearHand(); // карты руки не должны жить до следующего боя
+        TargetSelectionManager.Instance.CancelSelection(); // карта, ждавшая цель, не «висит»
         if (currentPlayer != null) Destroy(currentPlayer.gameObject);
         foreach (var e in currentEnemies)
             if (e != null) Destroy(e.gameObject);
