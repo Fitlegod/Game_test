@@ -1,6 +1,6 @@
 # Документация проекта
 
-Карта систем `Assets/Scripts` — построена по графу зависимостей (Graphify: 207 узлов, 370 рёбер, 9 сообществ, циклов импорта не найдено; сырые данные в `graphify-out/`). Игровой замысел — в `design-document.md` в корне; здесь — как устроен код.
+Карта систем `Assets/Scripts` — построена по графу зависимостей (Graphify: 207 узлов, 370 рёбер, 9 сообществ, циклов импорта не найдено; граф строится локально, `graphify-out/` в репозитории не хранится). Игровой замысел — в `design-document.md` в корне; здесь — как устроен код.
 
 Правило поддержания этих файлов при изменении кода — в разделе «Поддержание документации docs/» корневого `CLAUDE.md`.
 
@@ -19,8 +19,8 @@
 
 ## Как это связано (коротко)
 
-Игрок кликает карту → `TargetSelectionManager` либо сразу играет её, либо ждёт клика по цели → `Card.Play()` двигает виртуальное время `CombatManager` и регистрирует эффект карты как `OneShotEvent` → `CombatManager.ResolveUpTo` резолвит все события (карты, атаки врагов из `EnemyPatternData`, тики статус-эффектов) в порядке времени, при равенстве — в пользу карты игрока → эффекты карты/шага паттерна врага (`InstantActionEntry`/`AppliedEffectEntry`) считают урон/блок/лечение через формулы `Combatant`, учитывающие текущие статус-эффекты → карта уходит из `HandManager` в одну из колод `DeckManager` → бой заканчивается, когда `Combatant.OnDeath` игрока или всех врагов долетает до `CombatManager`.
+Игрок кликает карту → `TargetSelectionManager` либо сразу играет её, либо ждёт клика по цели → `Card.Play()` двигает виртуальное время `CombatManager` и регистрирует эффект карты как `OneShotEvent` → `CombatManager.ResolveUpTo` резолвит все события (карты, атаки врагов из `EnemyPatternData`, тики статус-эффектов) в порядке времени, при равенстве — по правилу ничьей из [combat-core.md](combat-core.md) (группа игрока раньше врагов, повтор после отката первым) → эффекты карты/шага паттерна врага (`InstantActionEntry`/`AppliedEffectEntry`) считают урон/блок/лечение через формулы `Combatant`, учитывающие текущие статус-эффекты → карта уходит из `HandManager` в одну из колод `DeckManager` → бой заканчивается, когда `Combatant.OnDeath` игрока или всех врагов долетает до `CombatManager`.
 
 Дальше — цикл: бой не стартует сам. `MapManager` генерирует карту по сиду и показывает `MapView` (экземпляр «MapScreen»); клик по боевому узлу вызывает `EncounterManager.StartEncounter(node.encounter)` — `CombatManager.ResetForNewCombat()` сбрасывает секундомер/расписание/блокировку ввода, `EncounterManager` спавнит игрока (накатывая `PlayerRunState.PersistedHP`, если он есть) и врагов, `HandManager.BeginNewHand()` собирает руку. Победа (`CombatManager.OnVictory`) → `EncounterManager.HandleVictory` сохраняет HP в `PersistedHP`; поражение (`OnDefeat`) → `HandleDefeat` сбрасывает его в `null` (следующий бой с полным HP). В обоих случаях участники удаляются, и `MapManager.OnCombatEnded` снова открывает карту. Подробности — [map.md](map.md).
 
-**Сверено с кодом:** `MapManager.OnCombatEnded` — `Managers/MapManager.cs:55`; `CombatManager.OnVictory`/`OnDefeat` — `Managers/CombatManager.cs:18-19`; `EncounterManager.HandleVictory` — `Managers/EncounterManager.cs:23`.
+**Сверено с кодом:** `MapManager.OnCombatEnded` — `Managers/MapManager.cs:56`; `CombatManager.OnVictory`/`OnDefeat` — `Managers/CombatManager.cs:44-45`; `EncounterManager.HandleVictory` — `Managers/EncounterManager.cs:23`.
