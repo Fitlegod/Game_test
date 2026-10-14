@@ -8,7 +8,7 @@
 
 ## Хранилище: `Dictionary<StatusEffectType, float>` на `Combatant`
 
-Стаки хранятся на каждом `Combatant` в приватном `effectStacks`. Тип значения — **`float`, не `int`**: осознанное решение, потому что Пошатывание могло бы нести дробное значение секунд (хотя по факту Пошатывание вообще не проходит через этот словарь — см. ниже).
+Стаки хранятся на каждом `Combatant` в приватном `effectStacks`. Тип значения — **`float`**. Пошатывание в этот словарь не попадает — см. ниже.
 
 - `GetStacks(type)` — `0f`, если ключа нет.
 - `AddEffectStacks(type, amount, applier = null)` — no-op, если `CurrentHP <= 0` (мёртвый не может получить новый стак); иначе прибавляет `amount` (может быть отрицательным — так карта в теории может *снять* часть стаков напрямую, не только периодическим распадом). При первом наложении типа, для которого `StatusEffectRules.TryGetPeriodicBehavior` возвращает `true`, регистрирует новый `PeriodicEffectEvent` и запоминает его в `activeScheduledEffects[type]`; первый тик считается от **момента срабатывания эффекта** (`CombatManager.EffectTime`: внутри события — момент события, вне — `CurrentTime`), а не от конца каста: враг, наложивший Слабость в момент 2 во время каста 0→3, получает снятие стака в 5, а не в 6 (и при повторе после отката тик остаётся в том же месте); повторные наложения того же типа **не** создают второе тикающее событие — стаки просто накапливаются в уже существующем интервале. `applier` — кто наложил (`AppliedEffectEntry.Apply` передаёт `source`; `null` — неизвестно) — уходит в `PeriodicEffectEvent.Applier` и определяет группу порядка тика: группа врагов (`Priority 1`), если носитель — `Enemy` и наложил не игрок; иначе группа игрока (`0`). Группу задаёт первый наложивший (тот, кто создал тик); последующие стаки от других источников её не меняют.
@@ -27,7 +27,7 @@
 | **Toughness** (Крепкость) | нет | — | `CalculateIncomingBlock`: `+ Mathf.RoundToInt(stacks)` к базовому блоку |
 | **Frailty** (Хрупкость) | каждые 3 с, `RemoveStacks(Frailty, 1)` | распад −1/тик | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепкости `× 0.5` через `Mathf.FloorToInt` |
 | **Vulnerable** (Уязвимость) | каждые 3 с, `RemoveStacks(Vulnerable, 1)` | распад −1/тик | `ApplyIncomingDamageModifiers`: если `stacks > 0`, входящий урон `× 1.5` через `Mathf.FloorToInt` |
-| **Stagger** (Пошатывание) | — особый случай, см. ниже | — | напрямую двигает `Enemy.scheduledHitTime`-аналог (`nextActionTime`), не через этот словарь |
+| **Stagger** (Пошатывание) | — особый случай, см. ниже | — | напрямую двигает `Enemy.nextActionTime`, не через этот словарь |
 
 `StatusEffectRules.TryGetPeriodicBehavior` — единственное место, где решается, какие типы вообще тикают: `Weak`/`Frailty`/`Vulnerable` (интервал 3 с) и `Regen` (интервал 1 с) возвращают `true` со своим действием; `Strength`/`Toughness`/`Stagger` попадают в `default` и возвращают `false` — это постоянные (пока не снятые вручную) значения без автораспада.
 
@@ -64,4 +64,4 @@
 
 `UI/CombatantStatusDisplay.cs` (бывший отдельный `EffectStacksDisplay.cs`, слит в общий дисплей бойца — см. [combat-core.md](combat-core.md)) — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StaggerDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`; код метода перенесён из старого файла буквально, без переписывания.
 
-**Сверено с кодом:** `GetStacks` возвращает `0f`, если ключа нет (`Combatants/Combatant.cs:30`); `RemoveStacks` не опускает стаки ниже нуля через `Mathf.Max(0f, …)` (`Combatants/Combatant.cs:57`); `AddEffectStacks` у мёртвого — no-op (`Combatants/Combatant.cs:35`).
+**Сверено с кодом:** `GetStacks` возвращает `0f`, если ключа нет (`Combatants/Combatant.cs:30`); `RemoveStacks` не опускает стаки ниже нуля через `Mathf.Max(0f, …)` (`Combatants/Combatant.cs:72`); `AddEffectStacks` у мёртвого — no-op (`Combatants/Combatant.cs:37`).
