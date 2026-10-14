@@ -8,7 +8,7 @@
 
 ## `Enemy` — `Combatant` + `IScheduledEvent`
 
-`Enemy` реализует `IScheduledEvent` напрямую (не через `PeriodicEffectEvent`): `NextTime => nextActionTime`, `Priority => 1` — группа врагов: в один момент ему уступают все события группы игрока (карты, таймер добора, тики эффектов на игроке и наложенных игроком), среди врагов порядок слева направо (правило ничьей — [combat-core.md](combat-core.md)). Регистрирует и отписывает его `EncounterManager`, а не сам `Enemy`/`Combatant` (кто заспавнил — тот и владеет подпиской).
+`Enemy` реализует `IScheduledEvent` напрямую (не через `PeriodicEffectEvent`): `NextTime => nextActionTime`, `Priority => 1` — группа врагов: в один момент он уступает всем событиям группы игрока (карты, таймер добора, тики эффектов на игроке и наложенных игроком), среди врагов порядок слева направо (правило ничьей — [combat-core.md](combat-core.md)). Регистрирует и отписывает его `EncounterManager`, а не сам `Enemy`/`Combatant` (кто заспавнил — тот и владеет подпиской).
 
 - `pattern` (`EnemyPatternData`) — назначается на префабе конкретного врага; зацикленный список `EnemyActionStep`.
 - `currentStepIndex` — какой шаг сработает следующим; продвигается по модулю `pattern.steps.Count` — паттерн крутится бесконечно.
@@ -63,4 +63,4 @@
 
 Раньше отдельный `EnemyAttackTimerDisplay`, теперь — `BuildTelegraphText()` внутри `UI/CombatantStatusDisplay.cs` (код перенесён буквально, без переписывания; подробности и сигнатура полей — в [combat-core.md](combat-core.md)). Коротко: обратный отсчёт до атаки (`enemyForTelegraph.NextTime - combatManager.CurrentTime`), название текущего шага и построчное описание каждого его действия/эффекта через тот же `ComputePreviewAmount` из `CardActions.cs`, `CardTextHelpers.HitCountSuffix` и `EnemyActionStep.DescribeTarget` для суффикса цели, что и текст карты игрока ([cards.md](cards.md)). Если у шага сейчас нет резолвящейся цели, для каждого действия печатает «(нет цели)» вместо числа.
 
-**Сверено с кодом:** `EncounterManager.StartEncounter(EncounterData)` — `Managers/EncounterManager.cs:45`; `HandleVictory` пишет `PersistedHP` (`:25`), `HandleDefeat` обнуляет его (`:32`); `Enemy.Priority => 1` — `Combatants/Enemy.cs:13`.
+**Сверено с кодом:** `EncounterManager.StartEncounter(EncounterData)` — `Managers/EncounterManager.cs:47`; `HandleVictory` пишет `PersistedHP` (`:25`), `HandleDefeat` обнуляет его (`:32`); `Enemy.Priority => 1` — `Combatants/Enemy.cs:13`.
