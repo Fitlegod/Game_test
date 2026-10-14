@@ -723,4 +723,73 @@ public class CombatTests
         Advance(t);
         CollectionAssert.AreEqual(new[] { "draw", "card" }, log);
     }
+
+    // Первый проход: Уязвимость от карты игрока в 0 (тик в 3), урон 10 карты, сыгранной в 2 (эффект в 3). Затем Откат на 3 с.
+    Enemy VulnScenarioFirstPass(out int hpAfterFirstPass, out PeriodicEffectEvent firstTick)
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        WithEffect(MakeCard(0, 0), StatusEffectType.Vulnerable, 1, EffectTargetTag.Enemy).Play(enemy);
+        firstTick = TickOf(enemy);
+        Advance(2);
+        Dmg(10, 1, 1).Play(enemy);
+        hpAfterFirstPass = enemy.CurrentHP;
+        return enemy;
+    }
+
+    [Test]
+    public void A2_8_ReplayKeepsTickBeforeCard_NoVulnerableOnReplayedHit()
+    {
+        var enemy = VulnScenarioFirstPass(out int hp, out _);
+        Assert.AreEqual(20, hp, "в первом проходе тик раньше карты: без ×1.5");
+        RewindCard(3, 0, 0).Play(null);
+        Assert.AreEqual(0, cm.CurrentTime);
+        Advance(3);
+        Assert.AreEqual(hp, enemy.CurrentHP);
+    }
+
+    [Test]
+    public void A2_9_ReplayReusesSameTickObject()
+    {
+        var enemy = VulnScenarioFirstPass(out _, out var first);
+        RewindCard(3, 0, 0).Play(null);
+        Advance(3);
+        Assert.AreSame(first, TickOf(enemy));
+    }
+
+    [Test]
+    public void A2_10_AfterReplayUntil_NewTickObject()
+    {
+        var enemy = MakeEnemyWithSteps(30, (Act(InstantActionKind.Block, 1, EffectTargetTag.Player), EnemyActionTarget.Self, 2));
+        enemy.pattern.steps[0].appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Weak, stacks = 1 });
+        Spawn(enemy);
+        Advance(2);                       // действие врага в 2: Слабость на себя, тик в 5
+        var first = TickOf(enemy);
+        RewindCard(3, 0, 0).Play(null);   // R=0, ReplayUntil=2
+        Assert.AreEqual(0, cm.CurrentTime);
+        WithEffect(MakeCard(0, 0), StatusEffectType.Stagger, 3, EffectTargetTag.Enemy).Play(enemy); // действие врага уходит за ReplayUntil
+        Assert.Greater(enemy.NextTime, cm.ReplayUntil);
+        Advance(enemy.NextTime);
+        Assert.AreNotSame(first, TickOf(enemy), "момент наложения позже ReplayUntil — переиспользования нет");
+    }
+
+    [Test]
+    public void A2_11_DifferentApplier_NewTickInEnemyGroup()
+    {
+        var a = MakeEnemy(30, 99, 1);
+        var b = MakeEnemy(30, 99, 1);
+        Spawn(a, b);
+        Advance(1);
+        WithEffect(MakeCard(0, 0), StatusEffectType.Vulnerable, 1, EffectTargetTag.Enemy).Play(a); // игрок, эффект в 1
+        var first = TickOf(a);
+        Assert.AreEqual(0, first.Priority);
+        Advance(1);
+        RewindCard(3, 0, 0).Play(null);   // R=0, ReplayUntil=2
+        a.AddEffectStacks(StatusEffectType.Vulnerable, 1, b); // в повторе первым накладывает враг B
+        var second = TickOf(a);
+        Assert.AreNotSame(first, second);
+        Assert.AreEqual(1, second.Priority);
+        Advance(1);                        // повтор карты игрока в 1: тик остаётся у врага
+        Assert.AreSame(second, TickOf(a));
+    }
 }

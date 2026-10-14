@@ -32,6 +32,7 @@ public class PeriodicEffectEvent : IScheduledEvent
     }
 
     public void Shift(int delta) => NextTime += delta;
+    public void Restart(int startTime) => NextTime = startTime + interval;
 }
 
 public class OneShotEvent : IScheduledEvent
