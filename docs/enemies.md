@@ -8,7 +8,7 @@
 
 ## `Enemy` — `Combatant` + `IScheduledEvent`
 
-`Enemy` реализует `IScheduledEvent` напрямую (не через `PeriodicEffectEvent`): `NextTime => nextActionTime`, `Priority => 1` (всегда проигрывает тай-брейк времени `OneShotEvent`-у карты игрока с приоритетом `0` — [combat-core.md](combat-core.md)). Регистрирует и отписывает его `EncounterManager`, а не сам `Enemy`/`Combatant` (кто заспавнил — тот и владеет подпиской).
+`Enemy` реализует `IScheduledEvent` напрямую (не через `PeriodicEffectEvent`): `NextTime => nextActionTime`, `Priority => 1` — группа врагов: в один момент ему уступают все события группы игрока (карты, таймер добора, тики эффектов на игроке и наложенных игроком), среди врагов порядок слева направо (правило ничьей — [combat-core.md](combat-core.md)). Регистрирует и отписывает его `EncounterManager`, а не сам `Enemy`/`Combatant` (кто заспавнил — тот и владеет подпиской).
 
 - `pattern` (`EnemyPatternData`) — назначается на префабе конкретного врага; зацикленный список `EnemyActionStep`.
 - `currentStepIndex` — какой шаг сработает следующим; продвигается по модулю `pattern.steps.Count` — паттерн крутится бесконечно.
