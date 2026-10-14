@@ -121,6 +121,7 @@ public class CombatManager : MonoBehaviour
                     next = ev;
             }
             if (next == null) break;
+            if (next.NextTime > ReplayUntil) replayOrders.Clear(); // вышли за интервал повтора: номера несработавших повторов больше не действуют
             CurrentEvent = next;
             CurrentEventTime = next.NextTime;
             CurrentFireOrder = ++fireCounter;
@@ -141,7 +142,8 @@ public class CombatManager : MonoBehaviour
     }
 
     // 0 — обычное событие; >0 — номер прежнего срабатывания, которое оно сейчас повторяет
-    private int ReplayOrderOf(IScheduledEvent ev) => replayOrders.TryGetValue(ev, out var s) && s.Count > 0 ? s.Peek() : 0;
+    private int ReplayOrderOf(IScheduledEvent ev) =>
+        ev.NextTime <= ReplayUntil && replayOrders.TryGetValue(ev, out var s) && s.Count > 0 ? s.Peek() : 0;
 
     public void PushReplayOrder(IScheduledEvent ev, int order)
     {

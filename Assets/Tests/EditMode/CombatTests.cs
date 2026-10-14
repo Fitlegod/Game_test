@@ -469,4 +469,28 @@ public class CombatTests
         Assert.AreEqual(28, b.CurrentHP);
         Assert.AreEqual(5, cm.CurrentTime);
     }
+
+    // Повтор сработал меньше раз, чем первый проход (ход врага ушёл на 9): «залипший» номер не должен обгонять новую карту вне интервала повтора
+    [Test]
+    public void T_StaleReplayOrder_DoesNotOutrunNewCardOutsideReplayWindow()
+    {
+        var e = MakeEnemyWithSteps(30, (Act(InstantActionKind.Damage, 5, EffectTargetTag.Player), EnemyActionTarget.Player, 6),
+                                       (Act(InstantActionKind.Damage, 5, EffectTargetTag.Player), EnemyActionTarget.Player, 6));
+        Spawn(e);
+        MakeCard(6, 0).Play(null);        // враг бьёт игрока в 6: 25
+        Assert.AreEqual(25, player.CurrentHP);
+        RewindCard(3, 1, 1).Play(null);   // T=7, R=4, ReplayUntil=7; ход в 6 ждёт повтора
+        Assert.AreEqual(4, cm.CurrentTime);
+
+        var stagger = MakeCard(1, 0);     // оглушение: ход врага 6 → 9
+        stagger.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stagger, stacks = 3, targetTag = EffectTargetTag.Enemy });
+        stagger.Play(e);
+        Assert.AreEqual(9, e.NextTime);
+
+        var delay = MakeCard(4, 4);       // эффект в 9: ещё одно оглушение на 1
+        delay.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stagger, stacks = 1, targetTag = EffectTargetTag.Enemy });
+        delay.Play(e);                    // время 9: карта в 9 первой — враг уходит на 10 и не бьёт
+        Assert.AreEqual(10, e.NextTime);
+        Assert.AreEqual(25, player.CurrentHP);
+    }
 }
