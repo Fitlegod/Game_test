@@ -33,7 +33,7 @@ public class EnemyFallbackStep
 public class EnemyActionStep
 {
     public string stepNameKey; // ключ в ru.txt: enemy.<паттерн>.<шаг>
-    public float delaySeconds;
+    public int delaySeconds;
     public EnemyActionTarget target;
     public int targetEnemyIndex; // используется только при target == SpecificEnemyIndex
     public List<InstantActionEntry> instantActions = new List<InstantActionEntry>();

@@ -4,7 +4,8 @@ public enum InstantActionKind
 {
     Damage,
     Block,
-    Heal
+    Heal,
+    Rewind // amount = на сколько секунд откатить бой; hitCount игнорируется
 }
 
 [System.Serializable]
@@ -17,6 +18,12 @@ public class InstantActionEntry
 
     public void Apply(CombatManager combatManager, Combatant source, Combatant target)
     {
+        if (kind == InstantActionKind.Rewind)
+        {
+            combatManager.Rewind(amount);
+            return;
+        }
+
         for (int i = 0; i < hitCount; i++)
         {
             switch (kind)
@@ -85,7 +92,7 @@ public class AppliedEffectEntry
         if (statusType == StatusEffectType.Stagger)
         {
             if (target is Enemy enemy)
-                enemy.ApplyStagger(stacks);
+                enemy.ApplyStagger(Mathf.RoundToInt(stacks));
             Debug.Log("Накладывает Пошатывание на " + stacks + " сек. цели " + target.name);
             return;
         }

@@ -5,8 +5,8 @@ using UnityEngine;
 public class CardData : ScriptableObject
 {
     public string nameKey; // ключ в Resources/Strings/ru.txt: card.<id>.name
-    public float timeCostSeconds;
-    public float effectDelaySeconds;
+    public int timeCostSeconds;
+    public int effectDelaySeconds;
     public CardType cardType;
 
     [Header("Разовые действия")]
@@ -27,8 +27,6 @@ public class CardData : ScriptableObject
     {
         if (!Loc.Has(nameKey))
             Debug.LogWarning(name + ": нет строки для ключа названия [" + nameKey + "]", this);
-        if (timeCostSeconds != Mathf.Round(timeCostSeconds) || effectDelaySeconds != Mathf.Round(effectDelaySeconds))
-            Debug.LogWarning(name + ": время должно быть целым (timeCostSeconds=" + timeCostSeconds + ", effectDelaySeconds=" + effectDelaySeconds + ")", this);
         if (timeCostSeconds < 1)
             Debug.LogWarning(name + ": timeCostSeconds должен быть >= 1 (сейчас " + timeCostSeconds + ")", this);
         if (effectDelaySeconds < 0)

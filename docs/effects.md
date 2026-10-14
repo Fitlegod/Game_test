@@ -33,9 +33,9 @@
 
 Реализовано на `Enemy` (`Combatants/Enemy.cs`), не на базовом `Combatant`, и не тикает через `StatusEffectRules`:
 
-- `ApplyStagger(seconds)` — применяется **мгновенно и целиком**: `nextActionTime += seconds` (следующее действие врага откладывается сразу), плюс запоминает `staggerAppliedAt`/`staggerAmount` только для отображения.
-- `StaggerDisplay` — `Mathf.Max(0f, staggerAmount - (CurrentTime - staggerAppliedAt))`: чисто косметическое обратное отсчитывание для UI, на логику не влияет — сдвиг времени уже произошёл в момент применения.
-- `AppliedEffectEntry.Apply` для `StatusEffectType.Stagger` отдельной веткой проверяет `if (target is Enemy enemy) enemy.ApplyStagger(stacks)`; если цель — не `Enemy` (например, `Player`), эффект тихо не применяется (кроме лога).
+- `ApplyStagger(int seconds)` — применяется **мгновенно и целиком**: `nextActionTime += seconds` (следующее действие врага откладывается сразу), плюс запоминает `staggerAppliedAt`/`staggerAmount` (оба `int`, начальное значение `0`) только для отображения.
+- `StaggerDisplay` — `Mathf.Max(0, staggerAmount - (CurrentTime - staggerAppliedAt))` (`int`): чисто косметическое обратное отсчитывание для UI, на логику не влияет — сдвиг времени уже произошёл в момент применения.
+- `AppliedEffectEntry.Apply` для `StatusEffectType.Stagger` отдельной веткой проверяет `if (target is Enemy enemy) enemy.ApplyStagger(Mathf.RoundToInt(stacks))` (стаки `float`, время целое); если цель — не `Enemy` (например, `Player`), эффект тихо не применяется (кроме лога).
 
 ## Полный конвейер урона (`InstantActionEntry.Apply`, `kind == Damage`)
 

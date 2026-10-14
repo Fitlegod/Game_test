@@ -2,6 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+// Запись журнала: как отменить одно изменение боя. Хранит реальную разницу, а не входное число.
+public class UndoEntry
+{
+    public int Time;             // момент события, внутри которого сделано изменение
+    public Combatant Target;     // чьё состояние меняется (null — состояние не боевого участника)
+    public IScheduledEvent Source; // событие, внутри которого сделано изменение
+    public System.Action Undo;
+}
+
 public class CombatManager : MonoBehaviour
 {
     public TMP_Text budgetText;
@@ -10,10 +19,18 @@ public class CombatManager : MonoBehaviour
 
     private List<Enemy> enemies = new List<Enemy>();
     public IReadOnlyList<Enemy> Enemies => enemies;
-    public float CurrentTime { get; private set; }
+    public int CurrentTime { get; private set; }
+    public int ReplayUntil { get; private set; } = -1; // действия врагов в моменты <= этого значения не бьют по игроку; -1 — отката не было
 
     private List<IScheduledEvent> scheduledEvents = new List<IScheduledEvent>();
+    public IReadOnlyList<IScheduledEvent> ScheduledEvents => scheduledEvents;
     private bool combatOver;
+
+    private List<UndoEntry> journal = new List<UndoEntry>();
+    public IReadOnlyList<UndoEntry> Journal => journal;
+    public IScheduledEvent CurrentEvent { get; private set; }
+    public int CurrentEventTime { get; private set; }
+    private bool isRewinding;
 
     public event System.Action OnVictory;
     public event System.Action OnDefeat;
@@ -34,12 +51,16 @@ public class CombatManager : MonoBehaviour
     public void ResetForNewCombat()
     {
         scheduledEvents.Clear();
-        CurrentTime = 0f;
+        CurrentTime = 0;
+        ReplayUntil = -1;
+        journal.Clear();
+        CurrentEvent = null;
+        isRewinding = false;
         combatOver = false;
         enemies.Clear();
         UpdateBudgetText();
         if (combatResultText != null) combatResultText.text = "";
-        TargetSelectionManager.Instance.UnlockInput();
+        if (TargetSelectionManager.Instance != null) TargetSelectionManager.Instance.UnlockInput();
     }
 
     public void RegisterEnemies(List<Enemy> spawnedEnemies)
@@ -49,38 +70,86 @@ public class CombatManager : MonoBehaviour
             enemy.OnDeath += HandleEnemyDeath;
     }
 
+    // «Мировое» — враги и их тики; всё остальное (таймер добора, тики на игроке, карты) — сторона игрока
+    private static bool IsWorld(IScheduledEvent ev) => ev is Enemy || (ev is PeriodicEffectEvent p && p.Owner is Enemy);
+    private static bool IsPlayerPeriodic(IScheduledEvent ev) => ev is PeriodicEffectEvent p && !(p.Owner is Enemy);
+    private static Combatant OwnerOf(IScheduledEvent ev) => ev as Enemy ?? (ev as PeriodicEffectEvent)?.Owner;
+
     public void RegisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
         scheduledEvents.Add(scheduledEvent);
+        if (IsWorld(scheduledEvent))
+            Record(OwnerOf(scheduledEvent), () => scheduledEvents.Remove(scheduledEvent));
     }
 
     public void UnregisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
-        scheduledEvents.Remove(scheduledEvent);
+        if (!scheduledEvents.Remove(scheduledEvent)) return;
+        if (IsWorld(scheduledEvent))
+            Record(OwnerOf(scheduledEvent), () => scheduledEvents.Add(scheduledEvent));
     }
 
-    public void AdvanceTime(float amount)
+    // Пишет обратную процедуру только внутри события и не во время самого отката
+    public void Record(Combatant target, System.Action undo)
+    {
+        if (CurrentEvent == null || isRewinding) return;
+        journal.Add(new UndoEntry { Time = CurrentEventTime, Target = target, Source = CurrentEvent, Undo = undo });
+    }
+
+    public void AdvanceTime(int amount)
     {
         CurrentTime += amount;
         UpdateBudgetText();
     }
 
-    public void ResolveUpTo(float targetTime)
+    public void ResolveUpTo()
     {
         while (true)
         {
             IScheduledEvent next = null;
             foreach (var ev in scheduledEvents)
             {
-                if (ev.NextTime > targetTime) continue;
+                if (!ev.IsPending || ev.NextTime > CurrentTime) continue;
                 if (next == null || ev.NextTime < next.NextTime ||
                     (ev.NextTime == next.NextTime && ev.Priority < next.Priority))
                     next = ev;
             }
             if (next == null) break;
-            next.Trigger();
-            if (float.IsPositiveInfinity(next.NextTime)) scheduledEvents.Remove(next); // отработавшее одноразовое событие
+            CurrentEvent = next;
+            CurrentEventTime = next.NextTime;
+            try { next.Trigger(); }
+            finally { CurrentEvent = null; }
         }
+    }
+
+    // Откат: вызывается из эффекта карты (внутри события). Игрок не меняется, враги и мир возвращаются обратными процедурами.
+    public void Rewind(int n)
+    {
+        if (CurrentEvent == null) return;
+        int t = CurrentEventTime;
+        int r = Mathf.Max(0, t - n);
+        int shift = t - r;
+        if (shift == 0) return;
+
+        var self = CurrentEvent;
+        isRewinding = true;
+        for (int i = journal.Count - 1; i >= 0; i--)
+        {
+            var e = journal[i];
+            if (e.Time < r || e.Target is Player || e.Source == self) continue;
+            if (e.Source != null && IsPlayerPeriodic(e.Source)) continue;
+            e.Undo();
+        }
+        journal.RemoveAll(e => e.Time >= r);
+
+        foreach (var ev in scheduledEvents)
+            if (ev is PeriodicEffectEvent p && IsPlayerPeriodic(p))
+                p.Shift(-shift);
+
+        CurrentTime -= shift;
+        ReplayUntil = Mathf.Max(ReplayUntil, t);
+        isRewinding = false;
+        UpdateBudgetText();
     }
 
     private void HandlePlayerDeath()
@@ -105,11 +174,12 @@ public class CombatManager : MonoBehaviour
         combatOver = true;
         if (combatResultText != null)
             combatResultText.text = Loc.Get(messageKey);
-        TargetSelectionManager.Instance.LockInput();
+        if (TargetSelectionManager.Instance != null) TargetSelectionManager.Instance.LockInput();
     }
 
     private void UpdateBudgetText()
     {
-        budgetText.text = Loc.Format("ui.combat.time", CurrentTime.ToString("0.0"));
+        if (budgetText != null)
+            budgetText.text = Loc.Format("ui.combat.time", CurrentTime.ToString());
     }
 }

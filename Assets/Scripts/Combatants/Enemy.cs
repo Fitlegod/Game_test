@@ -7,30 +7,32 @@ public class Enemy : Combatant, IScheduledEvent
     public EnemyPatternData pattern;
 
     private int currentStepIndex;
-    private float nextActionTime;
+    private int nextActionTime;
 
-    public float NextTime => nextActionTime;
+    public int NextTime => nextActionTime;
     public int Priority => 1;
+    public bool IsPending => CurrentHP > 0 && pattern != null && pattern.steps.Count > 0;
     public int CurrentStepIndex => currentStepIndex;
 
-    private float staggerAppliedAt = float.NegativeInfinity;
-    private float staggerAmount;
+    private int staggerAppliedAt;
+    private int staggerAmount;
 
-    public void ApplyStagger(float seconds)
+    public void ApplyStagger(int seconds)
     {
+        int prevNext = nextActionTime, prevAt = staggerAppliedAt, prevAmount = staggerAmount;
+        combatManager.Record(this, () => { nextActionTime = prevNext; staggerAppliedAt = prevAt; staggerAmount = prevAmount; });
         nextActionTime += seconds;
         staggerAppliedAt = combatManager.CurrentTime;
         staggerAmount = seconds;
     }
 
-    public float StaggerDisplay => Mathf.Max(0f, staggerAmount - (combatManager.CurrentTime - staggerAppliedAt));
+    public int StaggerDisplay => Mathf.Max(0, staggerAmount - (combatManager.CurrentTime - staggerAppliedAt));
 
     public void ScheduleFirstAction()
     {
         if (pattern == null || pattern.steps.Count == 0)
         {
             Debug.LogError("Враг " + name + ": пустой паттерн, враг не будет действовать", this);
-            nextActionTime = float.PositiveInfinity;
             return;
         }
         nextActionTime = combatManager.CurrentTime + pattern.steps[0].delaySeconds;
@@ -40,9 +42,15 @@ public class Enemy : Combatant, IScheduledEvent
     {
         if (CurrentHP <= 0) return;
 
+        int prevIndex = currentStepIndex, prevNext = nextActionTime;
+        combatManager.Record(this, () => { currentStepIndex = prevIndex; nextActionTime = prevNext; });
+
+        // Повтор после отката: действие в прошлом, игрок его уже пережил
+        bool skipPlayer = nextActionTime <= combatManager.ReplayUntil;
         var plan = GetPlannedStep();
         foreach (var target in plan.targets)
         {
+            if (skipPlayer && target is Player) continue;
             foreach (var action in plan.instantActions)
                 action.Apply(combatManager, this, target);
             foreach (var effect in plan.appliedEffects)

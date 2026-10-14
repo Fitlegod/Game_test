@@ -35,13 +35,17 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     {
         if (CurrentHP <= 0) return;
 
-        effectStacks[type] = GetStacks(type) + amount;
+        float before = GetStacks(type);
+        effectStacks[type] = before + amount;
+        float added = effectStacks[type] - before;
+        combatManager.Record(this, () => effectStacks[type] = GetStacks(type) - added);
 
         if (!activeScheduledEffects.ContainsKey(type) &&
-            StatusEffectRules.TryGetPeriodicBehavior(type, out float interval, out var action))
+            StatusEffectRules.TryGetPeriodicBehavior(type, out int interval, out var action))
         {
-            var periodicEvent = new PeriodicEffectEvent(combatManager.CurrentTime, interval, () => action(this));
+            var periodicEvent = new PeriodicEffectEvent(combatManager.CurrentTime, interval, () => action(this), this);
             activeScheduledEffects[type] = periodicEvent;
+            combatManager.Record(this, () => activeScheduledEffects.Remove(type));
             combatManager.RegisterScheduledEvent(periodicEvent);
         }
     }
@@ -49,13 +53,21 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     public void ClearAllScheduledEvents()
     {
         foreach (var kvp in activeScheduledEffects)
-            combatManager.UnregisterScheduledEvent(kvp.Value);
+        {
+            var type = kvp.Key;
+            var periodicEvent = kvp.Value;
+            combatManager.Record(this, () => activeScheduledEffects[type] = periodicEvent);
+            combatManager.UnregisterScheduledEvent(periodicEvent);
+        }
         activeScheduledEffects.Clear();
     }
 
     public void RemoveStacks(StatusEffectType type, float amount)
     {
-        effectStacks[type] = Mathf.Max(0f, GetStacks(type) - amount);
+        float before = GetStacks(type);
+        effectStacks[type] = Mathf.Max(0f, before - amount);
+        float removed = before - effectStacks[type];
+        combatManager.Record(this, () => effectStacks[type] = GetStacks(type) + removed);
     }
 
     public int CalculateOutgoingDamage(int baseDamage)
@@ -84,12 +96,16 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     public void Heal(int amount)
     {
         if (CurrentHP <= 0) return;
+        int before = CurrentHP;
         CurrentHP = Mathf.Min(maxHP, CurrentHP + amount);
+        int healed = CurrentHP - before;
+        combatManager.Record(this, () => CurrentHP -= healed);
     }
 
     public void GainBlock(int amount)
     {
         CurrentBlock += amount;
+        combatManager.Record(this, () => CurrentBlock -= amount);
     }
 
     public void SetCurrentHP(int hp)
@@ -107,8 +123,10 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         CurrentBlock -= absorbed;
         amount -= absorbed;
 
-        CurrentHP -= amount;
-        if (CurrentHP < 0) CurrentHP = 0;
+        int hpBefore = CurrentHP;
+        CurrentHP = Mathf.Max(0, CurrentHP - amount);
+        int hpLost = hpBefore - CurrentHP;
+        combatManager.Record(this, () => { CurrentBlock += absorbed; CurrentHP += hpLost; });
 
         if (CurrentHP == 0)
         {
