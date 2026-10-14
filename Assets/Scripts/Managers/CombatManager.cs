@@ -36,6 +36,8 @@ public class CombatManager : MonoBehaviour
     public int EffectTime => CurrentEvent != null ? CurrentEventTime : CurrentTime;
     // Номера прежних срабатываний события, которое откат вернул в ожидание: сверху — самое раннее (откат идёт от новых записей к старым)
     private Dictionary<IScheduledEvent, Stack<int>> replayOrders = new Dictionary<IScheduledEvent, Stack<int>>();
+    private Dictionary<IScheduledEvent, int> creationOrders = new Dictionary<IScheduledEvent, int>(); // номер создания события; повторная регистрация его не меняет
+    private int creationCounter;
     private int fireCounter; // сквозной номер срабатывания; при откате не уменьшается
     private bool isRewinding;
 
@@ -63,6 +65,8 @@ public class CombatManager : MonoBehaviour
         journal.Clear();
         fireCounter = 0;
         replayOrders.Clear();
+        creationOrders.Clear();
+        creationCounter = 0;
         CurrentEvent = null;
         isRewinding = false;
         combatOver = false;
@@ -87,6 +91,7 @@ public class CombatManager : MonoBehaviour
     public void RegisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
         scheduledEvents.Add(scheduledEvent);
+        if (!creationOrders.ContainsKey(scheduledEvent)) creationOrders[scheduledEvent] = ++creationCounter;
         if (IsWorld(scheduledEvent))
             Record(OwnerOf(scheduledEvent), () => scheduledEvents.Remove(scheduledEvent));
     }
@@ -135,14 +140,18 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    // Порядок при равном NextTime: повторяемые события — в порядке прежнего срабатывания и раньше новых; иначе Priority
+    // Порядок при равном NextTime: повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
     private bool GoesBefore(IScheduledEvent a, IScheduledEvent b)
     {
         if (a.NextTime != b.NextTime) return a.NextTime < b.NextTime;
         int ra = ReplayOrderOf(a), rb = ReplayOrderOf(b);
         if (ra > 0 && rb > 0) return ra < rb;
         if ((ra > 0) != (rb > 0)) return ra > 0;
-        return a.Priority < b.Priority;
+        if (a.Priority != b.Priority) return a.Priority < b.Priority;
+        int ca = creationOrders.TryGetValue(a, out var x) ? x : 0, cb = creationOrders.TryGetValue(b, out var y) ? y : 0;
+        if (a.Priority == 0) return ca < cb;
+        int ia = enemies.IndexOf(OwnerOf(a) as Enemy), ib = enemies.IndexOf(OwnerOf(b) as Enemy);
+        return ia != ib ? ia < ib : ca < cb;
     }
 
     // 0 — обычное событие; >0 — номер прежнего срабатывания, которое оно сейчас повторяет

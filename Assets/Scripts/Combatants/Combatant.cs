@@ -11,6 +11,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
 
     private Dictionary<StatusEffectType, float> effectStacks = new Dictionary<StatusEffectType, float>();
     private Dictionary<StatusEffectType, PeriodicEffectEvent> activeScheduledEffects = new Dictionary<StatusEffectType, PeriodicEffectEvent>();
+    private Dictionary<StatusEffectType, PeriodicEffectEvent> undoneTicks = new Dictionary<StatusEffectType, PeriodicEffectEvent>(); // тики, отменённые откатом: при повторе возвращаются тем же объектом
 
     // Явная инициализация при спавне: Awake не вызывается под неактивным родителем, поэтому HP нельзя ставить там.
     public void Init()
@@ -31,7 +32,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         return effectStacks.TryGetValue(type, out float value) ? value : 0f;
     }
 
-    public void AddEffectStacks(StatusEffectType type, float amount)
+    public void AddEffectStacks(StatusEffectType type, float amount, Combatant applier = null)
     {
         if (CurrentHP <= 0) return;
 
@@ -43,9 +44,15 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         if (!activeScheduledEffects.ContainsKey(type) &&
             StatusEffectRules.TryGetPeriodicBehavior(type, out int interval, out var action))
         {
-            var periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this);
+            PeriodicEffectEvent periodicEvent;
+            // Тик, отменённый откатом, при повторе возвращается тем же объектом: сохраняет номер создания и номера повтора
+            if (undoneTicks.TryGetValue(type, out periodicEvent) && periodicEvent.Applier == applier && combatManager.EffectTime <= combatManager.ReplayUntil)
+                periodicEvent.Restart(combatManager.EffectTime);
+            else
+                periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this, applier);
+            undoneTicks.Remove(type);
             activeScheduledEffects[type] = periodicEvent;
-            combatManager.Record(this, () => activeScheduledEffects.Remove(type));
+            combatManager.Record(this, () => { activeScheduledEffects.Remove(type); undoneTicks[type] = periodicEvent; });
             combatManager.RegisterScheduledEvent(periodicEvent);
         }
     }
