@@ -58,6 +58,9 @@ card.action.Block.Player = Даёт {0} блока{1}
 card.action.Heal.Enemy = Восстанавливает {0} HP врагу
 card.action.Heal.AllEnemies = Восстанавливает {0} HP всем врагам
 card.action.Heal.Player = Восстанавливает {0} HP
+card.action.Rewind.Enemy = Откат {0}
+card.action.Rewind.AllEnemies = Откат {0}
+card.action.Rewind.Player = Откат {0}
 
 # Накладываемые эффекты карты ({0} — стаки, {1} — название в родительном падеже)
 card.effect.positive.Enemy = Даёт {0} {1} врагу
@@ -103,6 +106,11 @@ combat.action.Heal.Player = Восстанавливает {0} HP по игро�
 combat.action.Heal.AllOtherEnemies = Восстанавливает {0} HP союзникам
 combat.action.Heal.LowestHpOtherEnemy = Восстанавливает {0} HP самому слабому союзнику
 combat.action.Heal.SpecificEnemyIndex = Восстанавливает {0} HP союзнику
+combat.action.Rewind.Self = Откат {0}
+combat.action.Rewind.Player = Откат {0}
+combat.action.Rewind.AllOtherEnemies = Откат {0}
+combat.action.Rewind.LowestHpOtherEnemy = Откат {0}
+combat.action.Rewind.SpecificEnemyIndex = Откат {0}
 combat.effect.Give.Self = Даёт {0} {1}
 combat.effect.Give.Player = Даёт {0} {1} по игроку
 combat.effect.Give.AllOtherEnemies = Даёт {0} {1} союзникам
@@ -121,6 +129,7 @@ card.stand_still.name = Стойка смирно
 card.embark.name = Отметить
 card.nova.name = Волна
 card.dash.name = Рывок
+card.rewind.name = Откат
 
 # Шаги врагов
 enemy.test.self_block = Self Block

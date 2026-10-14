@@ -36,7 +36,7 @@ public class CombatantStatusDisplay : MonoBehaviour
         AppendIfPresent(ref text, StatusEffectType.Frailty);
         AppendIfPresent(ref text, StatusEffectType.Vulnerable);
 
-        if (target is Enemy enemy && enemy.StaggerDisplay > 0f)
+        if (target is Enemy enemy && enemy.StaggerDisplay > 0)
             Join(ref text, StatusEffectType.Stagger, enemy.StaggerDisplay);
 
         return text;
@@ -57,8 +57,8 @@ public class CombatantStatusDisplay : MonoBehaviour
 
     private string BuildTelegraphText()
     {
-        float remaining = enemyForTelegraph.NextTime - combatManager.CurrentTime;
-        string text = Loc.Format("combat.telegraph.time", Mathf.Max(0, remaining).ToString("0.0"));
+        int remaining = enemyForTelegraph.NextTime - combatManager.CurrentTime;
+        string text = Loc.Format("combat.telegraph.time", Mathf.Max(0, remaining).ToString());
 
         if (enemyForTelegraph.pattern != null && enemyForTelegraph.pattern.steps.Count > 0)
         {

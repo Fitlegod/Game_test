@@ -42,32 +42,58 @@ public class Card : MonoBehaviour, IPointerClickHandler
         // Событие не держит ссылку на this: объект карты уничтожается сразу, а эффект может сработать позже
         CardInstance playedInstance = instance;
         CombatManager cm = combatManager;
-        float effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
-        cm.RegisterScheduledEvent(new OneShotEvent(effectTime, priority: 0, () => ApplyAllEffects(playedInstance.data, cm, target)));
+        int effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
+        var memo = new Dictionary<(int, Combatant), int>(); // числа первого срабатывания — для повтора после отката
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: 0, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay, memo)));
 
         if (HandManager.Instance != null)
             HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
 
         cm.AdvanceTime(playedInstance.data.timeCostSeconds);
-        cm.ResolveUpTo(cm.CurrentTime);
+        cm.ResolveUpTo();
 
         if (HandManager.Instance != null)
             HandManager.Instance.deckManager.Discard(playedInstance); // сброс или сжигание по EffectiveProperties
     }
 
-    private static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget)
+    // isReplay: событие переигрывается после отката — на игрока и сам Откат не действует, на врагов действует
+    // memo: итоговые («исходящие») числа по (номер действия, цель). Первое срабатывание их записывает, повтор применяет их как есть
+    // и не пересчитывает формулы источника по текущему состоянию игрока (игрок при откате не откатывается). Эффекты-стаки — фиксированные числа, в memo не нужны.
+    public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false, Dictionary<(int, Combatant), int> memo = null)
     {
-        foreach (var action in data.instantActions)
+        InstantActionEntry rewind = null; // Откат — один раз на карту и последним: после него у этой карты не остаётся записей журнала
+        for (int i = 0; i < data.instantActions.Count; i++)
+        {
+            var action = data.instantActions[i];
+            if (action.kind == InstantActionKind.Rewind)
+            {
+                if (rewind == null) rewind = action;
+                continue;
+            }
             foreach (var target in ResolveTargets(combatManager, action.targetTag, chosenTarget))
-                action.Apply(combatManager, combatManager.player, target);
+            {
+                if (isReplay && target is Player) continue;
+                if (isReplay && memo != null && memo.TryGetValue((i, target), out int remembered))
+                    action.Apply(combatManager, combatManager.player, target, remembered);
+                else
+                {
+                    int outgoing = action.Apply(combatManager, combatManager.player, target);
+                    if (!isReplay && memo != null) memo[(i, target)] = outgoing;
+                }
+            }
+        }
 
         foreach (var effect in data.appliedEffects)
             foreach (var target in ResolveTargets(combatManager, effect.targetTag, chosenTarget))
-                effect.Apply(combatManager, combatManager.player, target);
+                if (!(isReplay && target is Player))
+                    effect.Apply(combatManager, combatManager.player, target);
 
-        if (data.drawCardsOnPlay > 0 && HandManager.Instance != null)
+        if (!isReplay && data.drawCardsOnPlay > 0 && HandManager.Instance != null)
             for (int i = 0; i < data.drawCardsOnPlay; i++)
                 HandManager.Instance.TryDrawToHand();
+
+        if (rewind != null && !isReplay)
+            rewind.Apply(combatManager, combatManager.player, combatManager.player);
     }
 
     private static List<Combatant> ResolveTargets(CombatManager combatManager, EffectTargetTag tag, Combatant chosenTarget)

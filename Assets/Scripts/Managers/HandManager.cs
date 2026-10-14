@@ -4,7 +4,7 @@ public class HandManager : MonoBehaviour
 {
     public const int MaxHandSize = 7;
     public const int InitialHandSize = 4;
-    public const float DrawIntervalSeconds = 2f;
+    public const int DrawIntervalSeconds = 2;
 
     public static HandManager Instance { get; private set; }
 

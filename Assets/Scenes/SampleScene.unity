@@ -1248,6 +1248,8 @@ MonoBehaviour:
     instanceProperties: 0
   - data: {fileID: 11400000, guid: e4b2b1a7c7b564042b36201d8aed330b, type: 2}
     instanceProperties: 0
+  - data: {fileID: 11400000, guid: 2ee9878dd3883f647a6a0bd6e488801a, type: 2}
+    instanceProperties: 0
 --- !u!1 &236410162
 GameObject:
   m_ObjectHideFlags: 0

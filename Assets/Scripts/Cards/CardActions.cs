@@ -4,7 +4,8 @@ public enum InstantActionKind
 {
     Damage,
     Block,
-    Heal
+    Heal,
+    Rewind // amount = на сколько секунд откатить бой; hitCount игнорируется
 }
 
 [System.Serializable]
@@ -15,22 +16,32 @@ public class InstantActionEntry
     public int hitCount = 1;
     public EffectTargetTag targetTag;
 
-    public void Apply(CombatManager combatManager, Combatant source, Combatant target)
+    // Возвращает «исходящее» число: урон после модификаторов источника (до модификаторов цели), блок после Крепкости/Хрупкости получателя, лечение.
+    // outgoingOverride — число из первого срабатывания карты (повтор после отката): формулы источника заново не считаются.
+    public int Apply(CombatManager combatManager, Combatant source, Combatant target, int? outgoingOverride = null)
     {
+        if (kind == InstantActionKind.Rewind)
+        {
+            combatManager.Rewind(amount);
+            return amount;
+        }
+
+        int outgoing = amount;
+
         for (int i = 0; i < hitCount; i++)
         {
             switch (kind)
             {
                 case InstantActionKind.Damage:
-                    int finalDamage = source.CalculateOutgoingDamage(amount);
-                    finalDamage = target.ApplyIncomingDamageModifiers(finalDamage);
+                    outgoing = outgoingOverride ?? source.CalculateOutgoingDamage(amount);
+                    int finalDamage = target.ApplyIncomingDamageModifiers(outgoing);
                     target.TakeDamage(finalDamage);
                     Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
                     break;
 
                 case InstantActionKind.Block:
                     Combatant blockRecipient = target ?? source;
-                    int finalBlock = blockRecipient.CalculateIncomingBlock(amount);
+                    int finalBlock = outgoing = outgoingOverride ?? blockRecipient.CalculateIncomingBlock(amount);
                     blockRecipient.GainBlock(finalBlock);
                     Debug.Log("Даёт " + finalBlock + " блока цели " + blockRecipient.name + " (база " + amount + ")");
                     break;
@@ -42,6 +53,7 @@ public class InstantActionEntry
                     break;
             }
         }
+        return outgoing;
     }
 
     public int ComputePreviewAmount(Combatant source, Combatant recipient)
@@ -85,7 +97,7 @@ public class AppliedEffectEntry
         if (statusType == StatusEffectType.Stagger)
         {
             if (target is Enemy enemy)
-                enemy.ApplyStagger(stacks);
+                enemy.ApplyStagger(Mathf.RoundToInt(stacks));
             Debug.Log("Накладывает Пошатывание на " + stacks + " сек. цели " + target.name);
             return;
         }
