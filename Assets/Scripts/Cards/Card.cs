@@ -43,7 +43,8 @@ public class Card : MonoBehaviour, IPointerClickHandler
         CardInstance playedInstance = instance;
         CombatManager cm = combatManager;
         int effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
-        cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: 0, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay)));
+        var memo = new Dictionary<(int, Combatant), int>(); // числа первого срабатывания — для повтора после отката
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: 0, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay, memo)));
 
         if (HandManager.Instance != null)
             HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
@@ -56,14 +57,25 @@ public class Card : MonoBehaviour, IPointerClickHandler
     }
 
     // isReplay: событие переигрывается после отката — на игрока и сам Откат не действует, на врагов действует
-    public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false)
+    // memo: итоговые («исходящие») числа по (номер действия, цель). Первое срабатывание их записывает, повтор применяет их как есть
+    // и не пересчитывает формулы источника по текущему состоянию игрока (игрок при откате не откатывается). Эффекты-стаки — фиксированные числа, в memo не нужны.
+    public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false, Dictionary<(int, Combatant), int> memo = null)
     {
-        foreach (var action in data.instantActions)
+        for (int i = 0; i < data.instantActions.Count; i++)
         {
+            var action = data.instantActions[i];
             if (isReplay && action.kind == InstantActionKind.Rewind) continue;
             foreach (var target in ResolveTargets(combatManager, action.targetTag, chosenTarget))
-                if (!(isReplay && target is Player))
-                    action.Apply(combatManager, combatManager.player, target);
+            {
+                if (isReplay && target is Player) continue;
+                if (isReplay && memo != null && memo.TryGetValue((i, target), out int remembered))
+                    action.Apply(combatManager, combatManager.player, target, remembered);
+                else
+                {
+                    int outgoing = action.Apply(combatManager, combatManager.player, target);
+                    if (!isReplay && memo != null) memo[(i, target)] = outgoing;
+                }
+            }
         }
 
         foreach (var effect in data.appliedEffects)

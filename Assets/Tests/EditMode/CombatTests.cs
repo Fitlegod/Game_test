@@ -493,4 +493,24 @@ public class CombatTests
         Assert.AreEqual(10, e.NextTime);
         Assert.AreEqual(25, player.CurrentHP);
     }
+
+    // Повтор с параметрами первого раза: Сила, полученная в интервале (игрок не откатывается), не увеличивает повторный удар
+    [Test]
+    public void U_Replay_UsesNumbersOfFirstPass()
+    {
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        Dmg(8, 1, 0).Play(enemy);                       // 8 урона, Силы нет
+        var embark = MakeCard(1, 0);
+        embark.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Strength, stacks = 3, targetTag = EffectTargetTag.Player });
+        embark.Play(null);
+        Assert.AreEqual(3, player.GetStacks(StatusEffectType.Strength));
+        int afterFirstPass = enemy.CurrentHP;
+        Assert.AreEqual(42, afterFirstPass);
+
+        RewindCard(3, 1, 1).Play(null);                 // T=3, R=0: Jab повторяется
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(afterFirstPass, enemy.CurrentHP, "повторный удар — 8, а не 11");
+        Assert.AreEqual(3, player.GetStacks(StatusEffectType.Strength), "игрок не откатывается");
+    }
 }
