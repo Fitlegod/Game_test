@@ -5,6 +5,7 @@ using TMPro;
 // Запись журнала: как отменить одно изменение боя. Хранит реальную разницу, а не входное число.
 public class UndoEntry
 {
+    public int FireOrder;        // номер срабатывания события (CombatManager.fireCounter)
     public int Time;             // момент события, внутри которого сделано изменение
     public Combatant Target;     // чьё состояние меняется (null — состояние не боевого участника)
     public IScheduledEvent Source; // событие, внутри которого сделано изменение
@@ -30,6 +31,10 @@ public class CombatManager : MonoBehaviour
     public IReadOnlyList<UndoEntry> Journal => journal;
     public IScheduledEvent CurrentEvent { get; private set; }
     public int CurrentEventTime { get; private set; }
+    public int CurrentFireOrder { get; private set; }
+    // Номера прежних срабатываний события, которое откат вернул в ожидание: сверху — самое раннее (откат идёт от новых записей к старым)
+    private Dictionary<IScheduledEvent, Stack<int>> replayOrders = new Dictionary<IScheduledEvent, Stack<int>>();
+    private int fireCounter; // сквозной номер срабатывания; при откате не уменьшается
     private bool isRewinding;
 
     public event System.Action OnVictory;
@@ -54,6 +59,8 @@ public class CombatManager : MonoBehaviour
         CurrentTime = 0;
         ReplayUntil = -1;
         journal.Clear();
+        fireCounter = 0;
+        replayOrders.Clear();
         CurrentEvent = null;
         isRewinding = false;
         combatOver = false;
@@ -93,7 +100,7 @@ public class CombatManager : MonoBehaviour
     public void Record(Combatant target, System.Action undo)
     {
         if (CurrentEvent == null || isRewinding) return;
-        journal.Add(new UndoEntry { Time = CurrentEventTime, Target = target, Source = CurrentEvent, Undo = undo });
+        journal.Add(new UndoEntry { FireOrder = CurrentFireOrder, Time = CurrentEventTime, Target = target, Source = CurrentEvent, Undo = undo });
     }
 
     public void AdvanceTime(int amount)
@@ -110,22 +117,47 @@ public class CombatManager : MonoBehaviour
             foreach (var ev in scheduledEvents)
             {
                 if (!ev.IsPending || ev.NextTime > CurrentTime) continue;
-                if (next == null || ev.NextTime < next.NextTime ||
-                    (ev.NextTime == next.NextTime && ev.Priority < next.Priority))
+                if (next == null || GoesBefore(ev, next))
                     next = ev;
             }
             if (next == null) break;
             CurrentEvent = next;
             CurrentEventTime = next.NextTime;
+            CurrentFireOrder = ++fireCounter;
+            if (replayOrders.TryGetValue(next, out var pending) && pending.Count > 0) pending.Pop(); // это срабатывание — повтор самого раннего прежнего
             try { next.Trigger(); }
             finally { CurrentEvent = null; }
         }
+    }
+
+    // Порядок при равном NextTime: повторяемые события — в порядке прежнего срабатывания и раньше новых; иначе Priority
+    private bool GoesBefore(IScheduledEvent a, IScheduledEvent b)
+    {
+        if (a.NextTime != b.NextTime) return a.NextTime < b.NextTime;
+        int ra = ReplayOrderOf(a), rb = ReplayOrderOf(b);
+        if (ra > 0 && rb > 0) return ra < rb;
+        if ((ra > 0) != (rb > 0)) return ra > 0;
+        return a.Priority < b.Priority;
+    }
+
+    // 0 — обычное событие; >0 — номер прежнего срабатывания, которое оно сейчас повторяет
+    private int ReplayOrderOf(IScheduledEvent ev) => replayOrders.TryGetValue(ev, out var s) && s.Count > 0 ? s.Peek() : 0;
+
+    public void PushReplayOrder(IScheduledEvent ev, int order)
+    {
+        if (!replayOrders.TryGetValue(ev, out var s)) replayOrders[ev] = s = new Stack<int>();
+        s.Push(order);
     }
 
     // Откат: вызывается из эффекта карты (внутри события). Игрок не меняется, враги и мир возвращаются обратными процедурами.
     public void Rewind(int n)
     {
         if (CurrentEvent == null) return;
+        if (!(CurrentEvent is OneShotEvent))
+        {
+            Debug.LogError("Откат можно вызвать только из события карты игрока, а не из " + (CurrentEvent is Enemy enemy ? "действия врага " + enemy.name : CurrentEvent.GetType().Name));
+            return;
+        }
         int t = CurrentEventTime;
         int r = Mathf.Max(0, t - n);
         int shift = t - r;

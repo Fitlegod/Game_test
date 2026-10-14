@@ -20,7 +20,10 @@ public class PeriodicEffectEvent : IScheduledEvent
     public void Trigger()
     {
         if (Owner != null)
-            Owner.combatManager.Record(Owner, () => NextTime -= interval);
+        {
+            int order = Owner.combatManager.CurrentFireOrder;
+            Owner.combatManager.Record(Owner, () => { NextTime -= interval; Owner.combatManager.PushReplayOrder(this, order); });
+        }
         onTrigger();
         NextTime += interval;
     }
@@ -49,7 +52,8 @@ public class OneShotEvent : IScheduledEvent
     public void Trigger()
     {
         fired = true;
-        combatManager.Record(null, () => Rearm(true));
+        int order = combatManager.CurrentFireOrder;
+        combatManager.Record(null, () => { Rearm(true); combatManager.PushReplayOrder(this, order); });
         onTrigger?.Invoke(IsReplay);
     }
 

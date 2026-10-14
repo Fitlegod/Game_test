@@ -43,7 +43,8 @@ public class Enemy : Combatant, IScheduledEvent
         if (CurrentHP <= 0) return;
 
         int prevIndex = currentStepIndex, prevNext = nextActionTime;
-        combatManager.Record(this, () => { currentStepIndex = prevIndex; nextActionTime = prevNext; });
+        int order = combatManager.CurrentFireOrder;
+        combatManager.Record(this, () => { currentStepIndex = prevIndex; nextActionTime = prevNext; combatManager.PushReplayOrder(this, order); });
 
         // Повтор после отката: действие в прошлом, игрок его уже пережил
         bool skipPlayer = nextActionTime <= combatManager.ReplayUntil;

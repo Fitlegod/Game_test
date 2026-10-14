@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 // Боевое ядро без UI: время, события, откат. Враги/игрок/менеджер создаются в коде, карты играются через настоящий Card.Play.
 public class CombatTests
@@ -72,6 +73,29 @@ public class CombatTests
                 delaySeconds = delay,
                 target = EnemyActionTarget.Player,
                 instantActions = new List<InstantActionEntry> { Act(InstantActionKind.Damage, damage, EffectTargetTag.Player) }
+            });
+        enemy.pattern = pattern;
+        enemy.ScheduleFirstAction();
+        return enemy;
+    }
+
+    // Враг с произвольными шагами (каждый шаг: действие и задержка до следующего)
+    Enemy MakeEnemyWithSteps(int hp, params (InstantActionEntry action, EnemyActionTarget target, int delay)[] steps)
+    {
+        var enemy = Make<Enemy>();
+        enemy.maxHP = hp;
+        enemy.combatManager = cm;
+        enemy.Init();
+        enemy.player = player;
+        var pattern = ScriptableObject.CreateInstance<EnemyPatternData>();
+        created.Add(pattern);
+        foreach (var st in steps)
+            pattern.steps.Add(new EnemyActionStep
+            {
+                stepNameKey = "enemy.test.attack_player",
+                delaySeconds = st.delay,
+                target = st.target,
+                instantActions = new List<InstantActionEntry> { st.action }
             });
         enemy.pattern = pattern;
         enemy.ScheduleFirstAction();
@@ -363,5 +387,86 @@ public class CombatTests
         Assert.AreEqual(0, writtenDuringUndo, "во время Undo журнал не пишется");
         Assert.IsTrue(cm.Journal.Count > 0);
         Assert.IsTrue(cm.Journal.All(e => e.Time < 2));
+    }
+
+    // Враг A в момент 6 лечит слабейшего союзника на 4; карта Jab с моментом 6 сыграна уже ПОСЛЕ хода A и убивает A.
+    // Повтор после отката должен воспроизвести тот же порядок: сначала A, потом карта.
+    [Test]
+    public void O_Replay_KeepsOriginalOrderOfSameMoment()
+    {
+        var a = MakeEnemyWithSteps(5, (Act(InstantActionKind.Heal, 4, EffectTargetTag.Enemy), EnemyActionTarget.LowestHpOtherEnemy, 6),
+                                      (Act(InstantActionKind.Heal, 4, EffectTargetTag.Enemy), EnemyActionTarget.LowestHpOtherEnemy, 6));
+        var b = MakeEnemy(30, 99, 1);
+        b.SetCurrentHP(20);
+        Spawn(a, b);
+
+        MakeCard(6, 0).Play(null);        // время 6: A ходит в 6 и лечит B
+        Dmg(6, 1, 0).Play(a);             // Jab с моментом 6 — после хода A
+        int aHp = a.CurrentHP, bHp = b.CurrentHP, aStep = a.CurrentStepIndex, bStep = b.CurrentStepIndex;
+        Assert.AreEqual(0, aHp); Assert.AreEqual(24, bHp);
+
+        RewindCard(3, 1, 1).Play(null);   // T=8, R=5: время 5, повтор ещё впереди
+        Assert.AreEqual(5, cm.CurrentTime);
+        Advance(2);                       // время 7: повтор момента 6
+        Assert.AreEqual(aHp, a.CurrentHP);
+        Assert.AreEqual(bHp, b.CurrentHP);
+        Assert.AreEqual(aStep, a.CurrentStepIndex);
+        Assert.AreEqual(bStep, b.CurrentStepIndex);
+    }
+
+    // Новая карта в тот же момент, что и повторяемое действие врага: повторяемое — первым, без исключений и циклов
+    [Test]
+    public void P_NewCardAtSameMomentAsReplay_ReplayFirst()
+    {
+        var a = MakeEnemyWithSteps(30, (Act(InstantActionKind.Heal, 4, EffectTargetTag.Enemy), EnemyActionTarget.LowestHpOtherEnemy, 6));
+        var b = MakeEnemy(30, 99, 1);
+        b.SetCurrentHP(29);
+        Spawn(a, b);
+
+        MakeCard(6, 0).Play(null);        // A в 6 лечит B: 30
+        Assert.AreEqual(30, b.CurrentHP);
+        RewindCard(3, 1, 1).Play(null);   // T=7, R=4: B снова 29, ход A в 6 ждёт повтора
+        Assert.AreEqual(4, cm.CurrentTime);
+        Assert.AreEqual(29, b.CurrentHP);
+
+        Dmg(1, 2, 2).Play(b);             // эффект в 6, время 6: ход A (повтор) первым: 29→30→29
+        Assert.AreEqual(29, b.CurrentHP, "повторяемое действие врага — раньше новой карты");
+        Assert.AreEqual(6, cm.CurrentTime);
+    }
+
+    [Test]
+    public void R_RewindFromEnemyAction_DoesNothingAndLogsError()
+    {
+        var enemy = MakeEnemyWithSteps(30, (Act(InstantActionKind.Rewind, 3, EffectTargetTag.Player), EnemyActionTarget.Self, 2));
+        Spawn(enemy);
+        LogAssert.Expect(LogType.Error, new System.Text.RegularExpressions.Regex("Откат можно вызвать только из события карты"));
+        Advance(2);
+        Assert.AreEqual(2, cm.CurrentTime);
+        Assert.AreEqual(30, enemy.CurrentHP);
+        Assert.AreEqual(30, player.CurrentHP);
+        Assert.AreEqual(1, cm.Journal.Count, "только запись о самом ходе врага");
+        Assert.AreSame(enemy, cm.Journal[0].Source);
+    }
+
+    // Враг ходит в интервале несколько раз (в 2 и в 4), карта в 4 — после его хода: порядок обоих ходов должен сохраниться
+    [Test]
+    public void S_Replay_EnemyActsSeveralTimesInInterval()
+    {
+        var a = MakeEnemyWithSteps(5, (Act(InstantActionKind.Heal, 4, EffectTargetTag.Enemy), EnemyActionTarget.LowestHpOtherEnemy, 2),
+                                      (Act(InstantActionKind.Heal, 4, EffectTargetTag.Enemy), EnemyActionTarget.LowestHpOtherEnemy, 2));
+        var b = MakeEnemy(30, 99, 1);
+        b.SetCurrentHP(20);
+        Spawn(a, b);
+
+        MakeCard(4, 0).Play(null);        // A ходит в 2 и в 4: B 20→24→28
+        Dmg(6, 1, 0).Play(a);             // эффект в 4 — после хода A, A умирает
+        Assert.AreEqual(0, a.CurrentHP); Assert.AreEqual(28, b.CurrentHP);
+
+        RewindCard(5, 1, 1).Play(null);   // T=6, R=1: время 1
+        Assert.AreEqual(1, cm.CurrentTime);
+        Advance(4);                       // время 5
+        Assert.AreEqual(0, a.CurrentHP);
+        Assert.AreEqual(28, b.CurrentHP);
+        Assert.AreEqual(5, cm.CurrentTime);
     }
 }
