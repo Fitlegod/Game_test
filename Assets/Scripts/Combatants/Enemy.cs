@@ -22,7 +22,7 @@ public class Enemy : Combatant, IScheduledEvent
         int prevNext = nextActionTime, prevAt = staggerAppliedAt, prevAmount = staggerAmount;
         combatManager.Record(this, () => { nextActionTime = prevNext; staggerAppliedAt = prevAt; staggerAmount = prevAmount; });
         nextActionTime += seconds;
-        staggerAppliedAt = combatManager.CurrentTime;
+        staggerAppliedAt = combatManager.EffectTime;
         staggerAmount = seconds;
     }
 

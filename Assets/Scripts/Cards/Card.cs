@@ -61,10 +61,15 @@ public class Card : MonoBehaviour, IPointerClickHandler
     // и не пересчитывает формулы источника по текущему состоянию игрока (игрок при откате не откатывается). Эффекты-стаки — фиксированные числа, в memo не нужны.
     public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false, Dictionary<(int, Combatant), int> memo = null)
     {
+        InstantActionEntry rewind = null; // Откат — один раз на карту и последним: после него у этой карты не остаётся записей журнала
         for (int i = 0; i < data.instantActions.Count; i++)
         {
             var action = data.instantActions[i];
-            if (isReplay && action.kind == InstantActionKind.Rewind) continue;
+            if (action.kind == InstantActionKind.Rewind)
+            {
+                if (rewind == null) rewind = action;
+                continue;
+            }
             foreach (var target in ResolveTargets(combatManager, action.targetTag, chosenTarget))
             {
                 if (isReplay && target is Player) continue;
@@ -86,6 +91,9 @@ public class Card : MonoBehaviour, IPointerClickHandler
         if (!isReplay && data.drawCardsOnPlay > 0 && HandManager.Instance != null)
             for (int i = 0; i < data.drawCardsOnPlay; i++)
                 HandManager.Instance.TryDrawToHand();
+
+        if (rewind != null && !isReplay)
+            rewind.Apply(combatManager, combatManager.player, combatManager.player);
     }
 
     private static List<Combatant> ResolveTargets(CombatManager combatManager, EffectTargetTag tag, Combatant chosenTarget)

@@ -513,4 +513,114 @@ public class CombatTests
         Assert.AreEqual(afterFirstPass, enemy.CurrentHP, "повторный удар — 8, а не 11");
         Assert.AreEqual(3, player.GetStacks(StatusEffectType.Strength), "игрок не откатывается");
     }
+
+    // ---------- Момент эффекта (EffectTime), порядок после оживления, Откат один раз на карту ----------
+
+    Card WithEffect(Card card, StatusEffectType type, float stacks, EffectTargetTag tag)
+    {
+        card.data.appliedEffects.Add(new AppliedEffectEntry { statusType = type, stacks = stacks, targetTag = tag });
+        return card;
+    }
+
+    PeriodicEffectEvent TickOf(Combatant owner) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == owner);
+
+    [Test]
+    public void F2_WeakFromCastCost3_FirstTickCountedFromEffectMoment()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        WithEffect(MakeCard(3, 0), StatusEffectType.Weak, 1, EffectTargetTag.Enemy).Play(enemy); // эффект в 0, каст 0→3
+        Assert.AreEqual(3, cm.CurrentTime);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Weak), "стак снят в 3, а не в 6");
+    }
+
+    [Test]
+    public void H2_EnemyWeakOnPlayerDuringCast_TickFromEnemyMoment()
+    {
+        var enemy = Make<Enemy>();
+        enemy.maxHP = 30; enemy.combatManager = cm; enemy.Init(); enemy.player = player;
+        var pattern = ScriptableObject.CreateInstance<EnemyPatternData>();
+        created.Add(pattern);
+        pattern.steps.Add(new EnemyActionStep
+        {
+            stepNameKey = "enemy.test.attack_player", delaySeconds = 2, target = EnemyActionTarget.Player,
+            appliedEffects = new List<AppliedEffectEntry> { new AppliedEffectEntry { statusType = StatusEffectType.Weak, stacks = 1, targetTag = EffectTargetTag.Player } }
+        });
+        pattern.steps.Add(new EnemyActionStep { stepNameKey = "enemy.test.attack_player", delaySeconds = 99, target = EnemyActionTarget.Self });
+        enemy.pattern = pattern;
+        enemy.ScheduleFirstAction();
+        Spawn(enemy);
+
+        MakeCard(3, 0).Play(null);        // каст 0→3, враг накладывает Слабость в 2
+        Assert.AreEqual(1, player.GetStacks(StatusEffectType.Weak));
+        Assert.AreEqual(5, TickOf(player).NextTime);
+        Advance(1); Assert.AreEqual(1, player.GetStacks(StatusEffectType.Weak));   // 4
+        Advance(1); Assert.AreEqual(0, player.GetStacks(StatusEffectType.Weak));   // 5
+    }
+
+    [Test]
+    public void C2_Replay_WeakTickSameMomentAsFirstPass()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        Advance(2);
+        WithEffect(MakeCard(2, 0), StatusEffectType.Weak, 1, EffectTargetTag.Enemy).Play(enemy); // эффект в 2, каст 2→4
+        Assert.AreEqual(5, TickOf(enemy).NextTime);
+
+        RewindCard(3, 2, 1).Play(null);   // T=5, R=2, S=3: время 6→3 (не 4)
+        Assert.AreEqual(3, cm.CurrentTime);
+        Assert.AreEqual(1, enemy.GetStacks(StatusEffectType.Weak));
+        Assert.AreEqual(5, TickOf(enemy).NextTime, "тик повтора — от момента 2, а не от времени разбора");
+        Advance(2);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Weak));
+    }
+
+    [Test]
+    public void W_RevivedEnemy_KeepsItsPlaceInTurnOrder()
+    {
+        var a = MakeEnemy(5, 4, 1);
+        var b = MakeEnemy(30, 4, 1);
+        Spawn(a, b);
+        Dmg(10, 2, 2).Play(a);            // A погибает в 2
+        Assert.AreEqual(0, a.CurrentHP);
+        RewindCard(3, 1, 1).Play(null);   // T=3, R=0: A жив, повтор удара в 2 ждёт; ReplayUntil=3
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(5, a.CurrentHP);
+        MakeCard(1, 0, Act(InstantActionKind.Block, 20, EffectTargetTag.Enemy)).Play(a); // блок, чтобы повтор не убил A
+        Advance(3);                       // время 4: повтор в 2, затем общий момент 4
+        Assert.Greater(a.CurrentHP, 0);
+        var order = cm.Journal.Where(e => e.Time == 4 && e.Source is Enemy).Select(e => e.Source).Distinct().ToList();
+        CollectionAssert.AreEqual(new IScheduledEvent[] { a, b }, order, "A ходит раньше B");
+    }
+
+    [Test]
+    public void S2_StaggerAfterRewind_DisplayNeverAboveApplied()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        Advance(2);
+        WithEffect(MakeCard(3, 0), StatusEffectType.Stagger, 3, EffectTargetTag.Enemy).Play(enemy); // эффект в 2, каст 2→5
+        Assert.LessOrEqual(enemy.StaggerDisplay, 3);
+        RewindCard(3, 1, 1).Play(null);   // T=6, R=3, S=3: время 3, Пошатывание (момент 2) не отменено
+        Assert.AreEqual(3, cm.CurrentTime);
+        Assert.LessOrEqual(enemy.StaggerDisplay, 3);
+        Assert.AreEqual(2, enemy.StaggerDisplay);
+    }
+
+    [Test]
+    public void E_RewindOncePerCard_AndLast()
+    {
+        var e1 = MakeEnemy(30, 99, 1);
+        var e2 = MakeEnemy(30, 99, 1);
+        Spawn(e1, e2);
+        Advance(5);
+        var card = MakeCard(1, 1, Act(InstantActionKind.Rewind, 3, EffectTargetTag.AllEnemies), Act(InstantActionKind.Damage, 5, EffectTargetTag.Enemy));
+        card.Play(e1);                    // T=6, R=3: время 6→3 один раз; урон 5 — до переноса
+        Assert.AreEqual(3, cm.CurrentTime);
+        Assert.AreEqual(25, e1.CurrentHP);
+        Assert.AreEqual(30, e2.CurrentHP);
+
+        RewindCard(3, 1, 1).Play(null);   // второй Откат, покрывающий тот же момент
+        Assert.AreEqual(25, e1.CurrentHP, "урон карты Отката остаётся и не повторяется: её записи уже вычеркнуты из журнала");
+    }
 }

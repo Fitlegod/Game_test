@@ -43,7 +43,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         if (!activeScheduledEffects.ContainsKey(type) &&
             StatusEffectRules.TryGetPeriodicBehavior(type, out int interval, out var action))
         {
-            var periodicEvent = new PeriodicEffectEvent(combatManager.CurrentTime, interval, () => action(this), this);
+            var periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this);
             activeScheduledEffects[type] = periodicEvent;
             combatManager.Record(this, () => activeScheduledEffects.Remove(type));
             combatManager.RegisterScheduledEvent(periodicEvent);

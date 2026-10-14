@@ -32,6 +32,8 @@ public class CombatManager : MonoBehaviour
     public IScheduledEvent CurrentEvent { get; private set; }
     public int CurrentEventTime { get; private set; }
     public int CurrentFireOrder { get; private set; }
+    // Момент, в который «происходит» эффект: внутри события — момент события, вне — текущее время (не конец каста)
+    public int EffectTime => CurrentEvent != null ? CurrentEventTime : CurrentTime;
     // Номера прежних срабатываний события, которое откат вернул в ожидание: сверху — самое раннее (откат идёт от новых записей к старым)
     private Dictionary<IScheduledEvent, Stack<int>> replayOrders = new Dictionary<IScheduledEvent, Stack<int>>();
     private int fireCounter; // сквозной номер срабатывания; при откате не уменьшается
@@ -91,9 +93,11 @@ public class CombatManager : MonoBehaviour
 
     public void UnregisterScheduledEvent(IScheduledEvent scheduledEvent)
     {
-        if (!scheduledEvents.Remove(scheduledEvent)) return;
-        if (IsWorld(scheduledEvent))
-            Record(OwnerOf(scheduledEvent), () => scheduledEvents.Add(scheduledEvent));
+        int index = scheduledEvents.IndexOf(scheduledEvent);
+        if (index < 0) return;
+        scheduledEvents.RemoveAt(index);
+        if (IsWorld(scheduledEvent)) // обратно — на прежнее место: порядок в списке задаёт порядок ходов в общий момент
+            Record(OwnerOf(scheduledEvent), () => scheduledEvents.Insert(Mathf.Min(index, scheduledEvents.Count), scheduledEvent));
     }
 
     // Пишет обратную процедуру только внутри события и не во время самого отката
