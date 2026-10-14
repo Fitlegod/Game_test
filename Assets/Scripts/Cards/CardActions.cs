@@ -102,7 +102,7 @@ public class AppliedEffectEntry
             return;
         }
 
-        target.AddEffectStacks(statusType, stacks);
+        target.AddEffectStacks(statusType, stacks, source);
         Debug.Log("Применяет " + stacks + " стаков " + statusType + " цели " + target.name);
     }
 

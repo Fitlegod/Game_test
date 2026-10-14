@@ -31,7 +31,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         return effectStacks.TryGetValue(type, out float value) ? value : 0f;
     }
 
-    public void AddEffectStacks(StatusEffectType type, float amount)
+    public void AddEffectStacks(StatusEffectType type, float amount, Combatant applier = null)
     {
         if (CurrentHP <= 0) return;
 
@@ -43,7 +43,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         if (!activeScheduledEffects.ContainsKey(type) &&
             StatusEffectRules.TryGetPeriodicBehavior(type, out int interval, out var action))
         {
-            var periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this);
+            var periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this, applier);
             activeScheduledEffects[type] = periodicEvent;
             combatManager.Record(this, () => activeScheduledEffects.Remove(type));
             combatManager.RegisterScheduledEvent(periodicEvent);

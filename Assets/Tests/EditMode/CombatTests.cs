@@ -623,4 +623,104 @@ public class CombatTests
         RewindCard(3, 1, 1).Play(null);   // второй Откат, покрывающий тот же момент
         Assert.AreEqual(25, e1.CurrentHP, "урон карты Отката остаётся и не повторяется: её записи уже вычеркнуты из журнала");
     }
+
+    // ---------- A2: порядок одновременных событий ----------
+
+    // События в порядке срабатывания (по журналу: каждое событие здесь оставляет запись)
+    List<IScheduledEvent> FiredOrder() => cm.Journal.Select(e => e.Source).Distinct().ToList();
+
+    // Событие-«карта» на момент t: пишет в лог и видит стаки Слабости игрока
+    OneShotEvent LogCard(int t, List<string> log)
+    {
+        var ev = new OneShotEvent(cm, t, 0, _ => log.Add("card weak=" + player.GetStacks(StatusEffectType.Weak)));
+        cm.RegisterScheduledEvent(ev);
+        return ev;
+    }
+
+    [Test]
+    public void A2_1_EnemyWeakOnPlayer_TickBeforeLaterCard()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        var log = new List<string>();
+        player.AddEffectStacks(StatusEffectType.Weak, 1, enemy); // тик в 3
+        LogCard(3, log);                                         // создана позже тика
+        Advance(3);
+        CollectionAssert.AreEqual(new[] { "card weak=0" }, log);
+    }
+
+    [Test]
+    public void A2_2_CardCreatedBeforeEffect_CardBeforeTick()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        var log = new List<string>();
+        LogCard(3, log);
+        player.AddEffectStacks(StatusEffectType.Weak, 1, enemy);
+        Advance(3);
+        CollectionAssert.AreEqual(new[] { "card weak=1" }, log);
+    }
+
+    [Test]
+    public void A2_3_PlayerWeakOnEnemy_TickBeforeEnemyAction()
+    {
+        var a = MakeEnemy(30, 3, 10);
+        Spawn(a);
+        a.AddEffectStacks(StatusEffectType.Weak, 1, player);
+        Advance(3);
+        var order = FiredOrder();
+        Assert.AreEqual(2, order.Count);
+        Assert.AreSame(TickOf(a), order[0]);
+        Assert.AreSame(a, order[1]);
+        Assert.AreEqual(20, player.CurrentHP, "тик снял Слабость раньше удара");
+    }
+
+    [Test]
+    public void A2_4_EnemyWeakOnLeftEnemy_ActionTickAction()
+    {
+        var a = MakeEnemy(30, 3, 10);
+        var b = MakeEnemy(30, 3, 10);
+        Spawn(a, b);
+        a.AddEffectStacks(StatusEffectType.Weak, 1, b);
+        Advance(3);
+        var order = FiredOrder();
+        Assert.AreEqual(3, order.Count);
+        Assert.AreSame(a, order[0]);
+        Assert.AreSame(TickOf(a), order[1]);
+        Assert.AreSame(b, order[2]);
+    }
+
+    [Test]
+    public void A2_5_EnemiesLeftToRight_RegardlessOfRegistrationOrder()
+    {
+        var a = MakeEnemy(30, 3, 1);
+        var b = MakeEnemy(30, 3, 1);
+        cm.RegisterScheduledEvent(b); // правый зарегистрирован раньше
+        cm.RegisterScheduledEvent(a);
+        cm.RegisterEnemies(new List<Enemy> { a, b });
+        Advance(3);
+        var order = FiredOrder();
+        Assert.AreSame(a, order[0]);
+        Assert.AreSame(b, order[1]);
+    }
+
+    [Test]
+    public void A2_6_CardWeakOnEnemyAtItsAttackMoment_AttackWeakened()
+    {
+        var enemy = MakeEnemy(30, 3, 10);
+        Spawn(enemy);
+        WithEffect(MakeCard(3, 3), StatusEffectType.Weak, 1, EffectTargetTag.Enemy).Play(enemy); // эффект в 3, атака врага в 3
+        Assert.AreEqual(25, player.CurrentHP, "урон 10 ослаблен вдвое");
+    }
+
+    [Test]
+    public void A2_7_DrawTimerBeforeCardAtSameMoment()
+    {
+        var log = new List<string>();
+        int t = HandManager.DrawIntervalSeconds;
+        cm.RegisterScheduledEvent(new PeriodicEffectEvent(0, t, () => log.Add("draw")));
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, t, 0, _ => log.Add("card")));
+        Advance(t);
+        CollectionAssert.AreEqual(new[] { "draw", "card" }, log);
+    }
 }

@@ -5,15 +5,18 @@ public class PeriodicEffectEvent : IScheduledEvent
     private readonly System.Action onTrigger;
     private readonly int interval;
     public int NextTime { get; private set; }
-    public int Priority => 1;
+    // Группа порядка: 0 — сторона игрока, 1 — враги (тик на враге, наложенный врагом или неизвестно кем)
+    public int Priority => Owner is Enemy && !(Applier is Player) ? 1 : 0;
     public bool IsPending => true;
     public Combatant Owner { get; } // null — таймер добора
+    public Combatant Applier { get; } // кто наложил эффект, создавший тик; может быть null
 
-    public PeriodicEffectEvent(int startTime, int interval, System.Action onTrigger, Combatant owner = null)
+    public PeriodicEffectEvent(int startTime, int interval, System.Action onTrigger, Combatant owner = null, Combatant applier = null)
     {
         this.interval = interval;
         this.onTrigger = onTrigger;
         Owner = owner;
+        Applier = applier;
         NextTime = startTime + interval;
     }
 
