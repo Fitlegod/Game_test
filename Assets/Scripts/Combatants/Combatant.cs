@@ -77,19 +77,20 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         combatManager.Record(this, () => effectStacks[type] = GetStacks(type) + removed);
     }
 
-    public int CalculateOutgoingDamage(int baseDamage)
+    // Урон = (База + Сила) × Слабость × Уязвимость цели, округление вниз один раз в конце (ApplyIncomingDamageModifiers)
+    public float CalculateOutgoingDamage(int baseDamage)
     {
-        int result = baseDamage + Mathf.RoundToInt(GetStacks(StatusEffectType.Strength));
+        float result = baseDamage + Mathf.RoundToInt(GetStacks(StatusEffectType.Strength));
         if (GetStacks(StatusEffectType.Weak) > 0)
-            result = Mathf.FloorToInt(result * 0.5f);
-        return Mathf.Max(0, result);
+            result *= 0.5f;
+        return result;
     }
 
-    public int ApplyIncomingDamageModifiers(int damage)
+    public int ApplyIncomingDamageModifiers(float damage)
     {
         if (GetStacks(StatusEffectType.Vulnerable) > 0)
-            damage = Mathf.FloorToInt(damage * 1.5f);
-        return Mathf.Max(0, damage);
+            damage *= 1.5f;
+        return Mathf.Max(0, Mathf.FloorToInt(damage));
     }
 
     public int CalculateIncomingBlock(int baseAmount)
@@ -111,8 +112,18 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
 
     public void GainBlock(int amount)
     {
+        if (CurrentHP <= 0) return;
         CurrentBlock += amount;
         combatManager.Record(this, () => CurrentBlock -= amount);
+    }
+
+    // Затухание блока: снимает не больше, чем есть; в журнал — реальная разница
+    public void DecayBlock(int amount)
+    {
+        if (CurrentHP <= 0 || amount <= 0 || CurrentBlock <= 0) return;
+        int removed = Mathf.Min(CurrentBlock, amount);
+        CurrentBlock -= removed;
+        combatManager.Record(this, () => CurrentBlock += removed);
     }
 
     public void SetCurrentHP(int hp)

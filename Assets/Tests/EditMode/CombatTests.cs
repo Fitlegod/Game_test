@@ -20,8 +20,8 @@ public class CombatTests
         player.maxHP = 30;
         player.combatManager = cm;
         player.Init();
-        cm.SetPlayer(player);
         cm.ResetForNewCombat();
+        cm.SetPlayer(player);
     }
 
     [TearDown]
@@ -132,11 +132,12 @@ public class CombatTests
     [Test]
     public void A_CardCost2Delay1_FiresAtMark1()
     {
+        NoDecay();
         var card = MakeCard(2, 1, Act(InstantActionKind.Block, 5, EffectTargetTag.Player));
         card.Play(null);
         Assert.AreEqual(2, cm.CurrentTime);
         Assert.AreEqual(5, player.CurrentBlock);
-        Assert.IsTrue(cm.Journal.Count > 0 && cm.Journal.All(e => e.Time == 1), "эффект сработал на отметке 1, а не 2");
+        Assert.IsTrue(ActionJournal().Count > 0 && ActionJournal().All(e => e.Time == 1), "эффект сработал на отметке 1, а не 2");
     }
 
     [Test]
@@ -214,11 +215,12 @@ public class CombatTests
     [Test]
     public void G_Precision_BlockAndHpRestoredExactly_EnemyAndTicksReturn()
     {
+        NoDecay();
         var enemy = MakeEnemy(5, 50, 1);
         Spawn(enemy);
         enemy.GainBlock(3);
         enemy.AddEffectStacks(StatusEffectType.Weak, 1);
-        var tick = cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == enemy);
+        var tick = cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == enemy && p.Priority != 2);
 
         Dmg(10, 2, 2).Play(enemy);
         Assert.AreEqual(0, enemy.CurrentHP);
@@ -271,6 +273,7 @@ public class CombatTests
     [Test]
     public void K_OwnBlockInInterval_NotDoubledNotRemoved()
     {
+        NoDecay();
         MakeCard(1, 0, Act(InstantActionKind.Block, 5, EffectTargetTag.Player)).Play(null);
         RewindCard(2, 1, 1).Play(null); // T=2, R=0
         Assert.AreEqual(0, cm.CurrentTime);
@@ -385,8 +388,8 @@ public class CombatTests
         RewindCard(3, 1, 1).Play(null); // T=5, R=2, время 2
         Assert.AreEqual(2, cm.CurrentTime);
         Assert.AreEqual(0, writtenDuringUndo, "во время Undo журнал не пишется");
-        Assert.IsTrue(cm.Journal.Count > 0);
-        Assert.IsTrue(cm.Journal.All(e => e.Time < 2));
+        Assert.IsTrue(ActionJournal().Count > 0);
+        Assert.IsTrue(ActionJournal().All(e => e.Time < 2));
     }
 
     // Враг A в момент 6 лечит слабейшего союзника на 4; карта Jab с моментом 6 сыграна уже ПОСЛЕ хода A и убивает A.
@@ -444,8 +447,8 @@ public class CombatTests
         Assert.AreEqual(2, cm.CurrentTime);
         Assert.AreEqual(30, enemy.CurrentHP);
         Assert.AreEqual(30, player.CurrentHP);
-        Assert.AreEqual(1, cm.Journal.Count, "только запись о самом ходе врага");
-        Assert.AreSame(enemy, cm.Journal[0].Source);
+        Assert.AreEqual(1, ActionJournal().Count, "только запись о самом ходе врага");
+        Assert.AreSame(enemy, ActionJournal()[0].Source);
     }
 
     // Враг ходит в интервале несколько раз (в 2 и в 4), карта в 4 — после его хода: порядок обоих ходов должен сохраниться
@@ -522,7 +525,8 @@ public class CombatTests
         return card;
     }
 
-    PeriodicEffectEvent TickOf(Combatant owner) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == owner);
+    PeriodicEffectEvent TickOf(Combatant owner) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == owner && p.Priority != 2); // без тиков затухания блока (группа 2)
+    PeriodicEffectEvent DecayOf(Combatant owner) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == owner && p.Priority == 2);
 
     [Test]
     public void F2_WeakFromCastCost3_FirstTickCountedFromEffectMoment()
@@ -627,7 +631,10 @@ public class CombatTests
     // ---------- A2: порядок одновременных событий ----------
 
     // События в порядке срабатывания (по журналу: каждое событие здесь оставляет запись)
-    List<IScheduledEvent> FiredOrder() => cm.Journal.Select(e => e.Source).Distinct().ToList();
+    // Журнал без записей тиков затухания блока (группа 2)
+    List<UndoEntry> ActionJournal() => cm.Journal.Where(e => e.Source.Priority != 2).ToList();
+
+    List<IScheduledEvent> FiredOrder() => cm.Journal.Select(e => e.Source).Where(s => s.Priority != 2).Distinct().ToList(); // без тиков затухания блока
 
     // Событие-«карта» на момент t: пишет в лог и видит стаки Слабости игрока
     OneShotEvent LogCard(int t, List<string> log)
@@ -791,5 +798,167 @@ public class CombatTests
         Assert.AreEqual(1, second.Priority);
         Advance(1);                        // повтор карты игрока в 1: тик остаётся у врага
         Assert.AreSame(second, TickOf(a));
+    }
+
+    // ---------- A5: формулы урона, мёртвая цель, затухание блока ----------
+
+    void NoDecay() { cm.blockDecayBase = 0; cm.blockDecayPerStep = 0; }
+
+    Enemy WeakPlayerVulnerableEnemy(int hp = 50)
+    {
+        var enemy = MakeEnemy(hp, 99, 1);
+        Spawn(enemy);
+        player.AddEffectStacks(StatusEffectType.Weak, 1);
+        enemy.AddEffectStacks(StatusEffectType.Vulnerable, 5);
+        return enemy;
+    }
+
+    [Test]
+    public void F1_Damage_SingleRoundingAtEnd()
+    {
+        var enemy = WeakPlayerVulnerableEnemy();
+        Dmg(7, 0, 0).Play(enemy);         // (7 × 0.5) × 1.5 = 5.25 → 5, а не 3 → 4
+        Assert.AreEqual(45, enemy.CurrentHP);
+    }
+
+    [Test]
+    public void F2_Preview_MatchesRealDamage()
+    {
+        var enemy = WeakPlayerVulnerableEnemy();
+        var action = Act(InstantActionKind.Damage, 7, EffectTargetTag.Enemy);
+        Assert.AreEqual(5, action.ComputePreviewAmount(player, enemy));
+        Assert.AreEqual(3, action.ComputePreviewAmount(player, null), "без цели — исходящее, округлённое вниз");
+    }
+
+    [Test]
+    public void F3_NegativeStrength_DamageZero_NoHeal()
+    {
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        enemy.SetCurrentHP(40);
+        player.AddEffectStacks(StatusEffectType.Strength, -5);
+        Dmg(3, 0, 0).Play(enemy);
+        Assert.AreEqual(40, enemy.CurrentHP);
+        Assert.AreEqual(0, Act(InstantActionKind.Damage, 3, EffectTargetTag.Enemy).ComputePreviewAmount(player, enemy));
+    }
+
+    [Test]
+    public void F4_GainBlockOnDeadTarget_NothingHappensNothingLogged()
+    {
+        var dead = MakeEnemy(5, 99, 1); // не регистрируется: своего тика затухания нет
+        dead.SetCurrentHP(0);
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => dead.GainBlock(5)));
+        Advance(1);
+        Assert.AreEqual(0, dead.CurrentBlock);
+        Assert.AreEqual(0, cm.Journal.Count(e => e.Target == dead));
+    }
+
+    [Test]
+    public void F5_BlockDecay_FormulaAndTicks()
+    {
+        Assert.AreEqual(2, cm.BlockDecayAt(1));
+        Assert.AreEqual(2, cm.BlockDecayAt(9));
+        Assert.AreEqual(3, cm.BlockDecayAt(10));
+        Assert.AreEqual(4, cm.BlockDecayAt(25));
+
+        player.GainBlock(100);
+        Advance(1); Assert.AreEqual(98, player.CurrentBlock);
+        Advance(1); Assert.AreEqual(96, player.CurrentBlock);
+        Advance(7); Assert.AreEqual(82, player.CurrentBlock);   // моменты 3..9 по 2
+        Advance(1); Assert.AreEqual(79, player.CurrentBlock);   // момент 10 — 3
+        Advance(14); Assert.AreEqual(32, player.CurrentBlock);  // 11..19 по 3, 20..24 по 4
+        Advance(1); Assert.AreEqual(28, player.CurrentBlock);   // момент 25 — 4
+
+        var other = MakeEnemy(30, 99, 1);
+        other.GainBlock(1);
+        Spawn(other);
+        Advance(1);
+        Assert.AreEqual(0, other.CurrentBlock, "ниже нуля не уходит");
+    }
+
+    [Test]
+    public void F6_DecayAfterAllEventsOfMoment()
+    {
+        var enemy = MakeEnemy(30, 4, 5);
+        Spawn(enemy);
+        MakeCard(4, 4, Act(InstantActionKind.Block, 5, EffectTargetTag.Player)).Play(null); // блок и удар врага — в моменте 4
+        Assert.AreEqual(4, cm.CurrentTime);
+        Assert.AreEqual(30, player.CurrentHP, "удар полностью поглощён");
+        Assert.AreEqual(0, player.CurrentBlock);
+    }
+
+    [Test]
+    public void F6b_DecayHitsLeftoverBlockAfterEnemyHit()
+    {
+        var enemy = MakeEnemy(30, 4, 3);
+        Spawn(enemy);
+        MakeCard(4, 4, Act(InstantActionKind.Block, 5, EffectTargetTag.Player)).Play(null);
+        Assert.AreEqual(30, player.CurrentHP);
+        Assert.AreEqual(0, player.CurrentBlock, "5 − 3 = 2, затем затухание 2 в конце момента 4");
+    }
+
+    [Test]
+    public void F7_DecaySettingsAreData()
+    {
+        NoDecay();
+        player.GainBlock(10);
+        Advance(30);
+        Assert.AreEqual(10, player.CurrentBlock);
+
+        cm.blockDecayBase = 5;
+        Advance(1); Assert.AreEqual(5, player.CurrentBlock);
+        Advance(1); Assert.AreEqual(0, player.CurrentBlock);
+    }
+
+    [Test]
+    public void F8_Rewind_EnemyDecayRewoundPlayerDecayNot()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(20);
+        player.GainBlock(20);
+        Advance(3);
+        Assert.AreEqual(14, enemy.CurrentBlock);
+        Assert.AreEqual(14, player.CurrentBlock);
+
+        RewindCard(2, 0, 0).Play(null);   // T=3, R=1, S=2
+        Assert.AreEqual(1, cm.CurrentTime);
+        Assert.AreEqual(18, enemy.CurrentBlock, "блок врага откачен до 20, затухание момента 1 уже повторено в том же разборе");
+        Assert.AreEqual(14, player.CurrentBlock, "блок игрока не восстанавливается");
+        Assert.AreEqual(2, DecayOf(player).NextTime, "следующее затухание игрока — через секунду по его часам");
+        Assert.AreEqual(2, DecayOf(enemy).NextTime);
+
+        Advance(2);
+        Assert.AreEqual(14, enemy.CurrentBlock, "повтор затухает так же, как первый проход");
+        Assert.AreEqual(10, player.CurrentBlock);
+    }
+
+    [Test]
+    public void F9_Environment_AfterReplayedEventsAndNewOnes()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(20);
+        Advance(3);
+        RewindCard(2, 0, 0).Play(null);   // R=1, ReplayUntil=3: затухания врага в 1..3 ждут повтора
+        var seen = new List<int>();
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 2, 0, _ => seen.Add(enemy.CurrentBlock)));
+        Assert.AreEqual(18, enemy.CurrentBlock, "момент 1 повторён сразу");
+        Advance(1);                        // момент 2: новое событие без номера повтора, затем затухание
+        CollectionAssert.AreEqual(new[] { 18 }, seen, "затухание в моменте 2 — после нового события, хотя оно повтор");
+        Assert.AreEqual(16, enemy.CurrentBlock);
+    }
+
+    [Test]
+    public void F10_Replay_FractionalOutgoingNotRoundedTwice()
+    {
+        var enemy = WeakPlayerVulnerableEnemy();
+        Dmg(7, 1, 0).Play(enemy);         // исходящее 3.5, итог 5
+        Assert.AreEqual(45, enemy.CurrentHP);
+        player.RemoveStacks(StatusEffectType.Weak, 1);
+
+        RewindCard(1, 0, 0).Play(null);   // T=1, R=0: повтор удара с числом первого прохода
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(45, enemy.CurrentHP, "повтор снова 5, а не 10");
     }
 }

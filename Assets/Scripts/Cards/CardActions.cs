@@ -16,9 +16,9 @@ public class InstantActionEntry
     public int hitCount = 1;
     public EffectTargetTag targetTag;
 
-    // Возвращает «исходящее» число: урон после модификаторов источника (до модификаторов цели), блок после Крепкости/Хрупкости получателя, лечение.
+    // Возвращает «исходящее» число: урон после модификаторов источника (до модификаторов цели), блок после Крепости/Хрупкости получателя, лечение.
     // outgoingOverride — число из первого срабатывания карты (повтор после отката): формулы источника заново не считаются.
-    public int Apply(CombatManager combatManager, Combatant source, Combatant target, int? outgoingOverride = null)
+    public float Apply(CombatManager combatManager, Combatant source, Combatant target, float? outgoingOverride = null)
     {
         if (kind == InstantActionKind.Rewind)
         {
@@ -26,7 +26,7 @@ public class InstantActionEntry
             return amount;
         }
 
-        int outgoing = amount;
+        float outgoing = amount;
 
         for (int i = 0; i < hitCount; i++)
         {
@@ -41,7 +41,7 @@ public class InstantActionEntry
 
                 case InstantActionKind.Block:
                     Combatant blockRecipient = target ?? source;
-                    int finalBlock = outgoing = outgoingOverride ?? blockRecipient.CalculateIncomingBlock(amount);
+                    int finalBlock = (int)(outgoing = outgoingOverride ?? blockRecipient.CalculateIncomingBlock(amount));
                     blockRecipient.GainBlock(finalBlock);
                     Debug.Log("Даёт " + finalBlock + " блока цели " + blockRecipient.name + " (база " + amount + ")");
                     break;
@@ -61,9 +61,8 @@ public class InstantActionEntry
         switch (kind)
         {
             case InstantActionKind.Damage:
-                int dmg = source.CalculateOutgoingDamage(amount);
-                if (recipient != null) dmg = recipient.ApplyIncomingDamageModifiers(dmg);
-                return dmg;
+                float dmg = source.CalculateOutgoingDamage(amount);
+                return recipient != null ? recipient.ApplyIncomingDamageModifiers(dmg) : Mathf.Max(0, Mathf.FloorToInt(dmg));
             case InstantActionKind.Block:
                 return recipient != null ? recipient.CalculateIncomingBlock(amount) : amount;
             default:
