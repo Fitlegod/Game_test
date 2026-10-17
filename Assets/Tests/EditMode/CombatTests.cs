@@ -217,7 +217,7 @@ public class CombatTests
     {
         NoDecay();
         var enemy = MakeEnemy(5, 50, 1);
-        Spawn(enemy);
+        Spawn(enemy, MakeEnemy(30, 50, 1)); // второй враг жив: смерть первого не заканчивает бой, откат возможен
         enemy.GainBlock(3);
         enemy.AddEffectStacks(StatusEffectType.Weak, 1);
         var tick = cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == enemy && p.Priority != 2);
@@ -1357,30 +1357,26 @@ public class CombatTests
     [Test]
     public void C6_DeathByPoisonAndByDamage_OneDeathTicksRemovedRealDifferenceUndone()
     {
-        // Отравление: HP 2, потеря 5 — в журнале реальная разница 2
+        // Отравление: HP 2, потеря 5 — в журнале реальная разница 2. Третий враг жив: бой не заканчивается, откат возможен.
         var poisoned = MakeEnemy(2, 99, 1);
-        Spawn(poisoned);
+        var hit = MakeEnemy(3, 99, 1);
+        Spawn(poisoned, hit, MakeEnemy(50, 99, 1));
         int poisonDeaths = 0; poisoned.OnDeath += () => poisonDeaths++;
+        int hitDeaths = 0; hit.OnDeath += () => hitDeaths++;
         poisoned.AddEffectStacks(StatusEffectType.Poison, 5);
         poisoned.AddEffectStacks(StatusEffectType.Weak, 1);
+        hit.AddEffectStacks(StatusEffectType.Weak, 1);
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => hit.TakeDamage(10))); // урон: HP 3, урон 10
         Advance(1);
         Assert.AreEqual(0, poisoned.CurrentHP);
         Assert.AreEqual(1, poisonDeaths);
         Assert.IsFalse(HasTick(poisoned, StatusEffectType.Poison));
         Assert.IsFalse(HasTick(poisoned, StatusEffectType.Weak));
-
-        // Урон: HP 3, урон 10
-        var hit = MakeEnemy(3, 99, 1);
-        Spawn(hit);
-        int hitDeaths = 0; hit.OnDeath += () => hitDeaths++;
-        hit.AddEffectStacks(StatusEffectType.Weak, 1);
-        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => hit.TakeDamage(10)));
-        Advance(1);
         Assert.AreEqual(0, hit.CurrentHP);
         Assert.AreEqual(1, hitDeaths);
         Assert.IsFalse(HasTick(hit, StatusEffectType.Weak));
 
-        RewindCard(2, 0, 0).Play(null);   // T=2, R=0: оба оживают на реальную разницу
+        RewindCard(2, 0, 0).Play(null);   // T=1, R=0: оба оживают на реальную разницу
         Assert.AreEqual(2, poisoned.CurrentHP);
         Assert.AreEqual(3, hit.CurrentHP);
         Assert.AreEqual(1, poisonDeaths);
@@ -1432,16 +1428,106 @@ public class CombatTests
     [Test]
     public void C8_RepeatedRegistration_DeathHandlersSubscribedOnce()
     {
+        int victories = 0, defeats = 0;
+        cm.OnVictory += () => victories++;
+        cm.OnDefeat += () => defeats++;
+
         var enemy = MakeEnemy(5, 99, 1);
         Spawn(enemy);
         cm.RegisterEnemies(new List<Enemy> { enemy });  // повторно
+        enemy.TakeDamage(100);
+        Assert.AreEqual(1, victories);
+
+        cm.ResetForNewCombat();                          // следующий бой: второго исхода после победы в этом бою нет
+        cm.SetPlayer(player);
         cm.SetPlayer(player);                            // повторно
+        player.TakeDamage(100);
+        Assert.AreEqual(1, defeats);
+    }
+
+    // ---------- Конец боя останавливает разбор ----------
+
+    [Test]
+    public void K1_VictoryMidCast_LaterPoisonTickDoesNotKillPlayerSecondOutcome()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        int victories = 0, defeats = 0;
+        cm.OnVictory += () => victories++;
+        cm.OnDefeat += () => defeats++;
+        player.SetCurrentHP(3);
+        player.AddEffectStacks(StatusEffectType.Poison, 5);   // тик в 1 был бы смертельным
+        Dmg(10, 2, 0).Play(enemy);                             // победа в 0, каст до 2
+        Assert.AreEqual(1, victories);
+        Assert.AreEqual(0, defeats);
+        Assert.AreEqual(3, player.CurrentHP);
+        Assert.AreEqual(2, cm.CurrentTime);
+    }
+
+    [Test]
+    public void K2_RewindAfterVictoryInSameCast_DoesNothing()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        var card = MakeCard(2, 2, Act(InstantActionKind.Damage, 10, EffectTargetTag.Enemy), Act(InstantActionKind.Rewind, 2, EffectTargetTag.Player));
+        card.Play(enemy);                                      // в 2 урон убивает врага, затем Откат
+        Assert.AreEqual(0, enemy.CurrentHP, "враг остаётся мёртвым");
+        Assert.AreEqual(-1, cm.ReplayUntil);
+        Assert.AreEqual(2, cm.CurrentTime);
+        Assert.IsTrue(cm.Journal.Count > 0, "журнал не откатан");
+    }
+
+    [Test]
+    public void K3_DrawTimerAfterVictoryInSameCast_DoesNotFire()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        var draws = new List<int>();
+        AddDrawTimer(draws);                                   // тики в 2 и 4
+        Dmg(10, 5, 0).Play(enemy);                             // победа в 0, каст до 5
+        CollectionAssert.IsEmpty(draws);
+    }
+
+    [Test]
+    public void K4_PlayerDeathAfterVictory_NoDefeat()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
         int victories = 0, defeats = 0;
         cm.OnVictory += () => victories++;
         cm.OnDefeat += () => defeats++;
         enemy.TakeDamage(100);
         Assert.AreEqual(1, victories);
         player.TakeDamage(100);
-        Assert.AreEqual(1, defeats);
+        Assert.AreEqual(0, player.CurrentHP);
+        Assert.AreEqual(0, defeats);
+    }
+
+    [Test]
+    public void K5_NegativeAddToZero_RemovesTick_RewindReturnsTickAndStacks()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.AddEffectStacks(StatusEffectType.Weak, 2);
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Weak));
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => enemy.AddEffectStacks(StatusEffectType.Weak, -2)));
+        Advance(1);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Weak));
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Weak), "тик снят");
+
+        RewindCard(1, 0, 0).Play(null);   // T=1, R=0
+        Assert.AreEqual(2, enemy.GetStacks(StatusEffectType.Weak));
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Weak), "тик вернулся");
+    }
+
+    [Test]
+    public void K6_StunOnPlayerMidCast_AddsToCurrentTime()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        var stun = new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = 3, targetTag = EffectTargetTag.Player };
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 2, 0, _ => stun.Apply(cm, enemy, player)));
+        MakeCard(5, 0).Play(null);        // каст 0→5, в 2 Оглушение 3
+        Assert.AreEqual(8, cm.CurrentTime);
     }
 }

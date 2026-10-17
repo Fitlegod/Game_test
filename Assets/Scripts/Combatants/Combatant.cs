@@ -41,6 +41,12 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         float added = effectStacks[type] - before;
         combatManager.Record(this, () => effectStacks[type] = GetStacks(type) - added);
 
+        if (effectStacks[type] <= 0f)
+        {
+            RemoveTickIfExhausted(type); // стаки доведены до 0 отрицательным наложением: тик не нужен
+            return;
+        }
+
         if (!activeScheduledEffects.ContainsKey(type) &&
             StatusEffectRules.TryGetPeriodicBehavior(type, out int interval, out var action))
         {
@@ -76,13 +82,16 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         float removed = before - effectStacks[type];
         combatManager.Record(this, () => effectStacks[type] = GetStacks(type) + removed);
 
-        // Стаки кончились — тик эффекта снимается; повторное наложение создаст новый
-        if (effectStacks[type] <= 0f && activeScheduledEffects.TryGetValue(type, out var tick))
-        {
-            activeScheduledEffects.Remove(type);
-            combatManager.Record(this, () => activeScheduledEffects[type] = tick);
-            combatManager.UnregisterScheduledEvent(tick);
-        }
+        RemoveTickIfExhausted(type);
+    }
+
+    // Стаки кончились — тик эффекта снимается (с записью в журнал); повторное наложение создаст новый
+    private void RemoveTickIfExhausted(StatusEffectType type)
+    {
+        if (GetStacks(type) > 0f || !activeScheduledEffects.TryGetValue(type, out var tick)) return;
+        activeScheduledEffects.Remove(type);
+        combatManager.Record(this, () => activeScheduledEffects[type] = tick);
+        combatManager.UnregisterScheduledEvent(tick);
     }
 
     // Урон = (База + Сила) × Слабость × Уязвимость цели, округление вниз один раз в конце (ApplyIncomingDamageModifiers)
