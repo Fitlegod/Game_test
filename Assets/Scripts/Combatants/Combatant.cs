@@ -124,16 +124,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     public void LoseHP(int amount)
     {
         if (CurrentHP <= 0 || amount <= 0 || GetStacks(StatusEffectType.Invulnerable) > 0) return;
-        int hpBefore = CurrentHP;
-        CurrentHP = Mathf.Max(0, CurrentHP - amount);
-        int hpLost = hpBefore - CurrentHP;
-        combatManager.Record(this, () => CurrentHP += hpLost);
-
-        if (CurrentHP == 0)
-        {
-            ClearAllScheduledEvents();
-            OnDeath?.Invoke();
-        }
+        ReduceHP(amount, 0);
     }
 
     public void GainBlock(int amount)
@@ -165,12 +156,16 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
 
         int absorbed = Mathf.Min(CurrentBlock, amount);
         CurrentBlock -= absorbed;
-        amount -= absorbed;
+        ReduceHP(amount - absorbed, absorbed);
+    }
 
+    // Общий хвост TakeDamage и LoseHP: снять HP, записать в журнал реальную разницу (и поглощённый блок), при 0 HP — смерть
+    private void ReduceHP(int amount, int absorbedBlock)
+    {
         int hpBefore = CurrentHP;
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
         int hpLost = hpBefore - CurrentHP;
-        combatManager.Record(this, () => { CurrentBlock += absorbed; CurrentHP += hpLost; });
+        combatManager.Record(this, () => { CurrentBlock += absorbedBlock; CurrentHP += hpLost; });
 
         if (CurrentHP == 0)
         {

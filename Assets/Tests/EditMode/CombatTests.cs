@@ -1234,4 +1234,198 @@ public class CombatTests
         Advance(5);
         Assert.AreEqual(30, fresh.CurrentHP);
     }
+
+    // ---------- Порядок событий одним ключом ----------
+
+    static string Label(IScheduledEvent s)
+    {
+        if (s is Enemy e) return e.name;
+        if (s is PeriodicEffectEvent p) return (p.Owner == null ? "timer" : p.Owner.name) + ":" + (p.EffectType?.ToString() ?? (p.Priority == 2 ? "decay" : "?"));
+        return "card";
+    }
+
+    List<string> OrderAt(int time) => cm.Journal.Where(e => e.Time == time).Select(e => Label(e.Source)).Distinct().ToList();
+
+    // Новый бой с новым менеджером и игроком (как SetUp)
+    void FreshCombat()
+    {
+        cm = Make<CombatManager>();
+        player = Make<Player>();
+        player.maxHP = 30;
+        player.combatManager = cm;
+        player.Init();
+        cm.ResetForNewCombat();
+        cm.SetPlayer(player);
+    }
+
+    // Тройка из примера на одном враге в момент 1: R — Регенерация, наложенная врагом на себя (группа 1); P — Отравление от игрока (группа 0);
+    // A — действие врага (группа 1, создано раньше R в порядке 0,1,2). order — порядок регистрации [A, R, P].
+    Enemy RegisterTriple(int[] order)
+    {
+        var enemy = MakeEnemy(50, 1, 1);
+        enemy.name = "E";
+        foreach (int what in order)
+        {
+            if (what == 0) cm.RegisterScheduledEvent(enemy);
+            else if (what == 1) enemy.AddEffectStacks(StatusEffectType.Regen, 5, enemy);
+            else enemy.AddEffectStacks(StatusEffectType.Poison, 5, player);
+        }
+        enemy.OnDeath += () => cm.UnregisterScheduledEvent(enemy);
+        cm.RegisterEnemies(new List<Enemy> { enemy });
+        return enemy;
+    }
+
+    static IEnumerable<int[]> Permutations3()
+    {
+        int[][] all = { new[] { 0, 1, 2 }, new[] { 0, 2, 1 }, new[] { 1, 0, 2 }, new[] { 1, 2, 0 }, new[] { 2, 0, 1 }, new[] { 2, 1, 0 } };
+        return all;
+    }
+
+    [Test]
+    public void C1_RegenPoisonAction_SameOrderForAllRegistrationOrders()
+    {
+        foreach (var order in Permutations3())
+        {
+            FreshCombat();
+            RegisterTriple(order);
+            Advance(1);
+            var fired = OrderAt(1).Where(l => l != "Player:decay" && l != "E:decay").ToList();
+            CollectionAssert.AreEqual(new[] { "E:Regen", "E:Poison", "E" }, fired, "порядок регистрации " + string.Join(",", order));
+        }
+    }
+
+    [Test]
+    public void C2_RegenWithoutDamageOverTime_StaysAtA2Place()
+    {
+        var enemy = MakeEnemy(50, 99, 1);
+        enemy.name = "E";
+        Spawn(enemy);
+        var log = new List<string>();
+        enemy.AddEffectStacks(StatusEffectType.Regen, 3, enemy);              // группа 1
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => log.Add("card"))); // группа 0, создана позже
+        Advance(1);
+        CollectionAssert.AreEqual(new[] { "card", "E:Regen" }, OrderAt(1).Where(l => !l.EndsWith(":decay")).ToList());
+    }
+
+    [Test]
+    public void C3_RegenRightBeforeBleeding_RestByA2()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 3, 1);
+        enemy.name = "E";
+        Spawn(enemy);                                                   // действие врага A в 3 — создано первым
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 5, enemy);     // тик в 3
+        enemy.AddEffectStacks(StatusEffectType.Regen, 5, enemy);        // тики в 1, 2, 3
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 3, 0, _ => { })); // карта игрока в 3
+        Advance(3);
+        var at3 = OrderAt(3).Where(l => !l.EndsWith(":decay")).ToList();
+        CollectionAssert.AreEqual(new[] { "card", "E", "E:Regen", "E:Bleeding" }, at3);
+    }
+
+    [Test]
+    public void C4_Replay_TripleKeepsOrder()
+    {
+        FreshCombat();
+        RegisterTriple(new[] { 2, 0, 1 });
+        Advance(1);
+        var first = OrderAt(1).Where(l => !l.EndsWith(":decay")).ToList();
+        CollectionAssert.AreEqual(new[] { "E:Regen", "E:Poison", "E" }, first);
+
+        RewindCard(1, 0, 0).Play(null);   // T=1, R=0
+        Assert.AreEqual(0, cm.CurrentTime);
+        Advance(1);
+        var replay = OrderAt(1).Where(l => !l.EndsWith(":decay")).ToList();
+        CollectionAssert.AreEqual(first, replay);
+    }
+
+    [Test]
+    public void C5_RepeatedRegistration_OneDecayTickPerFighter()
+    {
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        cm.RegisterEnemies(new List<Enemy> { enemy });  // повторно
+        cm.SetPlayer(player);                            // повторно
+        Assert.AreEqual(1, cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Count(p => p.Owner == player && p.Priority == 2));
+        Assert.AreEqual(1, cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Count(p => p.Owner == enemy && p.Priority == 2));
+        player.GainBlock(10);
+        enemy.GainBlock(10);
+        Advance(1);
+        Assert.AreEqual(8, player.CurrentBlock);
+        Assert.AreEqual(8, enemy.CurrentBlock);
+    }
+
+    [Test]
+    public void C6_DeathByPoisonAndByDamage_OneDeathTicksRemovedRealDifferenceUndone()
+    {
+        // Отравление: HP 2, потеря 5 — в журнале реальная разница 2
+        var poisoned = MakeEnemy(2, 99, 1);
+        Spawn(poisoned);
+        int poisonDeaths = 0; poisoned.OnDeath += () => poisonDeaths++;
+        poisoned.AddEffectStacks(StatusEffectType.Poison, 5);
+        poisoned.AddEffectStacks(StatusEffectType.Weak, 1);
+        Advance(1);
+        Assert.AreEqual(0, poisoned.CurrentHP);
+        Assert.AreEqual(1, poisonDeaths);
+        Assert.IsFalse(HasTick(poisoned, StatusEffectType.Poison));
+        Assert.IsFalse(HasTick(poisoned, StatusEffectType.Weak));
+
+        // Урон: HP 3, урон 10
+        var hit = MakeEnemy(3, 99, 1);
+        Spawn(hit);
+        int hitDeaths = 0; hit.OnDeath += () => hitDeaths++;
+        hit.AddEffectStacks(StatusEffectType.Weak, 1);
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, 0, _ => hit.TakeDamage(10)));
+        Advance(1);
+        Assert.AreEqual(0, hit.CurrentHP);
+        Assert.AreEqual(1, hitDeaths);
+        Assert.IsFalse(HasTick(hit, StatusEffectType.Weak));
+
+        RewindCard(2, 0, 0).Play(null);   // T=2, R=0: оба оживают на реальную разницу
+        Assert.AreEqual(2, poisoned.CurrentHP);
+        Assert.AreEqual(3, hit.CurrentHP);
+        Assert.AreEqual(1, poisonDeaths);
+        Assert.AreEqual(1, hitDeaths);
+    }
+
+    [Test]
+    public void C6b_Invulnerable_BlocksBothLossPaths()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        int deaths = 0; enemy.OnDeath += () => deaths++;
+        enemy.AddEffectStacks(StatusEffectType.Invulnerable, 5);
+        enemy.LoseHP(10);
+        enemy.TakeDamage(10);
+        Assert.AreEqual(5, enemy.CurrentHP);
+        Assert.AreEqual(0, deaths);
+    }
+
+    // Смешанный момент 3: карта игрока, два врага, Регенерация, Отравление, Кровотечение, Слабость, затухание блока.
+    // Порядок регистрации врагов (и их эффектов) меняется, порядок срабатывания — нет.
+    List<string> MixedMoment(bool secondEnemyFirst)
+    {
+        FreshCombat();
+        var e1 = MakeEnemy(50, 3, 1); e1.name = "E1";
+        var e2 = MakeEnemy(50, 3, 1); e2.name = "E2";
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 3, 0, _ => { }));                // карта игрока в 3
+        void Block1() { cm.RegisterScheduledEvent(e1); e1.AddEffectStacks(StatusEffectType.Regen, 5, e1); e1.AddEffectStacks(StatusEffectType.Poison, 5, player); e1.AddEffectStacks(StatusEffectType.Weak, 1, e1); e1.GainBlock(20); }
+        void Block2() { cm.RegisterScheduledEvent(e2); e2.AddEffectStacks(StatusEffectType.Bleeding, 5, e2); e2.GainBlock(20); }
+        if (secondEnemyFirst) { Block2(); Block1(); } else { Block1(); Block2(); }
+        cm.RegisterEnemies(new List<Enemy> { e1, e2 });
+        player.GainBlock(20);
+        Advance(3);
+        return OrderAt(3);
+    }
+
+    [Test]
+    public void C7_MixedMoment_DeterministicForDifferentRegistrationOrders()
+    {
+        var a = MixedMoment(false);
+        var b = MixedMoment(true);
+        CollectionAssert.AreEqual(a, b);
+        Assert.AreEqual("card", a[0]);
+        Assert.AreEqual("E1:Regen", a[1], "Регенерация встаёт на место Отравления (группа 0, после карты)");
+        Assert.AreEqual("E1:Poison", a[2]);
+        Assert.AreEqual("Player:decay", a[a.Count - 3], "затухание блока — в конце момента");
+    }
 }

@@ -1,12 +1,20 @@
 using UnityEngine;
 
+// Группы порядка событий в одном моменте (IScheduledEvent.Priority)
+public static class EventGroup
+{
+    public const int Player = 0;      // карты, таймер добора, тики на игроке и тики, наложенные игроком
+    public const int Enemies = 1;     // действия врагов и тики, наложенные врагом
+    public const int Environment = 2; // затухание блока — всегда в конце момента
+}
+
 public class PeriodicEffectEvent : IScheduledEvent
 {
     private readonly System.Action onTrigger;
     private readonly int interval;
     public int NextTime { get; private set; }
-    // Группа порядка: 0 — сторона игрока, 1 — враги (тик на враге, наложенный врагом или неизвестно кем), 2 — окружение (затухание блока)
-    public int Priority => isEnvironment ? 2 : Owner is Enemy && !(Applier is Player) ? 1 : 0;
+    // Группа порядка (EventGroup): враги — тик на враге, наложенный врагом или неизвестно кем
+    public int Priority => isEnvironment ? EventGroup.Environment : Owner is Enemy && !(Applier is Player) ? EventGroup.Enemies : EventGroup.Player;
     private readonly bool isEnvironment;
     public bool IsPending => true;
     public Combatant Owner { get; } // null — таймер добора
@@ -74,6 +82,10 @@ public class OneShotEvent : IScheduledEvent
 
 public static class StatusEffectRules
 {
+    // «Лечит по времени» — тик такого эффекта идёт перед тиками «бьёт по времени» того же бойца (CombatManager, эффективный ключ порядка)
+    public static bool IsHealOverTime(StatusEffectType type) => type == StatusEffectType.Regen;
+    public static bool IsDamageOverTime(StatusEffectType type) => type == StatusEffectType.Poison || type == StatusEffectType.Bleeding;
+
     public static bool TryGetPeriodicBehavior(StatusEffectType type, out int interval, out System.Action<Combatant> action)
     {
         switch (type)

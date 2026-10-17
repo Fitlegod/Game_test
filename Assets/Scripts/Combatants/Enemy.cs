@@ -10,7 +10,7 @@ public class Enemy : Combatant, IScheduledEvent
     private int nextActionTime;
 
     public int NextTime => nextActionTime;
-    public int Priority => 1;
+    public int Priority => EventGroup.Enemies;
     public bool IsPending => CurrentHP > 0 && pattern != null && pattern.steps.Count > 0;
     public int CurrentStepIndex => currentStepIndex;
 
