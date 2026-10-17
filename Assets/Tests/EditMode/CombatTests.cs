@@ -486,12 +486,12 @@ public class CombatTests
         Assert.AreEqual(4, cm.CurrentTime);
 
         var stagger = MakeCard(1, 0);     // оглушение: ход врага 6 → 9
-        stagger.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stagger, stacks = 3, targetTag = EffectTargetTag.Enemy });
+        stagger.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = 3, targetTag = EffectTargetTag.Enemy });
         stagger.Play(e);
         Assert.AreEqual(9, e.NextTime);
 
         var delay = MakeCard(4, 4);       // эффект в 9: ещё одно оглушение на 1
-        delay.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stagger, stacks = 1, targetTag = EffectTargetTag.Enemy });
+        delay.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = 1, targetTag = EffectTargetTag.Enemy });
         delay.Play(e);                    // время 9: карта в 9 первой — враг уходит на 10 и не бьёт
         Assert.AreEqual(10, e.NextTime);
         Assert.AreEqual(25, player.CurrentHP);
@@ -598,17 +598,17 @@ public class CombatTests
     }
 
     [Test]
-    public void S2_StaggerAfterRewind_DisplayNeverAboveApplied()
+    public void S2_StunAfterRewind_DisplayNeverAboveApplied()
     {
         var enemy = MakeEnemy(30, 99, 1);
         Spawn(enemy);
         Advance(2);
-        WithEffect(MakeCard(3, 0), StatusEffectType.Stagger, 3, EffectTargetTag.Enemy).Play(enemy); // эффект в 2, каст 2→5
-        Assert.LessOrEqual(enemy.StaggerDisplay, 3);
-        RewindCard(3, 1, 1).Play(null);   // T=6, R=3, S=3: время 3, Пошатывание (момент 2) не отменено
+        WithEffect(MakeCard(3, 0), StatusEffectType.Stun, 3, EffectTargetTag.Enemy).Play(enemy); // эффект в 2, каст 2→5
+        Assert.LessOrEqual(enemy.StunDisplay, 3);
+        RewindCard(3, 1, 1).Play(null);   // T=6, R=3, S=3: время 3, Оглушение (момент 2) не отменено
         Assert.AreEqual(3, cm.CurrentTime);
-        Assert.LessOrEqual(enemy.StaggerDisplay, 3);
-        Assert.AreEqual(2, enemy.StaggerDisplay);
+        Assert.LessOrEqual(enemy.StunDisplay, 3);
+        Assert.AreEqual(2, enemy.StunDisplay);
     }
 
     [Test]
@@ -674,10 +674,11 @@ public class CombatTests
         var a = MakeEnemy(30, 3, 10);
         Spawn(a);
         a.AddEffectStacks(StatusEffectType.Weak, 1, player);
+        var tick = TickOf(a); // после срабатывания тик снимается (стаки кончились)
         Advance(3);
         var order = FiredOrder();
         Assert.AreEqual(2, order.Count);
-        Assert.AreSame(TickOf(a), order[0]);
+        Assert.AreSame(tick, order[0]);
         Assert.AreSame(a, order[1]);
         Assert.AreEqual(20, player.CurrentHP, "тик снял Слабость раньше удара");
     }
@@ -689,11 +690,12 @@ public class CombatTests
         var b = MakeEnemy(30, 3, 10);
         Spawn(a, b);
         a.AddEffectStacks(StatusEffectType.Weak, 1, b);
+        var tick = TickOf(a); // после срабатывания тик снимается (стаки кончились)
         Advance(3);
         var order = FiredOrder();
         Assert.AreEqual(3, order.Count);
         Assert.AreSame(a, order[0]);
-        Assert.AreSame(TickOf(a), order[1]);
+        Assert.AreSame(tick, order[1]);
         Assert.AreSame(b, order[2]);
     }
 
@@ -760,8 +762,8 @@ public class CombatTests
     {
         var enemy = VulnScenarioFirstPass(out _, out var first);
         RewindCard(3, 0, 0).Play(null);
+        Assert.AreSame(first, TickOf(enemy)); // до срабатывания: после него тик снимается
         Advance(3);
-        Assert.AreSame(first, TickOf(enemy));
     }
 
     [Test]
@@ -774,7 +776,7 @@ public class CombatTests
         var first = TickOf(enemy);
         RewindCard(3, 0, 0).Play(null);   // R=0, ReplayUntil=2
         Assert.AreEqual(0, cm.CurrentTime);
-        WithEffect(MakeCard(0, 0), StatusEffectType.Stagger, 3, EffectTargetTag.Enemy).Play(enemy); // действие врага уходит за ReplayUntil
+        WithEffect(MakeCard(0, 0), StatusEffectType.Stun, 3, EffectTargetTag.Enemy).Play(enemy); // действие врага уходит за ReplayUntil
         Assert.Greater(enemy.NextTime, cm.ReplayUntil);
         Advance(enemy.NextTime);
         Assert.AreNotSame(first, TickOf(enemy), "момент наложения позже ReplayUntil — переиспользования нет");
@@ -960,5 +962,276 @@ public class CombatTests
         RewindCard(1, 0, 0).Play(null);   // T=1, R=0: повтор удара с числом первого прохода
         Assert.AreEqual(0, cm.CurrentTime);
         Assert.AreEqual(45, enemy.CurrentHP, "повтор снова 5, а не 10");
+    }
+
+    // ---------- A6–A8: система эффектов ----------
+
+    bool HasTick(Combatant c, StatusEffectType t) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Any(p => p.Owner == c && p.EffectType == t);
+    PeriodicEffectEvent EffectTick(Combatant c, StatusEffectType t) => cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Single(p => p.Owner == c && p.EffectType == t);
+
+    [Test]
+    public void E1_ZeroStacks_TickRemoved_ReapplyStartsNewTick()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.AddEffectStacks(StatusEffectType.Weak, 1);
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Weak));
+        Advance(3);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Weak));
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Weak), "тик снят из очереди");
+        Advance(2);                       // время 5
+        enemy.AddEffectStacks(StatusEffectType.Weak, 1);
+        Assert.AreEqual(8, EffectTick(enemy, StatusEffectType.Weak).NextTime);
+    }
+
+    [Test]
+    public void E2_WeakIsPresenceNotAmount()
+    {
+        var other = Make<Player>();
+        other.combatManager = cm; other.Init();
+        player.AddEffectStacks(StatusEffectType.Weak, 1);
+        other.AddEffectStacks(StatusEffectType.Weak, 3);
+        Assert.AreEqual(5, player.CalculateOutgoingDamage(10));
+        Assert.AreEqual(5, other.CalculateOutgoingDamage(10));
+    }
+
+    [Test]
+    public void E3_Regen3_Heals3_2_1_ThenTickRemoved()
+    {
+        player.SetCurrentHP(10);
+        player.AddEffectStacks(StatusEffectType.Regen, 3);
+        Advance(1); Assert.AreEqual(13, player.CurrentHP);
+        Advance(1); Assert.AreEqual(15, player.CurrentHP);
+        Advance(1); Assert.AreEqual(16, player.CurrentHP);
+        Assert.AreEqual(0, player.GetStacks(StatusEffectType.Regen));
+        Assert.IsFalse(HasTick(player, StatusEffectType.Regen));
+        Advance(2); Assert.AreEqual(16, player.CurrentHP);
+    }
+
+    [Test]
+    public void E4_Poison_IgnoresBlockAndVulnerable_DecaysByOne()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(10);
+        enemy.AddEffectStacks(StatusEffectType.Vulnerable, 9);
+        enemy.AddEffectStacks(StatusEffectType.Poison, 3);
+        Advance(1); Assert.AreEqual(27, enemy.CurrentHP);
+        Advance(1); Assert.AreEqual(25, enemy.CurrentHP);
+        Advance(1); Assert.AreEqual(24, enemy.CurrentHP);
+        Assert.AreEqual(10, enemy.CurrentBlock);
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Poison));
+    }
+
+    [Test]
+    public void E5_Bleeding_BlockAbsorbs_NoVulnerable_DoesNotDecay()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(2);
+        enemy.AddEffectStacks(StatusEffectType.Vulnerable, 9);
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 4);
+        Advance(3);
+        Assert.AreEqual(28, enemy.CurrentHP, "блок 2 поглотил часть удара 4");
+        Assert.AreEqual(0, enemy.CurrentBlock);
+        Assert.AreEqual(4, enemy.GetStacks(StatusEffectType.Bleeding));
+        Advance(3);
+        Assert.AreEqual(24, enemy.CurrentHP, "−4 без ×1.5");
+    }
+
+    [Test]
+    public void E6_HealRemovesBleedingByActualHealed()
+    {
+        player.AddEffectStacks(StatusEffectType.Bleeding, 5);
+        player.SetCurrentHP(20);
+        player.Heal(3);
+        Assert.AreEqual(2, player.GetStacks(StatusEffectType.Bleeding));
+        player.SetCurrentHP(30);
+        player.Heal(3);
+        Assert.AreEqual(2, player.GetStacks(StatusEffectType.Bleeding), "на полном HP лечение 0");
+        player.SetCurrentHP(29);
+        player.Heal(3);
+        Assert.AreEqual(1, player.GetStacks(StatusEffectType.Bleeding), "вылечено 1");
+    }
+
+    [Test]
+    public void E7_RegenBeforePoisonAndBleedingOfSameFighter()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        enemy.AddEffectStacks(StatusEffectType.Poison, 5, player);     // группа 0, создан первым
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 20, player);
+        enemy.AddEffectStacks(StatusEffectType.Regen, 5, enemy);       // группа 1
+        Advance(3);
+        var order = cm.Journal.Where(e => e.Time == 3 && e.Source is PeriodicEffectEvent p && p.Owner == enemy)
+                              .Select(e => ((PeriodicEffectEvent)e.Source).EffectType).Where(t => t != null).Distinct().ToList();
+        Assert.AreEqual(StatusEffectType.Regen, order[0]);
+        CollectionAssert.Contains(order, StatusEffectType.Poison);
+        CollectionAssert.Contains(order, StatusEffectType.Bleeding);
+    }
+
+    [Test]
+    public void E8_RegenRemovesBleedingBeforeItsHit()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        enemy.SetCurrentHP(20);
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 3);            // тик в 3
+        Advance(2);
+        enemy.AddEffectStacks(StatusEffectType.Regen, 2);               // первый тик в 3
+        Advance(1);
+        Assert.AreEqual(21, enemy.CurrentHP, "лечение 2, затем удар 1");
+        Assert.AreEqual(1, enemy.GetStacks(StatusEffectType.Bleeding));
+    }
+
+    [Test]
+    public void E9_Invulnerable_BlocksDamageAndHpLossKeepsBlock_HealAndEffectsWork()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(5);
+        enemy.AddEffectStacks(StatusEffectType.Invulnerable, 1);
+        enemy.TakeDamage(5);
+        enemy.LoseHP(3);
+        Assert.AreEqual(30, enemy.CurrentHP);
+        Assert.AreEqual(5, enemy.CurrentBlock, "блок не тратится");
+        enemy.SetCurrentHP(20);
+        enemy.Heal(4);
+        Assert.AreEqual(24, enemy.CurrentHP, "лечение проходит");
+        enemy.AddEffectStacks(StatusEffectType.Weak, 1);
+        Assert.AreEqual(1, enemy.GetStacks(StatusEffectType.Weak), "эффекты накладываются");
+        Advance(1);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Invulnerable));
+        enemy.TakeDamage(5);
+        Assert.AreEqual(0, enemy.CurrentBlock);
+        enemy.TakeDamage(4);
+        Assert.AreEqual(20, enemy.CurrentHP, "урон снова проходит");
+    }
+
+    [Test]
+    public void E9b_Invulnerable_BlocksPoisonAndBleedingTicks()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        enemy.GainBlock(5);
+        enemy.AddEffectStacks(StatusEffectType.Invulnerable, 4);
+        enemy.AddEffectStacks(StatusEffectType.Poison, 2);
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 2);
+        Advance(3);                       // Отравление в 1, 2; Кровотечение в 3; Неуязвимость ещё 1
+        Assert.AreEqual(30, enemy.CurrentHP);
+        Assert.AreEqual(5, enemy.CurrentBlock);
+    }
+
+    [Test]
+    public void E10_StunOnEnemy_ShiftsNextAction()
+    {
+        var enemy = MakeEnemy(30, 5, 1);
+        Spawn(enemy);
+        Assert.AreEqual(5, enemy.NextTime);
+        new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = 3, targetTag = EffectTargetTag.Enemy }.Apply(cm, player, enemy);
+        Assert.AreEqual(8, enemy.NextTime);
+        Assert.AreEqual(0, enemy.GetStacks(StatusEffectType.Stun), "в словарь стаков не попадает");
+    }
+
+    // Враг: в 2 оглушает игрока на 3, в 4 бьёт на 5
+    Enemy StunnerEnemy()
+    {
+        var enemy = Make<Enemy>();
+        enemy.maxHP = 30; enemy.combatManager = cm; enemy.Init(); enemy.player = player;
+        var pattern = ScriptableObject.CreateInstance<EnemyPatternData>();
+        created.Add(pattern);
+        pattern.steps.Add(new EnemyActionStep
+        {
+            stepNameKey = "enemy.test.attack_player", delaySeconds = 2, target = EnemyActionTarget.Player,
+            appliedEffects = new List<AppliedEffectEntry> { new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = 3, targetTag = EffectTargetTag.Player } }
+        });
+        pattern.steps.Add(new EnemyActionStep
+        {
+            stepNameKey = "enemy.test.attack_player", delaySeconds = 2, target = EnemyActionTarget.Player,
+            instantActions = new List<InstantActionEntry> { Act(InstantActionKind.Damage, 5, EffectTargetTag.Player) }
+        });
+        enemy.pattern = pattern;
+        enemy.ScheduleFirstAction();
+        return enemy;
+    }
+
+    [Test]
+    public void E11_StunOnPlayer_TimeJumpsEnemiesActDrawRuns()
+    {
+        var enemy = StunnerEnemy();
+        Spawn(enemy);
+        var draws = new List<int>();
+        AddDrawTimer(draws);
+        MakeCard(2, 0).Play(null);        // каст 0→2, в 2 оглушение на 3
+        Assert.AreEqual(5, cm.CurrentTime);
+        Assert.AreEqual(25, player.CurrentHP, "удар врага в 4 прошёл");
+        CollectionAssert.AreEqual(new[] { 2, 4 }, draws, "добор в 4 сработал");
+    }
+
+    [Test]
+    public void E12a_Rewind_DotTicksUndoneAndReplayed_ZeroedTickReturns()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        enemy.AddEffectStacks(StatusEffectType.Poison, 2);
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 2);
+        enemy.AddEffectStacks(StatusEffectType.Regen, 1);
+        enemy.SetCurrentHP(40);
+        Advance(3);                       // Отравление −2, −1; Регенерация +1; Кровотечение −2 (в 3 лечение раньше удара не мешает)
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Poison));
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Regen));
+        int hpAfter = enemy.CurrentHP;
+
+        RewindCard(3, 0, 0).Play(null);   // R=0: всё откатывается
+        Assert.AreEqual(40, enemy.CurrentHP);
+        Assert.AreEqual(2, enemy.GetStacks(StatusEffectType.Poison));
+        Assert.AreEqual(1, enemy.GetStacks(StatusEffectType.Regen));
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Poison), "снятый при обнулении тик вернулся");
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Regen));
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Bleeding));
+
+        Advance(3);
+        Assert.AreEqual(hpAfter, enemy.CurrentHP, "повтор даёт то же самое");
+        Assert.IsFalse(HasTick(enemy, StatusEffectType.Poison));
+    }
+
+    [Test]
+    public void E12b_Rewind_EnemyStunOnPlayerNotReplayed()
+    {
+        var enemy = StunnerEnemy();
+        Spawn(enemy);
+        MakeCard(2, 0).Play(null);        // время 5, HP 25
+        RewindCard(4, 0, 0).Play(null);   // T=5, R=1
+        Assert.AreEqual(1, cm.CurrentTime);
+        Advance(4);                       // повтор действий врага в 2 и 4: на игрока не действует
+        Assert.AreEqual(5, cm.CurrentTime);
+        Assert.AreEqual(25, player.CurrentHP);
+    }
+
+    [Test]
+    public void E13_NewCombat_NoEffectsOrTicksOfPreviousFight()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        player.AddEffectStacks(StatusEffectType.Poison, 5);
+        player.AddEffectStacks(StatusEffectType.Weak, 2);
+        enemy.AddEffectStacks(StatusEffectType.Bleeding, 3);
+
+        cm.ResetForNewCombat();
+        var fresh = Make<Player>();
+        fresh.maxHP = 30; fresh.combatManager = cm; fresh.Init();
+        cm.SetPlayer(fresh);
+        foreach (StatusEffectType t in System.Enum.GetValues(typeof(StatusEffectType)))
+            Assert.AreEqual(0, fresh.GetStacks(t), t.ToString());
+        Assert.IsFalse(cm.ScheduledEvents.OfType<PeriodicEffectEvent>().Any(p => p.EffectType != null), "тиков прошлого боя нет");
+        Advance(5);
+        Assert.AreEqual(30, fresh.CurrentHP);
     }
 }

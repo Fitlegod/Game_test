@@ -158,11 +158,16 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    // Порядок при равном NextTime: окружение (группа 2) — после остальных; повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
+    // Порядок при равном NextTime: окружение (группа 2) — после остальных; Регенерация бойца — раньше его Отравления/Кровотечения; повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
     private bool GoesBefore(IScheduledEvent a, IScheduledEvent b)
     {
         if (a.NextTime != b.NextTime) return a.NextTime < b.NextTime;
         if ((a.Priority == 2) != (b.Priority == 2)) return b.Priority == 2; // окружение — после всего в момент, сильнее правила повтора
+        if (a is PeriodicEffectEvent ta && b is PeriodicEffectEvent tb && ta.Owner != null && ta.Owner == tb.Owner) // Регенерация бойца — раньше его Отравления и Кровотечения
+        {
+            if (ta.EffectType == StatusEffectType.Regen && IsDamageOverTime(tb.EffectType)) return true;
+            if (tb.EffectType == StatusEffectType.Regen && IsDamageOverTime(ta.EffectType)) return false;
+        }
         int ra = ReplayOrderOf(a), rb = ReplayOrderOf(b);
         if (ra > 0 && rb > 0) return ra < rb;
         if ((ra > 0) != (rb > 0)) return ra > 0;
@@ -172,6 +177,8 @@ public class CombatManager : MonoBehaviour
         int ia = enemies.IndexOf(OwnerOf(a) as Enemy), ib = enemies.IndexOf(OwnerOf(b) as Enemy);
         return ia != ib ? ia < ib : ca < cb;
     }
+
+    private static bool IsDamageOverTime(StatusEffectType? type) => type == StatusEffectType.Poison || type == StatusEffectType.Bleeding;
 
     // 0 — обычное событие; >0 — номер прежнего срабатывания, которое оно сейчас повторяет
     private int ReplayOrderOf(IScheduledEvent ev) =>

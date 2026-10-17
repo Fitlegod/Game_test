@@ -14,19 +14,19 @@ public class Enemy : Combatant, IScheduledEvent
     public bool IsPending => CurrentHP > 0 && pattern != null && pattern.steps.Count > 0;
     public int CurrentStepIndex => currentStepIndex;
 
-    private int staggerAppliedAt;
-    private int staggerAmount;
+    private int stunAppliedAt;
+    private int stunAmount;
 
-    public void ApplyStagger(int seconds)
+    public void ApplyStun(int seconds)
     {
-        int prevNext = nextActionTime, prevAt = staggerAppliedAt, prevAmount = staggerAmount;
-        combatManager.Record(this, () => { nextActionTime = prevNext; staggerAppliedAt = prevAt; staggerAmount = prevAmount; });
+        int prevNext = nextActionTime, prevAt = stunAppliedAt, prevAmount = stunAmount;
+        combatManager.Record(this, () => { nextActionTime = prevNext; stunAppliedAt = prevAt; stunAmount = prevAmount; });
         nextActionTime += seconds;
-        staggerAppliedAt = combatManager.EffectTime;
-        staggerAmount = seconds;
+        stunAppliedAt = combatManager.EffectTime;
+        stunAmount = seconds;
     }
 
-    public int StaggerDisplay => Mathf.Max(0, staggerAmount - (combatManager.CurrentTime - staggerAppliedAt));
+    public int StunDisplay => Mathf.Max(0, stunAmount - (combatManager.CurrentTime - stunAppliedAt));
 
     public void ScheduleFirstAction()
     {

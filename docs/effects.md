@@ -1,6 +1,6 @@
 # Статус-эффекты
 
-Классы: `StatusEffectType` (7 значений), `StatusEffectRules` (`Combat/TimedEffects.cs`), формулы на `Combatant` (`Combatants/Combatant.cs`).
+Классы: `StatusEffectType` (10 значений), `StatusEffectRules` (`Combat/TimedEffects.cs`), формулы на `Combatant` (`Combatants/Combatant.cs`).
 
 Файлы: `Enums/StatusEffectType.cs`, `Combat/TimedEffects.cs`, `Combatants/Combatant.cs`, `Cards/CardActions.cs` (точки входа `Apply`).
 
@@ -8,7 +8,7 @@
 
 ## Хранилище: `Dictionary<StatusEffectType, float>` на `Combatant`
 
-Стаки хранятся на каждом `Combatant` в приватном `effectStacks`. Тип значения — **`float`**. Пошатывание в этот словарь не попадает — см. ниже.
+Стаки хранятся на каждом `Combatant` в приватном `effectStacks`. Тип значения — **`float`**. Оглушение в этот словарь не попадает — см. ниже.
 
 - `GetStacks(type)` — `0f`, если ключа нет.
 - `AddEffectStacks(type, amount, applier = null)` — no-op, если `CurrentHP <= 0` (мёртвый не может получить новый стак); иначе прибавляет `amount` (может быть отрицательным — так карта в теории может *снять* часть стаков напрямую, не только периодическим распадом). При первом наложении типа, для которого `StatusEffectRules.TryGetPeriodicBehavior` возвращает `true`, регистрирует новый `PeriodicEffectEvent` и запоминает его в `activeScheduledEffects[type]`; первый тик считается от **момента срабатывания эффекта** (`CombatManager.EffectTime`: внутри события — момент события, вне — `CurrentTime`), а не от конца каста: враг, наложивший Слабость в момент 2 во время каста 0→3, получает снятие стака в 5, а не в 6 (и при повторе после отката тик остаётся в том же месте); повторные наложения того же типа **не** создают второе тикающее событие — стаки просто накапливаются в уже существующем интервале. `applier` — кто наложил (`AppliedEffectEntry.Apply` передаёт `source`; `null` — неизвестно) — уходит в `PeriodicEffectEvent.Applier` и определяет группу порядка тика: группа врагов (`Priority 1`), если носитель — `Enemy` и наложил не игрок; иначе группа игрока (`0`). Группу задаёт первый наложивший (тот, кто создал тик); последующие стаки от других источников её не меняют.
@@ -17,27 +17,46 @@
 - `RemoveStacks(type, amount)` — вычитает, но не даёт уйти ниже `0` (`Mathf.Max(0f, ...)`).
 - `ClearAllScheduledEvents()` — при смерти отписывает из `CombatManager` все тики из `activeScheduledEffects` (нужен словарь с самой ссылкой на событие, а не просто `HashSet`-флаг, потому что отписать можно только тот же объект, что был зарегистрирован) и чистит словарь. Сами значения стаков в `effectStacks` при этом не обнуляются — но это не имеет значения, мёртвый `Combatant` больше не участвует в бою.
 
-## Все 7 типов — точные формулы
+## Все 10 типов — точные формулы
 
-| Тип | Тикает? | Действие тика | Где применяется постоянный эффект |
+Общее правило тиков: действие эффекта, **затем** −1 стак (если не сказано иное). Когда стаки доходят до 0, тик снимается (см. ниже). «Важно наличие»: Слабость, Хрупкость, Уязвимость действуют одинаково при любом числе стаков больше 0.
+
+| Тип | Тикает? | Действие тика | Постоянное действие |
 |---|---|---|---|
 | **Strength** (Сила) | нет | — | `CalculateOutgoingDamage`: `+ Mathf.RoundToInt(stacks)` к базовому урону |
-| **Weak** (Слабость) | каждые 3 с, `RemoveStacks(Weak, 1)` | распад −1/тик | `CalculateOutgoingDamage`: если `stacks > 0`, сумма после Силы `× 0.5` (без округления — оно одно, в конце конвейера) |
-| **Regen** (Лечение) | каждую 1 с | `owner.Heal(Mathf.RoundToInt(stacks))` — **не** уменьшает собственные стаки | лечит на текущее число стаков каждую секунду, пока стаки не снимут иначе |
+| **Weak** (Слабость) | каждые 3 с | `RemoveStacks(Weak, 1)` | `CalculateOutgoingDamage`: если `stacks > 0`, сумма после Силы `× 0.5` (без округления — оно одно, в конце конвейера) |
+| **Regen** (Лечение) | каждую 1 с | `Heal(stacks)`, затем `RemoveStacks(Regen, 1)` | — |
 | **Toughness** (Крепость) | нет | — | `CalculateIncomingBlock`: `+ Mathf.RoundToInt(stacks)` к базовому блоку |
-| **Frailty** (Хрупкость) | каждые 3 с, `RemoveStacks(Frailty, 1)` | распад −1/тик | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепости `× 0.5` через `Mathf.FloorToInt` |
-| **Vulnerable** (Уязвимость) | каждые 3 с, `RemoveStacks(Vulnerable, 1)` | распад −1/тик | `ApplyIncomingDamageModifiers`: если `stacks > 0`, урон `× 1.5`, затем единственное `Mathf.FloorToInt` |
-| **Stagger** (Пошатывание) | — особый случай, см. ниже | — | напрямую двигает `Enemy.nextActionTime`, не через этот словарь |
+| **Frailty** (Хрупкость) | каждые 3 с | `RemoveStacks(Frailty, 1)` | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепости `× 0.5` через `Mathf.FloorToInt` |
+| **Vulnerable** (Уязвимость) | каждые 3 с | `RemoveStacks(Vulnerable, 1)` | `ApplyIncomingDamageModifiers`: если `stacks > 0`, урон от **атаки** (`InstantActionKind.Damage`) `× 1.5`, затем единственное `Mathf.FloorToInt`. Отравление и Кровотечение Уязвимость не усиливает |
+| **Poison** (Отравление) | каждую 1 с | `LoseHP(stacks)` — мимо блока и Уязвимости, затем `RemoveStacks(Poison, 1)` | — |
+| **Bleeding** (Кровотечение) | каждые 3 с | `TakeDamage(stacks)` — блок поглощает, Уязвимость не действует; сам не затухает | любое лечение (`Heal`) снимает столько стаков, сколько HP реально вылечено (на полном HP — 0) |
+| **Invulnerable** (Неуязвимость) | каждую 1 с | `RemoveStacks(Invulnerable, 1)` (стаки = секунды) | пока `stacks > 0`: `TakeDamage` и `LoseHP` ничего не делают, блок не тратится; лечение и наложение эффектов работают |
+| **Stun** (Оглушение) | — особый случай, см. ниже | — | не в словаре: враг откладывает действие, игрок сдвигает время вперёд |
 
-`StatusEffectRules.TryGetPeriodicBehavior` — единственное место, где решается, какие типы вообще тикают: `Weak`/`Frailty`/`Vulnerable` (интервал 3 с) и `Regen` (интервал 1 с) возвращают `true` со своим действием; `Strength`/`Toughness`/`Stagger` попадают в `default` и возвращают `false` — это постоянные (пока не снятые вручную) значения без автораспада.
+`StatusEffectRules.TryGetPeriodicBehavior` — единственное место, где решается, какие типы тикают: `Weak`/`Frailty`/`Vulnerable`/`Bleeding` (интервал 3 с) и `Regen`/`Poison`/`Invulnerable` (интервал 1 с); `Strength`/`Toughness`/`Stun` — `false`.
 
-### Пошатывание — не через общий `Dictionary`
+### Снятие тика при 0 стаков
 
-Реализовано на `Enemy` (`Combatants/Enemy.cs`), не на базовом `Combatant`, и не тикает через `StatusEffectRules`:
+`Combatant.RemoveStacks`: если стаки типа стали 0 и у типа есть тик в `activeScheduledEffects`, тик удаляется оттуда и из очереди (`UnregisterScheduledEvent`); в журнал пишутся две обратные процедуры (вернуть запись в `activeScheduledEffects` и вернуть событие в очередь на прежнее место), так что откат возвращает снятый тик. Повторное наложение создаёт **новый** тик от момента наложения; тик, отменённый откатом, при повторе возвращается прежним объектом (`undoneTicks`, как раньше). `PeriodicEffectEvent.EffectType` (`StatusEffectType?`, `null` у таймера добора и затухания блока) хранит, чей это тик.
 
-- `ApplyStagger(int seconds)` — применяется **мгновенно и целиком**: `nextActionTime += seconds` (следующее действие врага откладывается сразу), плюс запоминает `staggerAppliedAt`/`staggerAmount` (оба `int`, начальное значение `0`) только для отображения; `staggerAppliedAt` берётся из `CombatManager.EffectTime` (момент срабатывания эффекта), иначе после отката `StaggerDisplay` мог бы показать больше наложенного.
-- `StaggerDisplay` — `Mathf.Max(0, staggerAmount - (CurrentTime - staggerAppliedAt))` (`int`): чисто косметическое обратное отсчитывание для UI, на логику не влияет — сдвиг времени уже произошёл в момент применения.
-- `AppliedEffectEntry.Apply` для `StatusEffectType.Stagger` отдельной веткой проверяет `if (target is Enemy enemy) enemy.ApplyStagger(Mathf.RoundToInt(stacks))` (стаки `float`, время целое); если цель — не `Enemy` (например, `Player`), эффект тихо не применяется (кроме лога).
+### Потеря HP и лечение
+
+- `LoseHP(int)` — потеря HP мимо блока (Отравление): нет эффекта, если боец мёртв, `amount <= 0` или есть Неуязвимость; смерть — как в `TakeDamage` (`ClearAllScheduledEvents` + `OnDeath`); в журнал — реальная разница.
+- `TakeDamage` при Неуязвимости не делает ничего (и блок не тратится).
+- `Heal`: после лечения, если вылечено `> 0` и есть Кровотечение, вызывает `RemoveStacks(Bleeding, вылечено)` — это работает для карты, Регенерации и любого другого лечения.
+
+### Порядок в один момент
+
+Тик Регенерации бойца срабатывает раньше тиков его Отравления и Кровотечения (`CombatManager.GoesBefore`, сразу после правила окружения, независимо от групп и от того, кто наложил): исцеление успевает снять Кровотечение до его удара.
+
+### Оглушение — не через общий `Dictionary`
+
+Расходуется сразу при наложении, в словарь стаков не попадает и не тикает через `StatusEffectRules`; `AppliedEffectEntry.Apply` обрабатывает `Stun` отдельной веткой:
+
+- **На враге:** `Enemy.ApplyStun(int seconds)` — `nextActionTime += seconds` сразу, плюс запоминает `stunAppliedAt`/`stunAmount` (оба `int`) только для отображения; `stunAppliedAt` берётся из `CombatManager.EffectTime`, иначе после отката `StunDisplay` мог бы показать больше наложенного. `StunDisplay` — `Mathf.Max(0, stunAmount - (CurrentTime - stunAppliedAt))`: косметический обратный отсчёт для UI.
+- **На игроке:** `CombatManager.AdvanceTime(seconds)` — время боя сдвигается вперёд прямо внутри события (`ResolveUpTo` читает `CurrentTime` заново на каждом шаге, поэтому разбор продолжается до нового времени): враги в это время действуют, добор идёт, игрок ничего не разыгрывает. В журнал не пишется (время игрока не откатывается); при повторе после отката действие врага на игрока пропускается, так что повторного сдвига нет.
+- `IsPositive`: Strength, Regen, Invulnerable, Toughness (при `stacks >= 0`) — положительные; Poison, Bleeding, Stun и остальные — отрицательные.
 
 ## Полный конвейер урона (`InstantActionKind.Damage`)
 
@@ -74,6 +93,6 @@
 
 ## UI-потребитель: `CombatantStatusDisplay.BuildEffectsText()`
 
-`UI/CombatantStatusDisplay.cs` (бывший отдельный `EffectStacksDisplay.cs`, слит в общий дисплей бойца — см. [combat-core.md](combat-core.md)) — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StaggerDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`; код метода перенесён из старого файла буквально, без переписывания.
+`UI/CombatantStatusDisplay.cs` (бывший отдельный `EffectStacksDisplay.cs`, слит в общий дисплей бойца — см. [combat-core.md](combat-core.md)) — каждый `Update()` строит строку из `target.GetStacks(type)` для Strength/Weak/Regen/Toughness/Frailty/Vulnerable/Poison/Bleeding/Invulnerable (через `AppendIfPresent`, пропуская нулевые), и отдельно — `Enemy.StunDisplay`, если цель является `Enemy` и значение больше нуля. Сам ничего не считает, только форматирует то, что уже посчитано на `Combatant`/`Enemy`; код метода перенесён из старого файла буквально, без переписывания.
 
 **Сверено с кодом:** `GetStacks` возвращает `0f`, если ключа нет (`Combatants/Combatant.cs:30`); `RemoveStacks` не опускает стаки ниже нуля через `Mathf.Max(0f, …)` (`Combatants/Combatant.cs:72`); `AddEffectStacks` у мёртвого — no-op (`Combatants/Combatant.cs:37`).

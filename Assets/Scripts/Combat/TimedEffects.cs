@@ -11,9 +11,11 @@ public class PeriodicEffectEvent : IScheduledEvent
     public bool IsPending => true;
     public Combatant Owner { get; } // null — таймер добора
     public Combatant Applier { get; } // кто наложил эффект, создавший тик; может быть null
+    public StatusEffectType? EffectType { get; } // какой статус-эффект тикает; null — таймер добора и затухание блока
 
-    public PeriodicEffectEvent(int startTime, int interval, System.Action onTrigger, Combatant owner = null, Combatant applier = null, bool isEnvironment = false)
+    public PeriodicEffectEvent(int startTime, int interval, System.Action onTrigger, Combatant owner = null, Combatant applier = null, bool isEnvironment = false, StatusEffectType? effectType = null)
     {
+        EffectType = effectType;
         this.isEnvironment = isEnvironment;
         this.interval = interval;
         this.onTrigger = onTrigger;
@@ -91,9 +93,32 @@ public static class StatusEffectRules
                 action = owner => owner.RemoveStacks(StatusEffectType.Vulnerable, 1);
                 return true;
 
-            case StatusEffectType.Regen:
+            case StatusEffectType.Regen: // лечит на текущие стаки, затем −1
                 interval = 1;
-                action = owner => owner.Heal(Mathf.RoundToInt(owner.GetStacks(StatusEffectType.Regen)));
+                action = owner =>
+                {
+                    owner.Heal(Mathf.RoundToInt(owner.GetStacks(StatusEffectType.Regen)));
+                    owner.RemoveStacks(StatusEffectType.Regen, 1);
+                };
+                return true;
+
+            case StatusEffectType.Poison: // потеря HP мимо блока и Уязвимости, затем −1
+                interval = 1;
+                action = owner =>
+                {
+                    owner.LoseHP(Mathf.RoundToInt(owner.GetStacks(StatusEffectType.Poison)));
+                    owner.RemoveStacks(StatusEffectType.Poison, 1);
+                };
+                return true;
+
+            case StatusEffectType.Bleeding: // урон по стакам (блок поглощает, Уязвимость не действует); сам не затухает
+                interval = 3;
+                action = owner => owner.TakeDamage(Mathf.RoundToInt(owner.GetStacks(StatusEffectType.Bleeding)));
+                return true;
+
+            case StatusEffectType.Invulnerable: // стаки — секунды
+                interval = 1;
+                action = owner => owner.RemoveStacks(StatusEffectType.Invulnerable, 1);
                 return true;
 
             default:

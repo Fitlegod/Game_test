@@ -83,8 +83,14 @@ effect.genitive.Frailty = Хрупкости
 effect.name.Frailty = Хрупкость
 effect.genitive.Vulnerable = Уязвимости
 effect.name.Vulnerable = Уязвимость
-effect.genitive.Stagger = Пошатывания
-effect.name.Stagger = Пошатывание
+effect.genitive.Stun = Оглушения
+effect.name.Stun = Оглушение
+effect.genitive.Poison = Отравления
+effect.name.Poison = Отравление
+effect.genitive.Bleeding = Кровотечения
+effect.name.Bleeding = Кровотечение
+effect.genitive.Invulnerable = Неуязвимости
+effect.name.Invulnerable = Неуязвимость
 effect.stacks = {0} x{1}
 effect.join = {0} | {1}
 

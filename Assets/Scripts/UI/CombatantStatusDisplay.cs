@@ -35,9 +35,12 @@ public class CombatantStatusDisplay : MonoBehaviour
         AppendIfPresent(ref text, StatusEffectType.Toughness);
         AppendIfPresent(ref text, StatusEffectType.Frailty);
         AppendIfPresent(ref text, StatusEffectType.Vulnerable);
+        AppendIfPresent(ref text, StatusEffectType.Poison);
+        AppendIfPresent(ref text, StatusEffectType.Bleeding);
+        AppendIfPresent(ref text, StatusEffectType.Invulnerable);
 
-        if (target is Enemy enemy && enemy.StaggerDisplay > 0)
-            Join(ref text, StatusEffectType.Stagger, enemy.StaggerDisplay);
+        if (target is Enemy enemy && enemy.StunDisplay > 0)
+            Join(ref text, StatusEffectType.Stun, enemy.StunDisplay);
 
         return text;
     }
