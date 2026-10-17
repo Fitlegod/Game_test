@@ -127,7 +127,7 @@ public class CombatManager : MonoBehaviour
         int index = scheduledEvents.IndexOf(scheduledEvent);
         if (index < 0) return;
         scheduledEvents.RemoveAt(index);
-        if (IsWorld(scheduledEvent)) // обратно — на прежнее место: порядок в списке задаёт порядок ходов в общий момент
+        if (IsWorld(scheduledEvent)) // обратно — на прежнее место
             Record(OwnerOf(scheduledEvent), () => scheduledEvents.Insert(Mathf.Min(index, scheduledEvents.Count), scheduledEvent));
     }
 
@@ -148,6 +148,7 @@ public class CombatManager : MonoBehaviour
     {
         while (true)
         {
+            if (combatOver) break; // бой закончен: события, запланированные позже, не срабатывают (дизайн-документ §4.2)
             IScheduledEvent next = null;
             OrderKey nextKey = default;
             foreach (var ev in scheduledEvents)
@@ -223,7 +224,7 @@ public class CombatManager : MonoBehaviour
     // Откат: вызывается из эффекта карты (внутри события). Игрок не меняется, враги и мир возвращаются обратными процедурами.
     public void Rewind(int n)
     {
-        if (CurrentEvent == null) return;
+        if (CurrentEvent == null || combatOver) return; // после конца боя откат невозможен (дизайн-документ §8.2)
         if (!(CurrentEvent is OneShotEvent))
         {
             Debug.LogError("Откат можно вызвать только из события карты игрока, а не из " + (CurrentEvent is Enemy enemy ? "действия врага " + enemy.name : CurrentEvent.GetType().Name));
@@ -257,6 +258,7 @@ public class CombatManager : MonoBehaviour
 
     private void HandlePlayerDeath()
     {
+        if (combatOver) return; // бой уже закончен (например, победой) — второго исхода не будет
         EndCombat("combat.defeat");
         OnDefeat?.Invoke();
     }
