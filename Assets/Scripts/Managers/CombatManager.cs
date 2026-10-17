@@ -60,6 +60,7 @@ public class CombatManager : MonoBehaviour
     // Вызывать после ResetForNewCombat: сброс очищает расписание и список бойцов с тиком затухания
     public void SetPlayer(Player newPlayer)
     {
+        if (player != null) player.OnDeath -= HandlePlayerDeath; // повторный SetPlayer не должен подписывать обработчик второй раз
         player = newPlayer;
         player.OnDeath += HandlePlayerDeath;
         RegisterBlockDecay(player);
@@ -97,9 +98,12 @@ public class CombatManager : MonoBehaviour
 
     public void RegisterEnemies(List<Enemy> spawnedEnemies)
     {
+        foreach (var enemy in enemies)
+            enemy.OnDeath -= HandleEnemyDeath;
         enemies = spawnedEnemies;
         foreach (var enemy in enemies)
         {
+            enemy.OnDeath -= HandleEnemyDeath; // повторный RegisterEnemies не подписывает второй раз
             enemy.OnDeath += HandleEnemyDeath;
             RegisterBlockDecay(enemy);
         }

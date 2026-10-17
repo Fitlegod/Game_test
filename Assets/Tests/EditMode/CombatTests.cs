@@ -1428,4 +1428,20 @@ public class CombatTests
         Assert.AreEqual("E1:Poison", a[2]);
         Assert.AreEqual("Player:decay", a[a.Count - 3], "затухание блока — в конце момента");
     }
+
+    [Test]
+    public void C8_RepeatedRegistration_DeathHandlersSubscribedOnce()
+    {
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        cm.RegisterEnemies(new List<Enemy> { enemy });  // повторно
+        cm.SetPlayer(player);                            // повторно
+        int victories = 0, defeats = 0;
+        cm.OnVictory += () => victories++;
+        cm.OnDefeat += () => defeats++;
+        enemy.TakeDamage(100);
+        Assert.AreEqual(1, victories);
+        player.TakeDamage(100);
+        Assert.AreEqual(1, defeats);
+    }
 }
