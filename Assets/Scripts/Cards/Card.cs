@@ -43,7 +43,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         CardInstance playedInstance = instance;
         CombatManager cm = combatManager;
         int effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
-        var memo = new Dictionary<(int, Combatant), int>(); // числа первого срабатывания — для повтора после отката
+        var memo = new Dictionary<(int, Combatant), float>(); // числа первого срабатывания — для повтора после отката
         cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: 0, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay, memo)));
 
         if (HandManager.Instance != null)
@@ -59,7 +59,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
     // isReplay: событие переигрывается после отката — на игрока и сам Откат не действует, на врагов действует
     // memo: итоговые («исходящие») числа по (номер действия, цель). Первое срабатывание их записывает, повтор применяет их как есть
     // и не пересчитывает формулы источника по текущему состоянию игрока (игрок при откате не откатывается). Эффекты-стаки — фиксированные числа, в memo не нужны.
-    public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false, Dictionary<(int, Combatant), int> memo = null)
+    public static void ApplyAllEffects(CardData data, CombatManager combatManager, Combatant chosenTarget, bool isReplay = false, Dictionary<(int, Combatant), float> memo = null)
     {
         InstantActionEntry rewind = null; // Откат — один раз на карту и последним: после него у этой карты не остаётся записей журнала
         for (int i = 0; i < data.instantActions.Count; i++)
@@ -73,11 +73,11 @@ public class Card : MonoBehaviour, IPointerClickHandler
             foreach (var target in ResolveTargets(combatManager, action.targetTag, chosenTarget))
             {
                 if (isReplay && target is Player) continue;
-                if (isReplay && memo != null && memo.TryGetValue((i, target), out int remembered))
+                if (isReplay && memo != null && memo.TryGetValue((i, target), out float remembered))
                     action.Apply(combatManager, combatManager.player, target, remembered);
                 else
                 {
-                    int outgoing = action.Apply(combatManager, combatManager.player, target);
+                    float outgoing = action.Apply(combatManager, combatManager.player, target);
                     if (!isReplay && memo != null) memo[(i, target)] = outgoing;
                 }
             }

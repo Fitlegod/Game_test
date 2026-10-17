@@ -18,6 +18,11 @@ public class CombatManager : MonoBehaviour
     public TMP_Text combatResultText;
     public Player player;
 
+    [Header("Затухание блока")]
+    public int blockDecayBase = 2;
+    public int blockDecayStepSeconds = 10;
+    public int blockDecayPerStep = 1;
+
     private List<Enemy> enemies = new List<Enemy>();
     public IReadOnlyList<Enemy> Enemies => enemies;
     public int CurrentTime { get; private set; }
@@ -55,6 +60,16 @@ public class CombatManager : MonoBehaviour
     {
         player = newPlayer;
         player.OnDeath += HandlePlayerDeath;
+        RegisterBlockDecay(player);
+    }
+
+    // Затухание блока в момент t: база + прибавка за каждые полные step секунд (step <= 0 — без прибавки)
+    public int BlockDecayAt(int t) => blockDecayBase + (blockDecayStepSeconds > 0 ? blockDecayPerStep * (t / blockDecayStepSeconds) : 0);
+
+    // У каждого бойца свой тик раз в секунду; не в activeScheduledEffects (это не статус-эффект)
+    private void RegisterBlockDecay(Combatant owner)
+    {
+        RegisterScheduledEvent(new PeriodicEffectEvent(CurrentTime, 1, () => owner.DecayBlock(BlockDecayAt(CurrentEventTime)), owner, null, true));
     }
 
     public void ResetForNewCombat()
@@ -80,7 +95,10 @@ public class CombatManager : MonoBehaviour
     {
         enemies = spawnedEnemies;
         foreach (var enemy in enemies)
+        {
             enemy.OnDeath += HandleEnemyDeath;
+            RegisterBlockDecay(enemy);
+        }
     }
 
     // «Мировое» — враги и их тики; всё остальное (таймер добора, тики на игроке, карты) — сторона игрока
@@ -140,16 +158,17 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    // Порядок при равном NextTime: повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
+    // Порядок при равном NextTime: окружение (группа 2) — после остальных; повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
     private bool GoesBefore(IScheduledEvent a, IScheduledEvent b)
     {
         if (a.NextTime != b.NextTime) return a.NextTime < b.NextTime;
+        if ((a.Priority == 2) != (b.Priority == 2)) return b.Priority == 2; // окружение — после всего в момент, сильнее правила повтора
         int ra = ReplayOrderOf(a), rb = ReplayOrderOf(b);
         if (ra > 0 && rb > 0) return ra < rb;
         if ((ra > 0) != (rb > 0)) return ra > 0;
         if (a.Priority != b.Priority) return a.Priority < b.Priority;
         int ca = creationOrders.TryGetValue(a, out var x) ? x : 0, cb = creationOrders.TryGetValue(b, out var y) ? y : 0;
-        if (a.Priority == 0) return ca < cb;
+        if (a.Priority != 1) return ca < cb;
         int ia = enemies.IndexOf(OwnerOf(a) as Enemy), ib = enemies.IndexOf(OwnerOf(b) as Enemy);
         return ia != ib ? ia < ib : ca < cb;
     }

@@ -22,11 +22,11 @@
 | Тип | Тикает? | Действие тика | Где применяется постоянный эффект |
 |---|---|---|---|
 | **Strength** (Сила) | нет | — | `CalculateOutgoingDamage`: `+ Mathf.RoundToInt(stacks)` к базовому урону |
-| **Weak** (Слабость) | каждые 3 с, `RemoveStacks(Weak, 1)` | распад −1/тик | `CalculateOutgoingDamage`: если `stacks > 0`, итог после Силы `× 0.5` через `Mathf.FloorToInt` |
+| **Weak** (Слабость) | каждые 3 с, `RemoveStacks(Weak, 1)` | распад −1/тик | `CalculateOutgoingDamage`: если `stacks > 0`, сумма после Силы `× 0.5` (без округления — оно одно, в конце конвейера) |
 | **Regen** (Лечение) | каждую 1 с | `owner.Heal(Mathf.RoundToInt(stacks))` — **не** уменьшает собственные стаки | лечит на текущее число стаков каждую секунду, пока стаки не снимут иначе |
-| **Toughness** (Крепкость) | нет | — | `CalculateIncomingBlock`: `+ Mathf.RoundToInt(stacks)` к базовому блоку |
-| **Frailty** (Хрупкость) | каждые 3 с, `RemoveStacks(Frailty, 1)` | распад −1/тик | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепкости `× 0.5` через `Mathf.FloorToInt` |
-| **Vulnerable** (Уязвимость) | каждые 3 с, `RemoveStacks(Vulnerable, 1)` | распад −1/тик | `ApplyIncomingDamageModifiers`: если `stacks > 0`, входящий урон `× 1.5` через `Mathf.FloorToInt` |
+| **Toughness** (Крепость) | нет | — | `CalculateIncomingBlock`: `+ Mathf.RoundToInt(stacks)` к базовому блоку |
+| **Frailty** (Хрупкость) | каждые 3 с, `RemoveStacks(Frailty, 1)` | распад −1/тик | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепости `× 0.5` через `Mathf.FloorToInt` |
+| **Vulnerable** (Уязвимость) | каждые 3 с, `RemoveStacks(Vulnerable, 1)` | распад −1/тик | `ApplyIncomingDamageModifiers`: если `stacks > 0`, урон `× 1.5`, затем единственное `Mathf.FloorToInt` |
 | **Stagger** (Пошатывание) | — особый случай, см. ниже | — | напрямую двигает `Enemy.nextActionTime`, не через этот словарь |
 
 `StatusEffectRules.TryGetPeriodicBehavior` — единственное место, где решается, какие типы вообще тикают: `Weak`/`Frailty`/`Vulnerable` (интервал 3 с) и `Regen` (интервал 1 с) возвращают `true` со своим действием; `Strength`/`Toughness`/`Stagger` попадают в `default` и возвращают `false` — это постоянные (пока не снятые вручную) значения без автораспада.
@@ -39,17 +39,29 @@
 - `StaggerDisplay` — `Mathf.Max(0, staggerAmount - (CurrentTime - staggerAppliedAt))` (`int`): чисто косметическое обратное отсчитывание для UI, на логику не влияет — сдвиг времени уже произошёл в момент применения.
 - `AppliedEffectEntry.Apply` для `StatusEffectType.Stagger` отдельной веткой проверяет `if (target is Enemy enemy) enemy.ApplyStagger(Mathf.RoundToInt(stacks))` (стаки `float`, время целое); если цель — не `Enemy` (например, `Player`), эффект тихо не применяется (кроме лога).
 
-## Полный конвейер урона (`InstantActionEntry.Apply`, `kind == Damage`)
+## Полный конвейер урона (`InstantActionKind.Damage`)
 
-1. `source.CalculateOutgoingDamage(baseAmount)`: `baseAmount + round(Strength)`, затем `× 0.5` (floor), если `Weak > 0`; итог не ниже `0`.
-2. `target.ApplyIncomingDamageModifiers(damage)`: `× 1.5` (floor), если `Vulnerable > 0`; итог не ниже `0`.
-3. `target.TakeDamage(damage)`: при `damage <= 0` ничего не делает (отрицательная сумма не должна давать блок); иначе сначала поглощение блоком — `absorbed = min(CurrentBlock, damage)`, `CurrentBlock -= absorbed`, `damage -= absorbed`; остаток вычитается из `CurrentHP`, зажимается снизу нулём. Если HP дошло ровно до `0` — вызывается `ClearAllScheduledEvents()` и стреляет `OnDeath`.
+Формула (дизайн-документ §7.2): `Урон = (База + Сила) × Слабость × Уязвимость цели`, округление вниз **один раз в конце**, не ниже 0. Число остаётся `float` до самого конца.
+
+1. `source.CalculateOutgoingDamage(baseAmount)` → `float`: `baseAmount + round(Strength)`, `× 0.5`, если `Weak > 0`. Без округления и без зажима.
+2. `target.ApplyIncomingDamageModifiers(float)` → `int`: `× 1.5`, если `Vulnerable > 0`, затем `Mathf.FloorToInt` и `Mathf.Max(0, …)` — единственное округление. Пример: база 7, Слабость у источника, Уязвимость у цели → 7 × 0.5 × 1.5 = 5.25 → 5 (раньше, с округлением на каждом шаге, выходило 4). Отрицательная Сила, сводящая сумму ниже нуля, даёт 0 урона, а не лечение.
+3. `target.TakeDamage(damage)`: при `damage <= 0` ничего не делает; иначе сначала поглощение блоком — `absorbed = min(CurrentBlock, damage)`, остаток вычитается из `CurrentHP`, зажимается снизу нулём. Если HP дошло до `0` — `ClearAllScheduledEvents()` и `OnDeath`.
+
+Предпросмотр (`ComputePreviewAmount`) идёт по той же схеме; без цели (нет наведения) возвращает `FloorToInt(исходящее)`, не ниже 0 — с целью совпадает с реальным уроном.
 
 ## Конвейер блока (`kind == Block`)
 
 1. `recipient = target ?? source`.
-2. `recipient.CalculateIncomingBlock(baseAmount)`: `baseAmount + round(Toughness)`, затем `× 0.5` (floor), если `Frailty > 0`; итог зажимается снизу нулём (`Mathf.Max(0, result)`).
-3. `recipient.GainBlock(finalBlock)`: `CurrentBlock += finalBlock` — накапливается без верхнего предела.
+2. `recipient.CalculateIncomingBlock(baseAmount)`: `baseAmount + round(Toughness)`, затем `× 0.5` (floor), если `Frailty > 0`; итог не ниже нуля — одно умножение и одно округление.
+3. `recipient.GainBlock(finalBlock)`: `CurrentBlock += finalBlock` без верхнего предела. **No-op у мёртвого** (`CurrentHP <= 0`), в журнал ничего не пишется — как у `Heal` и `AddEffectStacks`.
+
+### Затухание блока (дизайн-документ §7.4)
+
+Раз в секунду у **каждого** бойца (игрок и враги) блок уменьшается на `CombatManager.BlockDecayAt(t) = blockDecayBase + blockDecayPerStep × (t / blockDecayStepSeconds)` (целочисленное деление; при `blockDecayStepSeconds <= 0` — без прибавки). `t` — момент события затухания (`CurrentEventTime`). Умолчания: 2 / 10 / 1, то есть 2 в секундах 1–9, 3 в 10–19, 4 в 20–29. Поля — в инспекторе `CombatManager` под заголовком «Затухание блока» (`blockDecayBase`, `blockDecayStepSeconds`, `blockDecayPerStep`); `0` / `0` отключает затухание.
+
+- `Combatant.DecayBlock(amount)`: no-op у мёртвого, при `amount <= 0` или нулевом блоке; иначе снимает `min(блок, amount)`, в журнал пишется реальная разница. Ниже нуля блок не уходит.
+- Тик — `PeriodicEffectEvent` с интервалом 1 и флагом `isEnvironment`; первое затухание — в момент 1. Игрока создаёт `CombatManager.SetPlayer` (вызывать после `ResetForNewCombat`), врагов — `RegisterEnemies`. В `activeScheduledEffects` тики затухания не попадают (это не статус-эффект) и не снимаются при смерти — мёртвый боец просто ничего не затухает.
+- Порядок в моменте и поведение при откате — см. [combat-core.md](combat-core.md): группа 2 «окружение» срабатывает после всех остальных событий момента.
 
 ## Конвейер лечения (`kind == Heal`)
 
