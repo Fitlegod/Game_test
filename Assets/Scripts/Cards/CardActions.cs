@@ -93,11 +93,15 @@ public class AppliedEffectEntry
 
     public void Apply(CombatManager combatManager, Combatant source, Combatant target)
     {
-        if (statusType == StatusEffectType.Stagger)
+        if (statusType == StatusEffectType.Stun)
         {
+            // Расходуется сразу, в словарь стаков не попадает: враг откладывает действие, игрок «проваливается» вперёд во времени
+            int seconds = Mathf.RoundToInt(stacks);
             if (target is Enemy enemy)
-                enemy.ApplyStagger(Mathf.RoundToInt(stacks));
-            Debug.Log("Накладывает Пошатывание на " + stacks + " сек. цели " + target.name);
+                enemy.ApplyStun(seconds);
+            else if (target is Player && seconds > 0)
+                combatManager.AdvanceTime(seconds);
+            Debug.Log("Накладывает Оглушение на " + stacks + " сек. цели " + target.name);
             return;
         }
 
@@ -111,6 +115,7 @@ public class AppliedEffectEntry
         {
             case StatusEffectType.Strength:
             case StatusEffectType.Regen:
+            case StatusEffectType.Invulnerable:
                 return true;
             case StatusEffectType.Toughness:
                 return stacks >= 0;

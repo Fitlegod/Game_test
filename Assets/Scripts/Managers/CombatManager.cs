@@ -43,6 +43,7 @@ public class CombatManager : MonoBehaviour
     private Dictionary<IScheduledEvent, Stack<int>> replayOrders = new Dictionary<IScheduledEvent, Stack<int>>();
     private Dictionary<IScheduledEvent, int> creationOrders = new Dictionary<IScheduledEvent, int>(); // номер создания события; повторная регистрация его не меняет
     private int creationCounter;
+    private HashSet<Combatant> decayRegistered = new HashSet<Combatant>(); // у кого уже есть тик затухания блока; сбрасывается в ResetForNewCombat
     private int fireCounter; // сквозной номер срабатывания; при откате не уменьшается
     private bool isRewinding;
 
@@ -56,8 +57,10 @@ public class CombatManager : MonoBehaviour
             combatResultText.text = "";
     }
 
+    // Вызывать после ResetForNewCombat: сброс очищает расписание и список бойцов с тиком затухания
     public void SetPlayer(Player newPlayer)
     {
+        if (player != null) player.OnDeath -= HandlePlayerDeath; // повторный SetPlayer не должен подписывать обработчик второй раз
         player = newPlayer;
         player.OnDeath += HandlePlayerDeath;
         RegisterBlockDecay(player);
@@ -69,6 +72,7 @@ public class CombatManager : MonoBehaviour
     // У каждого бойца свой тик раз в секунду; не в activeScheduledEffects (это не статус-эффект)
     private void RegisterBlockDecay(Combatant owner)
     {
+        if (!decayRegistered.Add(owner)) return; // повторный SetPlayer / RegisterEnemies без сброса не создаёт второй тик
         RegisterScheduledEvent(new PeriodicEffectEvent(CurrentTime, 1, () => owner.DecayBlock(BlockDecayAt(CurrentEventTime)), owner, null, true));
     }
 
@@ -81,6 +85,7 @@ public class CombatManager : MonoBehaviour
         fireCounter = 0;
         replayOrders.Clear();
         creationOrders.Clear();
+        decayRegistered.Clear();
         creationCounter = 0;
         CurrentEvent = null;
         isRewinding = false;
@@ -93,9 +98,12 @@ public class CombatManager : MonoBehaviour
 
     public void RegisterEnemies(List<Enemy> spawnedEnemies)
     {
+        foreach (var enemy in enemies)
+            enemy.OnDeath -= HandleEnemyDeath;
         enemies = spawnedEnemies;
         foreach (var enemy in enemies)
         {
+            enemy.OnDeath -= HandleEnemyDeath; // повторный RegisterEnemies не подписывает второй раз
             enemy.OnDeath += HandleEnemyDeath;
             RegisterBlockDecay(enemy);
         }
@@ -141,11 +149,16 @@ public class CombatManager : MonoBehaviour
         while (true)
         {
             IScheduledEvent next = null;
+            OrderKey nextKey = default;
             foreach (var ev in scheduledEvents)
             {
                 if (!ev.IsPending || ev.NextTime > CurrentTime) continue;
-                if (next == null || GoesBefore(ev, next))
+                var key = EffectiveKey(ev);
+                if (next == null || key.CompareTo(nextKey) < 0)
+                {
                     next = ev;
+                    nextKey = key;
+                }
             }
             if (next == null) break;
             if (next.NextTime > ReplayUntil) replayOrders.Clear(); // вышли за интервал повтора: номера несработавших повторов больше не действуют
@@ -158,19 +171,43 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    // Порядок при равном NextTime: окружение (группа 2) — после остальных; повторяемые события — в порядке прежнего срабатывания и раньше новых; затем группа (0 игрок, 1 враги); в группе игрока — по номеру создания, в группе врагов — по носителю слева направо, затем по номеру создания
-    private bool GoesBefore(IScheduledEvent a, IScheduledEvent b)
+    // Порядок событий задаёт один ключ — кортеж, сравниваемый по полям по очереди (дизайн-документ §4.1):
+    // момент; окружение (группа 2) в конце момента; повторяемые — раньше новых; номер прежнего срабатывания; группа (EventGroup);
+    // носитель (индекс врага слева направо; только в группе врагов); номер создания; признак «Регенерация».
+    private readonly struct OrderKey : System.IComparable<OrderKey>
     {
-        if (a.NextTime != b.NextTime) return a.NextTime < b.NextTime;
-        if ((a.Priority == 2) != (b.Priority == 2)) return b.Priority == 2; // окружение — после всего в момент, сильнее правила повтора
-        int ra = ReplayOrderOf(a), rb = ReplayOrderOf(b);
-        if (ra > 0 && rb > 0) return ra < rb;
-        if ((ra > 0) != (rb > 0)) return ra > 0;
-        if (a.Priority != b.Priority) return a.Priority < b.Priority;
-        int ca = creationOrders.TryGetValue(a, out var x) ? x : 0, cb = creationOrders.TryGetValue(b, out var y) ? y : 0;
-        if (a.Priority != 1) return ca < cb;
-        int ia = enemies.IndexOf(OwnerOf(a) as Enemy), ib = enemies.IndexOf(OwnerOf(b) as Enemy);
-        return ia != ib ? ia < ib : ca < cb;
+        public readonly (int, int, int, int, int, int, int, int) Fields;
+        public OrderKey((int, int, int, int, int, int, int, int) fields) { Fields = fields; }
+        public int CompareTo(OrderKey other) => Fields.CompareTo(other.Fields);
+    }
+
+    private OrderKey BaseKey(IScheduledEvent ev)
+    {
+        int replay = ReplayOrderOf(ev);
+        int owner = ev.Priority == EventGroup.Enemies ? enemies.IndexOf(OwnerOf(ev) as Enemy) : 0;
+        int created = creationOrders.TryGetValue(ev, out var c) ? c : 0;
+        return new OrderKey((ev.NextTime, ev.Priority == EventGroup.Environment ? 1 : 0, replay > 0 ? 0 : 1, replay, ev.Priority, owner, created, 1));
+    }
+
+    // Тик «лечит по времени» (Регенерация) берёт минимум из своего ключа и ключей ожидающих тиков «бьёт по времени» того же бойца в тот же момент
+    // и ставится прямо перед ними (последнее поле 0). Остальные события — базовый ключ.
+    private OrderKey EffectiveKey(IScheduledEvent ev)
+    {
+        var key = BaseKey(ev);
+        if (!(ev is PeriodicEffectEvent p) || p.Owner == null || !(p.EffectType is StatusEffectType type) || !StatusEffectRules.IsHealOverTime(type))
+            return key;
+        foreach (var other in scheduledEvents)
+        {
+            if (other == ev || !other.IsPending || other.NextTime != ev.NextTime) continue;
+            if (other is PeriodicEffectEvent q && q.Owner == p.Owner && q.EffectType is StatusEffectType otherType && StatusEffectRules.IsDamageOverTime(otherType))
+            {
+                var otherKey = BaseKey(other);
+                if (otherKey.CompareTo(key) < 0) key = otherKey;
+            }
+        }
+        var f = key.Fields;
+        f.Item8 = 0;
+        return new OrderKey(f);
     }
 
     // 0 — обычное событие; >0 — номер прежнего срабатывания, которое оно сейчас повторяет

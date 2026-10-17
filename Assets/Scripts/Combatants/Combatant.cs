@@ -49,7 +49,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
             if (undoneTicks.TryGetValue(type, out periodicEvent) && periodicEvent.Applier == applier && combatManager.EffectTime <= combatManager.ReplayUntil)
                 periodicEvent.Restart(combatManager.EffectTime);
             else
-                periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this, applier);
+                periodicEvent = new PeriodicEffectEvent(combatManager.EffectTime, interval, () => action(this), this, applier, false, type);
             undoneTicks.Remove(type);
             activeScheduledEffects[type] = periodicEvent;
             combatManager.Record(this, () => { activeScheduledEffects.Remove(type); undoneTicks[type] = periodicEvent; });
@@ -75,6 +75,14 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         effectStacks[type] = Mathf.Max(0f, before - amount);
         float removed = before - effectStacks[type];
         combatManager.Record(this, () => effectStacks[type] = GetStacks(type) + removed);
+
+        // Стаки кончились — тик эффекта снимается; повторное наложение создаст новый
+        if (effectStacks[type] <= 0f && activeScheduledEffects.TryGetValue(type, out var tick))
+        {
+            activeScheduledEffects.Remove(type);
+            combatManager.Record(this, () => activeScheduledEffects[type] = tick);
+            combatManager.UnregisterScheduledEvent(tick);
+        }
     }
 
     // Урон = (База + Сила) × Слабость × Уязвимость цели, округление вниз один раз в конце (ApplyIncomingDamageModifiers)
@@ -108,6 +116,15 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
         CurrentHP = Mathf.Min(maxHP, CurrentHP + amount);
         int healed = CurrentHP - before;
         combatManager.Record(this, () => CurrentHP -= healed);
+        if (healed > 0 && GetStacks(StatusEffectType.Bleeding) > 0)
+            RemoveStacks(StatusEffectType.Bleeding, healed); // лечение снимает столько Кровотечения, сколько реально вылечено
+    }
+
+    // Потеря HP в обход блока (Отравление). Неуязвимость защищает и от неё.
+    public void LoseHP(int amount)
+    {
+        if (CurrentHP <= 0 || amount <= 0 || GetStacks(StatusEffectType.Invulnerable) > 0) return;
+        ReduceHP(amount, 0);
     }
 
     public void GainBlock(int amount)
@@ -135,16 +152,20 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
 
     public virtual void TakeDamage(int amount)
     {
-        if (CurrentHP <= 0 || amount <= 0) return;
+        if (CurrentHP <= 0 || amount <= 0 || GetStacks(StatusEffectType.Invulnerable) > 0) return; // Неуязвимость: ни урона, ни траты блока
 
         int absorbed = Mathf.Min(CurrentBlock, amount);
         CurrentBlock -= absorbed;
-        amount -= absorbed;
+        ReduceHP(amount - absorbed, absorbed);
+    }
 
+    // Общий хвост TakeDamage и LoseHP: снять HP, записать в журнал реальную разницу (и поглощённый блок), при 0 HP — смерть
+    private void ReduceHP(int amount, int absorbedBlock)
+    {
         int hpBefore = CurrentHP;
         CurrentHP = Mathf.Max(0, CurrentHP - amount);
         int hpLost = hpBefore - CurrentHP;
-        combatManager.Record(this, () => { CurrentBlock += absorbed; CurrentHP += hpLost; });
+        combatManager.Record(this, () => { CurrentBlock += absorbedBlock; CurrentHP += hpLost; });
 
         if (CurrentHP == 0)
         {

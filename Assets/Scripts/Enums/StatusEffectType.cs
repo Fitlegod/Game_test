@@ -6,5 +6,8 @@ public enum StatusEffectType
     Toughness,
     Frailty,
     Vulnerable,
-    Stagger
+    Stun,
+    Poison,
+    Bleeding,
+    Invulnerable
 }

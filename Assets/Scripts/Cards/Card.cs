@@ -44,7 +44,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         CombatManager cm = combatManager;
         int effectTime = cm.CurrentTime + playedInstance.data.effectDelaySeconds;
         var memo = new Dictionary<(int, Combatant), float>(); // числа первого срабатывания — для повтора после отката
-        cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: 0, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay, memo)));
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, effectTime, priority: EventGroup.Player, isReplay => ApplyAllEffects(playedInstance.data, cm, target, isReplay, memo)));
 
         if (HandManager.Instance != null)
             HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
