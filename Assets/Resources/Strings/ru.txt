@@ -23,6 +23,7 @@ ui.key.slot6 = 6
 ui.key.slot7 = 7
 
 # Исход боя
+combat.wait = Подождать (Пробел)
 combat.victory = Победа
 combat.defeat = Поражение
 
@@ -75,8 +76,8 @@ effect.genitive.Strength = Силы
 effect.name.Strength = Сила
 effect.genitive.Weak = Слабости
 effect.name.Weak = Слабость
-effect.genitive.Regen = Лечения
-effect.name.Regen = Лечение
+effect.genitive.Regen = Регенерации
+effect.name.Regen = Регенерация
 effect.genitive.Toughness = Крепости
 effect.name.Toughness = Крепость
 effect.genitive.Frailty = Хрупкости
@@ -91,6 +92,16 @@ effect.genitive.Bleeding = Кровотечения
 effect.name.Bleeding = Кровотечение
 effect.genitive.Invulnerable = Неуязвимости
 effect.name.Invulnerable = Неуязвимость
+effect.desc.Strength = Каждый стак добавляет +1 к урону атак. Не угасает в бою, может быть отрицательной.
+effect.desc.Weak = Урон атак ×0,5, важно наличие, а не число стаков. Каждые 3 с снимается 1 стак.
+effect.desc.Regen = Каждую секунду восстанавливает HP, равное числу стаков, затем снимается 1 стак. Лечение снимает Кровотечение.
+effect.desc.Toughness = Каждый стак добавляет +1 к получаемому блоку. Не угасает в бою, может быть отрицательной.
+effect.desc.Frailty = Получаемый блок ×0,5, важно наличие, а не число стаков. Каждые 3 с снимается 1 стак.
+effect.desc.Vulnerable = Урон от атак ×1,5, важно наличие, а не число стаков. Каждые 3 с снимается 1 стак. Отравление и Кровотечение не усиливаются.
+effect.desc.Stun = Откладывает следующее действие врага на указанное число секунд. Оставшееся время обратным отсчётом.
+effect.desc.Poison = Каждую секунду отнимает HP, равное числу стаков, затем снимается 1 стак. Игнорирует блок и Уязвимость.
+effect.desc.Bleeding = Каждые 3 с наносит урон, равный числу стаков; блок поглощает его. Само не угасает, любое лечение снимает столько же стаков.
+effect.desc.Invulnerable = Пока есть стаки, урон и потеря HP не действуют, блок не тратится. Каждую секунду снимается 1 стак (стаки — секунды).
 effect.stacks = {0} x{1}
 effect.join = {0} | {1}
 

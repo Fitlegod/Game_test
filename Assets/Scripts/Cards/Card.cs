@@ -49,7 +49,9 @@ public class Card : MonoBehaviour, IPointerClickHandler
         if (HandManager.Instance != null)
             HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
 
+        cm.RaiseCardPlayed(playedInstance, target);
         cm.AdvanceTime(playedInstance.data.timeCostSeconds);
+        cm.RaiseCastSeconds(playedInstance.data.timeCostSeconds);
         cm.ResolveUpTo();
 
         if (HandManager.Instance != null)

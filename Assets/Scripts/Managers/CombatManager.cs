@@ -50,6 +50,26 @@ public class CombatManager : MonoBehaviour
     public event System.Action OnVictory;
     public event System.Action OnDefeat;
 
+    // События для триггеров (docs/combat-core.md). Первые три — вне таймлайна: журнал их не пишет, после отката они не повторяются.
+    public event System.Action OnCombatStart;
+    public event System.Action<CardInstance, Combatant> OnCardPlayed;
+    public event System.Action<int> OnCastSeconds;
+    public event System.Action<Combatant, Combatant, int, bool> OnAttack; // внутри события: подписчик пишет своё состояние через Record(null, undo)
+
+    public void RaiseCombatStart() => OnCombatStart?.Invoke();
+    public void RaiseCardPlayed(CardInstance card, Combatant target) => OnCardPlayed?.Invoke(card, target);
+    public void RaiseCastSeconds(int seconds) => OnCastSeconds?.Invoke(seconds);
+    public void RaiseAttack(Combatant source, Combatant target, int damage) =>
+        OnAttack?.Invoke(source, target, damage, CurrentEvent != null && CurrentEventTime <= ReplayUntil);
+
+    // «Подождать»: секунда без розыгрыша карты; секундами каста не считается
+    public void Wait()
+    {
+        if (combatOver) return;
+        AdvanceTime(1);
+        ResolveUpTo();
+    }
+
     void Start()
     {
         UpdateBudgetText();

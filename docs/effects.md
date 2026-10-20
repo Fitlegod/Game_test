@@ -25,7 +25,7 @@
 |---|---|---|---|
 | **Strength** (Сила) | нет | — | `CalculateOutgoingDamage`: `+ Mathf.RoundToInt(stacks)` к базовому урону |
 | **Weak** (Слабость) | каждые 3 с | `RemoveStacks(Weak, 1)` | `CalculateOutgoingDamage`: если `stacks > 0`, сумма после Силы `× 0.5` (без округления — оно одно, в конце конвейера) |
-| **Regen** (Лечение) | каждую 1 с | `Heal(stacks)`, затем `RemoveStacks(Regen, 1)` | — |
+| **Regen** (Регенерация) | каждую 1 с | `Heal(stacks)`, затем `RemoveStacks(Regen, 1)` | — |
 | **Toughness** (Крепость) | нет | — | `CalculateIncomingBlock`: `+ Mathf.RoundToInt(stacks)` к базовому блоку |
 | **Frailty** (Хрупкость) | каждые 3 с | `RemoveStacks(Frailty, 1)` | `CalculateIncomingBlock`: если `stacks > 0`, итог после Крепости `× 0.5` через `Mathf.FloorToInt` |
 | **Vulnerable** (Уязвимость) | каждые 3 с | `RemoveStacks(Vulnerable, 1)` | `ApplyIncomingDamageModifiers`: если `stacks > 0`, урон от **атаки** (`InstantActionKind.Damage`) `× 1.5`, затем единственное `Mathf.FloorToInt`. Отравление и Кровотечение Уязвимость не усиливает |

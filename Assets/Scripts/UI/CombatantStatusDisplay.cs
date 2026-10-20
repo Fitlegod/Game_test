@@ -16,6 +16,9 @@ public class CombatantStatusDisplay : MonoBehaviour
     void Start()
     {
         if (hpSlider != null) hpSlider.maxValue = target.maxHP;
+        if (effectsLabel != null && effectsLabel.GetComponent<EffectLabelHover>() == null)
+            effectsLabel.gameObject.AddComponent<EffectLabelHover>(); // подсказка при наведении; Raycast Target включается там же
+        if (effectsLabel != null) effectsLabel.raycastTarget = true;
     }
 
     private CanvasGroup enemyGroup; // только у врага: корень скрывается при смерти, но остаётся активным (Update должен работать — после отката враг снова виден)
@@ -70,7 +73,7 @@ public class CombatantStatusDisplay : MonoBehaviour
 
     private static void Join(ref string text, StatusEffectType type, float stacks)
     {
-        string entry = Loc.Format("effect.stacks", Loc.Get("effect.name." + type), stacks.ToString("0.##"));
+        string entry = "<link=\"" + type + "\">" + Loc.Format("effect.stacks", Loc.Get("effect.name." + type), stacks.ToString("0.##")) + "</link>";
         text = text.Length > 0 ? Loc.Format("effect.join", text, entry) : entry;
     }
 
