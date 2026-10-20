@@ -127,7 +127,7 @@ public class CombatManager : MonoBehaviour
     {
         foreach (var enemy in enemies)
             enemy.OnDeath -= HandleEnemyDeath;
-        enemies = spawnedEnemies;
+        enemies = new List<Enemy>(spawnedEnemies); // копия: очистка списка вызывающего не должна опустошать бой
         foreach (var enemy in enemies)
         {
             enemy.OnDeath -= HandleEnemyDeath; // повторный RegisterEnemies не подписывает второй раз

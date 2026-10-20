@@ -7,7 +7,9 @@ public class TargetSelectionManager : MonoBehaviour
     public CombatManager combatManager;
     public Card PendingCard { get; private set; }
     private Combatant hoveredTarget;
-    public Combatant HoveredTarget => hoveredTarget != null && hoveredTarget.CurrentHP > 0 ? hoveredTarget : null; // превью не на мёртвого
+    // Превью числа — только для живой цели, на которую выбранная карта вообще может быть сыграна (наведение на игрока превью не меняет)
+    public Combatant HoveredTarget =>
+        hoveredTarget != null && hoveredTarget.CurrentHP > 0 && (PendingCard == null || PendingCard.IsValidTarget(hoveredTarget)) ? hoveredTarget : null;
 
     private bool inputLocked;
 
