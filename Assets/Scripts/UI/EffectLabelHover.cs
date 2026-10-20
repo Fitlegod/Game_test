@@ -15,7 +15,11 @@ public class EffectLabelHover : MonoBehaviour, IPointerMoveHandler, IPointerExit
         EffectTooltip.Instance.Show(text.textInfo.linkInfo[i].GetLinkID(), e.position);
     }
 
-    public void OnPointerExit(PointerEventData e)
+    public void OnPointerExit(PointerEventData e) => HideTooltip();
+
+    void OnDisable() => HideTooltip(); // экран боя выключили под курсором — плашка не должна остаться
+
+    private static void HideTooltip()
     {
         if (EffectTooltip.Instance != null) EffectTooltip.Instance.Hide();
     }

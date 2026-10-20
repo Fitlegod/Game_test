@@ -14,8 +14,8 @@
 | [effects.md](effects.md) | Все 10 статус-эффектов с точными формулами, порядком применения, округлением и распадом; хранилище стаков; затухание блока, снятие тиков, особый случай Оглушения | `StatusEffectType`, `StatusEffectRules`, формулы на `Combatant`, `CombatantStatusDisplay` |
 | [deck-hand.md](deck-hand.md) | Четыре колоды персонажа, перемешивание, приоритет «Впереди»; рука на 7 явных слотов, ручной сдвиг, автодобор, пересборка руки на каждый новый бой; общий оверлей просмотра всех четырёх стопок | `DeckManager`, `HandManager`, `DeckPileScreen`, `DeckPileCountDisplay` |
 | [enemies.md](enemies.md) | Паттерны поведения врага, пять видов цели и запасной шаг (`EnemyFallbackStep`), динамический спавн игрока и врагов на один бой (`StartEncounter`), исход боя (победа/поражение) наружу, телеграф атаки | `Enemy`, `EnemyPatternData`, `EnemyActionStep`, `EncounterData`, `EncounterManager`, `EnemyActionTarget`, `CombatantStatusDisplay` |
-| [ui.md](ui.md) | Менеджер экранов и оверлеев (`ScreenManager`), ввод и горячие клавиши, таблица строк | `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapScreen` |
-| [map.md](map.md) | Процедурная карта локации (20 строк × 7 столбцов): данные, шаги генерации по сиду и причины решений, навигация `MapRunState`, `MapManager`, экран карты, цикл «карта → бой → карта», источник иконки, тесты | `RoomType`, `MapGenerationConfig`, `MapData`, `MapGenerator`, `MapRunState`, `MapManager`, `MapScreen` |
+| [ui.md](ui.md) | Менеджер экранов и оверлеев (`ScreenManager`), ввод и горячие клавиши, таблица строк | `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapView`, `EffectTooltip`, `EffectLabelHover` |
+| [map.md](map.md) | Процедурная карта локации (20 строк × 7 столбцов): данные, шаги генерации по сиду и причины решений, навигация `MapRunState`, `MapManager`, экран карты, цикл «карта → бой → карта», источник иконки, тесты | `RoomType`, `MapGenerationConfig`, `MapData`, `MapGenerator`, `MapRunState`, `MapManager`, `MapView` |
 
 ## Как это связано (коротко)
 
@@ -23,4 +23,4 @@
 
 Дальше — цикл: бой не стартует сам. `MapManager` генерирует карту по сиду и показывает `MapView` (экземпляр «MapScreen»); клик по боевому узлу вызывает `EncounterManager.StartEncounter(node.encounter)` — `CombatManager.ResetForNewCombat()` сбрасывает секундомер/расписание/блокировку ввода, `EncounterManager` спавнит игрока (накатывая `PlayerRunState.PersistedHP`, если он есть) и врагов, `HandManager.BeginNewHand()` собирает руку. Победа (`CombatManager.OnVictory`) → `EncounterManager.HandleVictory` сохраняет HP в `PersistedHP`; поражение (`OnDefeat`) → `HandleDefeat` сбрасывает его в `null` (следующий бой с полным HP). В обоих случаях участники удаляются, и `MapManager.OnCombatEnded` снова открывает карту. Подробности — [map.md](map.md).
 
-**Сверено с кодом:** `MapManager.OnCombatEnded` — `Managers/MapManager.cs:56`; `CombatManager.OnVictory`/`OnDefeat` — `Managers/CombatManager.cs:44-45`; `EncounterManager.HandleVictory` — `Managers/EncounterManager.cs:23`.
+**Сверено с кодом:** `MapManager.OnCombatEnded` — `Managers/MapManager.cs`; `CombatManager.OnVictory`/`OnDefeat` — `Managers/CombatManager.cs`; `EncounterManager.HandleVictory` — `Managers/EncounterManager.cs` (номера строк не указываем: устаревают).

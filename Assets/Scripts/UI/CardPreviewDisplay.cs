@@ -20,6 +20,10 @@ public class CardPreviewDisplay : MonoBehaviour
             lines.Add(effect.Describe());
         if (data.drawCardsOnPlay > 0)
             lines.Add(Loc.Format("card.draw", data.drawCardsOnPlay));
+        foreach (var action in data.parryActions)
+            lines.Add(Loc.Format("card.parry", action.Describe(action.amount)));
+        foreach (var effect in data.parryEffects)
+            lines.Add(Loc.Format("card.parry", effect.Describe()));
         if (effectLabel != null) effectLabel.text = string.Join("\n", lines);
 
         if (propertiesLabel != null)

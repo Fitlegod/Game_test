@@ -21,12 +21,13 @@ public class Enemy : Combatant, IScheduledEvent
     {
         int prevNext = nextActionTime, prevAt = stunAppliedAt, prevAmount = stunAmount;
         combatManager.Record(this, () => { nextActionTime = prevNext; stunAppliedAt = prevAt; stunAmount = prevAmount; });
+        int remaining = StunDisplay; // ещё не истёкшее прежнее Оглушение показывается вместе с новым
         nextActionTime += seconds;
         stunAppliedAt = combatManager.EffectTime;
-        stunAmount = seconds;
+        stunAmount = remaining + seconds;
     }
 
-    public int StunDisplay => Mathf.Max(0, stunAmount - (combatManager.CurrentTime - stunAppliedAt));
+    public int StunDisplay => Mathf.Max(0, stunAmount - (combatManager.EffectTime - stunAppliedAt)); // вне событий EffectTime == CurrentTime
 
     public void ScheduleFirstAction()
     {
@@ -35,7 +36,7 @@ public class Enemy : Combatant, IScheduledEvent
             Debug.LogError("Враг " + name + ": пустой паттерн, враг не будет действовать", this);
             return;
         }
-        nextActionTime = combatManager.CurrentTime + pattern.steps[0].delaySeconds;
+        nextActionTime = combatManager.CurrentTime + Mathf.Max(1, pattern.steps[0].delaySeconds); // задержка >= 1: иначе ResolveUpTo зациклится
     }
 
     public void Trigger()
@@ -58,7 +59,7 @@ public class Enemy : Combatant, IScheduledEvent
                 effect.Apply(combatManager, this, target);
         }
         currentStepIndex = (currentStepIndex + 1) % pattern.steps.Count;
-        nextActionTime += pattern.steps[currentStepIndex].delaySeconds;
+        nextActionTime += Mathf.Max(1, pattern.steps[currentStepIndex].delaySeconds);
     }
 
     // Что враг сделает на текущем шаге: основной шаг или, если у него нет цели, запасной.

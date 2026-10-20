@@ -1986,4 +1986,60 @@ public class CombatTests
         RewindCard(1, 1, 0).Play(null); Grew("откат");
         cm.ResetForNewCombat(); Grew("сброс боя");
     }
+
+    // ---------- Исправления по полной проверке (группа R) ----------
+
+    [Test]
+    public void R1_StepDelayZero_ResolveUpToFinishes_EnemyActsEverySecond()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 0, 1);                  // delaySeconds = 0 в данных
+        Spawn(enemy);
+        Advance(3);                                       // без Max(1, …) ResolveUpTo зациклился бы
+        Assert.AreEqual(3, cm.CurrentTime);
+        Assert.AreEqual(27, player.CurrentHP, "действия в 1, 2, 3");
+    }
+
+    [Test]
+    public void R2_ClearingCallersList_DoesNotEmptyCombatManagerEnemies()
+    {
+        var list = new List<Enemy> { MakeEnemy(30, 99, 1) };
+        cm.RegisterEnemies(list);
+        list.Clear();
+        Assert.AreEqual(1, cm.Enemies.Count);
+    }
+
+    [Test]
+    public void R3_TwoStuns_DisplayShowsSum_ActionShiftedByBoth()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(100, 2, 1);                 // первое действие в 2
+        Spawn(enemy);
+        Card Stun(int seconds)
+        {
+            var card = MakeCard(1, 0, Act(InstantActionKind.Damage, 0, EffectTargetTag.Enemy));
+            card.data.appliedEffects.Add(new AppliedEffectEntry { statusType = StatusEffectType.Stun, stacks = seconds, targetTag = EffectTargetTag.Enemy });
+            return card;
+        }
+        int displayAt1 = -1;
+        Stun(3).Play(enemy);                              // Оглушение 3 в 0: действие 2 → 5
+        cm.RegisterScheduledEvent(new OneShotEvent(cm, 1, EventGroup.Environment, _ => displayAt1 = enemy.StunDisplay)); // читает значение в конце момента 1
+        Stun(2).Play(enemy);                              // Оглушение 2 в 1: остаток 2 + 2
+        Assert.AreEqual(4, displayAt1, "в момент 1 осталось 2 от первого + 2 нового");
+        Assert.AreEqual(7, enemy.NextTime, "действие сдвинуто на 5 (2 → 7)");
+    }
+
+    [Test]
+    public void R4_HoveringPlayer_DoesNotChangePreview_HoveringAliveEnemyDoes()
+    {
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        var tsm = Make<TargetSelectionManager>();
+        tsm.SelectCard(Dmg(3, 1, 0));                     // нужна цель-враг: карта ждёт её
+        Assert.IsNotNull(tsm.PendingCard);
+        tsm.SetHoveredTarget(player);
+        Assert.IsNull(tsm.HoveredTarget, "игрок не допустимая цель карты");
+        tsm.SetHoveredTarget(enemy);
+        Assert.AreSame(enemy, tsm.HoveredTarget);
+    }
 }

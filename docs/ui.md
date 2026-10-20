@@ -1,6 +1,6 @@
 # Экраны, ввод, строки
 
-Классы: `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapView` (экземпляры `MapScreen` и `MapOverlay`), см. также [map.md](map.md) — цикл «карта → бой → карта».
+Классы: `ScreenManager`, `ScreenRoot`, `DeckPileScreen`, `MapView` (экземпляры `MapScreen` и `MapOverlay`), `EffectTooltip`, `EffectLabelHover`, см. также [map.md](map.md) — цикл «карта → бой → карта».
 
 ## ScreenManager (`Managers/ScreenManager.cs`)
 
