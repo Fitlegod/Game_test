@@ -21,6 +21,9 @@ public class Card : MonoBehaviour, IPointerClickHandler
         UpdatePropertiesText();
     }
 
+    private int shownVersion = -1;
+    private Combatant shownPreviewTarget;
+
     void Update()
     {
         UpdateEffectText();
@@ -160,6 +163,11 @@ public class Card : MonoBehaviour, IPointerClickHandler
         bool isPending = TargetSelectionManager.Instance != null && TargetSelectionManager.Instance.PendingCard == this;
         if (isPending)
             previewTarget = TargetSelectionManager.Instance.HoveredTarget;
+
+        int version = combatManager.StateVersion;
+        if (version == shownVersion && previewTarget == shownPreviewTarget) return; // ни бой, ни цель наведения не менялись
+        shownVersion = version;
+        shownPreviewTarget = previewTarget;
 
         var lines = new List<string>();
         foreach (var action in data.instantActions)

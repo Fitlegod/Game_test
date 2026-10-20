@@ -20,6 +20,10 @@
 - `scheduledEvents` (`List<IScheduledEvent>`) — плоский список, не куча/приоритетная очередь. `ResolveUpTo` каждый шаг цикла линейно сканирует весь список заново — O(n) на срабатывание, но при масштабе «несколько врагов + несколько активных эффектов за один бой» это осознанно достаточно просто (YAGNI), а не недосмотр.
 - `RegisterScheduledEvent`/`UnregisterScheduledEvent` — используются: `Card.Play` (разовый `OneShotEvent` эффекта карты), `Combatant.AddEffectStacks` (периодический тик статус-эффекта), `HandManager.BeginNewHand` (периодический автодобор, регистрируется заново на каждый бой — см. [deck-hand.md](deck-hand.md)), `EncounterManager` (регистрирует сам `Enemy`, потому что `Enemy` — это `IScheduledEvent`).
 
+### `StateVersion` — версия состояния для UI-кэша
+
+`CombatManager.StateVersion` (`int`) растёт при любом изменении состояния боя: каждая `Record` (в начале, до раннего выхода — то есть и для изменений вне событий), `AdvanceTime`, конец `Rewind` (обратные процедуры меняют состояние в обход `Record`), `ResetForNewCombat` и `Touch()` (его зовёт `Combatant.SetCurrentHP`, меняющий HP мимо журнала). UI (`CombatantStatusDisplay`, `Card.UpdateEffectText`) пересобирает строки только при смене версии. **Правило:** новое изменение состояния, видимого игроку, должно идти через `Record` или вызывать `Touch()`, иначе текст не обновится (тест `V1`).
+
 ### `AdvanceTime` и `ResolveUpTo`
 
 - `AdvanceTime(int amount)` — `CurrentTime += amount`, затем обновляет текстовый UI «Прошло времени». Вызывается только из `Card.Play` с `timeCostSeconds` сыгранной карты.

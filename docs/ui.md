@@ -36,9 +36,13 @@
 
 Мёртвый враг скрывается `CanvasGroup` (alpha 0, без raycast) и не может быть целью карты; объект и запись в `CombatManager.Enemies` остаются ради отката — подробности в [enemies.md](enemies.md).
 
+## Кэш текстов (не пересобирать строки каждый кадр)
+
+`CombatantStatusDisplay` (блок, эффекты, телеграф) и `Card.UpdateEffectText` (текст карты) пересобирают строки, только если изменился `CombatManager.StateVersion` (у карты — ещё и цель наведения); полоса HP и скрытие мёртвого врага обновляются каждый кадр без аллокаций. `DeckPileCountDisplay` обновляет подпись, только если изменилось число карт. Правило для нового состояния — в [combat-core.md](combat-core.md#stateversion--версия-состояния-для-ui-кэша).
+
 ## Подсказки эффектов (`UI/EffectTooltip.cs`)
 
-`CombatantStatusDisplay` оборачивает каждый эффект строки эффектов (и Оглушение врага) в `<link="Тип">…</link>`. `EffectLabelHover` (в том же файле; `CombatantStatusDisplay.Start` добавляет его на `effectsLabel` и включает Raycast Target — правка префабов врагов не нужна) на `IPointerMoveHandler` берёт позицию из `PointerEventData` (`Mouse.current` не используется), ищет ссылку через `TMP_TextUtilities.FindIntersectingLink` и показывает общую плашку `EffectTooltip` (префаб `Prefabs/UI/EffectTooltip`, один экземпляр на `Canvas`; корень всегда активен, прячется дочерняя `Panel`) рядом с курсором; при уходе с текста плашка скрывается. Текст: заголовок `effect.name.<Тип>`, описание `effect.desc.<Тип>` (все 10 типов, одной строкой — `
+`CombatantStatusDisplay` оборачивает каждый эффект строки эффектов (и Оглушение врага) в `<link="Тип">…</link>`. `EffectLabelHover` (в том же файле; `CombatantStatusDisplay.Start` добавляет его на `effectsLabel` и включает Raycast Target — правка префабов врагов не нужна) на `IPointerMoveHandler` берёт позицию из `PointerEventData` (`Mouse.current` не используется), ищет ссылку (текст кэшируется в поле) через `TMP_TextUtilities.FindIntersectingLink` и показывает общую плашку `EffectTooltip` (префаб `Prefabs/UI/EffectTooltip`, один экземпляр на `Canvas`; корень всегда активен, прячется дочерняя `Panel`) рядом с курсором; при уходе с текста плашка скрывается. Текст: заголовок `effect.name.<Тип>`, описание `effect.desc.<Тип>` (все 10 типов, одной строкой — `
 ` в `ru.txt` не работает).
 
 ## Таблица строк (`Loc`)

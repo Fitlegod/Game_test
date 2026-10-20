@@ -21,12 +21,19 @@ public class CombatantStatusDisplay : MonoBehaviour
         if (effectsLabel != null) effectsLabel.raycastTarget = true;
     }
 
+    private int shownVersion = -1; // StateVersion, для которого собраны тексты
     private CanvasGroup enemyGroup; // только у врага: корень скрывается при смерти, но остаётся активным (Update должен работать — после отката враг снова виден)
 
     void Update()
     {
         if (enemyForTelegraph != null) UpdateEnemyVisibility();
         if (hpSlider != null) hpSlider.value = target.CurrentHP;
+        if (target.combatManager != null)
+        {
+            int version = target.combatManager.StateVersion;
+            if (version == shownVersion) return; // состояние боя не менялось: тексты прежние
+            shownVersion = version;
+        }
         if (blockLabel != null) blockLabel.text = target.CurrentBlock.ToString();
         if (effectsLabel != null) effectsLabel.text = BuildEffectsText();
         if (enemyForTelegraph != null && telegraphLabel != null) telegraphLabel.text = BuildTelegraphText();

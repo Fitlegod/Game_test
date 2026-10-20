@@ -1967,4 +1967,23 @@ public class CombatTests
         Assert.AreEqual(50, enemy.CurrentHP, "при повторе урон снова не проходит");
         Assert.AreEqual(4, enemy.GetStacks(StatusEffectType.Invulnerable));
     }
+
+    // ---------- Версия состояния боя (для UI-кэша текстов) ----------
+
+    [Test]
+    public void V1_StateVersion_GrowsOnEveryStateChange()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        int v = cm.StateVersion;
+        void Grew(string what) { Assert.Greater(cm.StateVersion, v, what); v = cm.StateVersion; }
+        player.GainBlock(3); Grew("блок вне события");
+        player.AddEffectStacks(StatusEffectType.Strength, 1); Grew("эффект вне события");
+        enemy.SetCurrentHP(40); Grew("SetCurrentHP");
+        cm.AdvanceTime(1); Grew("время");
+        Dmg(5, 1, 0).Play(enemy); Grew("розыгрыш карты");
+        RewindCard(1, 1, 0).Play(null); Grew("откат");
+        cm.ResetForNewCombat(); Grew("сброс боя");
+    }
 }

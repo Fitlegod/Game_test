@@ -17,6 +17,8 @@ public class DeckPileCountDisplay : MonoBehaviour
         button.onClick.AddListener(() => screen.OpenToPile(pile));
     }
 
+    private int shownCount = -1;
+
     void Update()
     {
         int count = pile switch
@@ -27,6 +29,8 @@ public class DeckPileCountDisplay : MonoBehaviour
             PileKind.Exhaust => deckManager.ExhaustPile.Count,
             _ => 0
         };
+        if (count == shownCount) return;
+        shownCount = count;
         if (countLabel != null) countLabel.text = Loc.Format("ui.deck.count." + pile, count);
     }
 }
