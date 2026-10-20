@@ -18,6 +18,10 @@ public class CardData : ScriptableObject
     [Header("Накладываемые эффекты")]
     public List<AppliedEffectEntry> appliedEffects = new List<AppliedEffectEntry>();
 
+    [Header("Парирование (если эффект совпал по времени с действием врага)")]
+    public List<InstantActionEntry> parryActions = new List<InstantActionEntry>();
+    public List<AppliedEffectEntry> parryEffects = new List<AppliedEffectEntry>();
+
     [Header("Свойства карты")]
     public CardPropertyFlags properties;
 

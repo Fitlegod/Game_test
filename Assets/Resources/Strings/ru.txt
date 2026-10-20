@@ -42,6 +42,7 @@ map.room.Chest = Сундук
 # Свойства карт и добор
 card.property.exhaust = Сжигаемое
 card.property.frontOfDraw = Впереди
+card.parry = Парирование: {0}
 card.draw = Добор: {0}
 
 # Число ударов: {0} подставляется числом
@@ -143,6 +144,9 @@ combat.effect.Apply.SpecificEnemyIndex = Накладывает {0} {1} союз
 card.jab.name = Тычок
 card.kick.name = Подножка
 card.stand_still.name = Стойка смирно
+card.parry_guard.name = Стойка
+card.parry_wave.name = Волна
+card.parry_strike.name = Ядовитый выпад
 card.embark.name = Отметить
 card.nova.name = Волна
 card.dash.name = Рывок

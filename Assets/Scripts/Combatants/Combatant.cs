@@ -155,6 +155,7 @@ public abstract class Combatant : MonoBehaviour, IPointerClickHandler, IPointerE
     public void SetCurrentHP(int hp)
     {
         CurrentHP = Mathf.Clamp(hp, 0, maxHP);
+        if (combatManager != null) combatManager.Touch(); // меняет HP в обход журнала
     }
 
     public event System.Action OnDeath;

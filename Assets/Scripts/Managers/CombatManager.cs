@@ -26,6 +26,9 @@ public class CombatManager : MonoBehaviour
     private List<Enemy> enemies = new List<Enemy>();
     public IReadOnlyList<Enemy> Enemies => enemies;
     public int CurrentTime { get; private set; }
+    // Растёт при любом изменении состояния боя (запись в журнал, время, откат, сброс, Touch): UI пересобирает тексты, только если версия сменилась
+    public int StateVersion { get; private set; }
+    public void Touch() => StateVersion++;
     public int ReplayUntil { get; private set; } = -1; // действия врагов в моменты <= этого значения не бьют по игроку; -1 — отката не было
 
     private List<IScheduledEvent> scheduledEvents = new List<IScheduledEvent>();
@@ -54,11 +57,14 @@ public class CombatManager : MonoBehaviour
     public event System.Action OnCombatStart;
     public event System.Action<CardInstance, Combatant> OnCardPlayed;
     public event System.Action<int> OnCastSeconds;
+    public event System.Action<CardInstance, Enemy, bool> OnParry; // один раз на срабатывание карты, до эффектов Парирования
     public event System.Action<Combatant, Combatant, int, bool> OnAttack; // внутри события: подписчик пишет своё состояние через Record(null, undo)
 
     public void RaiseCombatStart() => OnCombatStart?.Invoke();
     public void RaiseCardPlayed(CardInstance card, Combatant target) => OnCardPlayed?.Invoke(card, target);
     public void RaiseCastSeconds(int seconds) => OnCastSeconds?.Invoke(seconds);
+    public void RaiseParry(CardInstance card, Enemy enemy) =>
+        OnParry?.Invoke(card, enemy, CurrentEvent != null && CurrentEventTime <= ReplayUntil);
     public void RaiseAttack(Combatant source, Combatant target, int damage) =>
         OnAttack?.Invoke(source, target, damage, CurrentEvent != null && CurrentEventTime <= ReplayUntil);
 
@@ -110,6 +116,7 @@ public class CombatManager : MonoBehaviour
         CurrentEvent = null;
         isRewinding = false;
         combatOver = false;
+        StateVersion++;
         enemies.Clear();
         UpdateBudgetText();
         if (combatResultText != null) combatResultText.text = "";
@@ -154,6 +161,7 @@ public class CombatManager : MonoBehaviour
     // Пишет обратную процедуру только внутри события и не во время самого отката
     public void Record(Combatant target, System.Action undo)
     {
+        StateVersion++; // до раннего выхода: изменения вне событий тоже должны обновить UI
         if (CurrentEvent == null || isRewinding) return;
         journal.Add(new UndoEntry { FireOrder = CurrentFireOrder, Time = CurrentEventTime, Target = target, Source = CurrentEvent, Undo = undo });
     }
@@ -161,6 +169,7 @@ public class CombatManager : MonoBehaviour
     public void AdvanceTime(int amount)
     {
         CurrentTime += amount;
+        StateVersion++;
         UpdateBudgetText();
     }
 
@@ -273,6 +282,7 @@ public class CombatManager : MonoBehaviour
         CurrentTime -= shift;
         ReplayUntil = Mathf.Max(ReplayUntil, t);
         isRewinding = false;
+        StateVersion++; // обратные процедуры меняют состояние в обход Record
         UpdateBudgetText();
     }
 
