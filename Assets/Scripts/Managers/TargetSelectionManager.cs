@@ -4,6 +4,7 @@ public class TargetSelectionManager : MonoBehaviour
 {
     public static TargetSelectionManager Instance { get; private set; }
 
+    public CombatManager combatManager;
     public Card PendingCard { get; private set; }
     public Combatant HoveredTarget { get; private set; }
 
@@ -44,6 +45,13 @@ public class TargetSelectionManager : MonoBehaviour
             PendingCard = null;
             card.Play(null);
         }
+    }
+
+    // «Подождать» — единая точка входа для клавиши и кнопки
+    public void Wait()
+    {
+        if (inputLocked || PendingCard != null) return;
+        combatManager.Wait();
     }
 
     public void CancelSelection()

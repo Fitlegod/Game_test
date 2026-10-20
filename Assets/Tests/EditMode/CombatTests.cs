@@ -1530,4 +1530,178 @@ public class CombatTests
         MakeCard(5, 0).Play(null);        // каст 0→5, в 2 Оглушение 3
         Assert.AreEqual(8, cm.CurrentTime);
     }
+
+    // ---------- События боя и «Подождать» (группа W) ----------
+
+    [Test]
+    public void W1_Wait_AdvancesOneSecond_EnemyActionAndDrawFireInTheirTime()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 1, 2);
+        Spawn(enemy);
+        var draws = new List<int>();
+        AddDrawTimer(draws);
+        cm.Wait();
+        Assert.AreEqual(1, cm.CurrentTime);
+        Assert.AreEqual(28, player.CurrentHP, "действие врага в 1 сработало");
+        Assert.AreEqual(0, draws.Count);
+        cm.Wait();
+        Assert.AreEqual(2, cm.CurrentTime);
+        CollectionAssert.AreEqual(new[] { 2 }, draws, "добор сработал в своё время");
+    }
+
+    [Test]
+    public void W2_Wait_DoesNothingAfterCombatEnd_AndWhileCardAwaitsTarget()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(5, 99, 1);
+        Spawn(enemy);
+        var tsm = Make<TargetSelectionManager>();
+        tsm.combatManager = cm;
+        tsm.SelectCard(Dmg(3, 1, 0));            // нужна цель: карта ждёт её
+        Assert.IsNotNull(tsm.PendingCard);
+        tsm.Wait();
+        Assert.AreEqual(0, cm.CurrentTime, "при выбранной карте Подождать игнорируется");
+        tsm.CancelSelection();
+        tsm.Wait();
+        Assert.AreEqual(1, cm.CurrentTime, "без выбранной карты Подождать работает");
+        Dmg(10, 1, 0).Play(enemy);               // победа
+        int t = cm.CurrentTime;
+        cm.Wait();
+        Assert.AreEqual(t, cm.CurrentTime, "после конца боя Подождать ничего не делает");
+    }
+
+    [Test]
+    public void W3_CardPlayedAndCastSeconds_OncePerPlay_WaitDoesNotRaiseThem()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(30, 99, 1);
+        Spawn(enemy);
+        var played = new List<(CardInstance, Combatant)>();
+        var seconds = new List<int>();
+        int timeAtPlayed = -1;
+        cm.OnCardPlayed += (c, t) => { played.Add((c, t)); timeAtPlayed = cm.CurrentTime; };
+        cm.OnCastSeconds += seconds.Add;
+        var card = Dmg(1, 2, 0);
+        var instance = card.instance;
+        card.Play(enemy);
+        Assert.AreEqual(1, played.Count);
+        Assert.AreSame(instance, played[0].Item1);
+        Assert.AreSame(enemy, played[0].Item2);
+        Assert.AreEqual(0, timeAtPlayed, "OnCardPlayed — до AdvanceTime");
+        CollectionAssert.AreEqual(new[] { 2 }, seconds);
+        cm.Wait();
+        Assert.AreEqual(1, played.Count);
+        Assert.AreEqual(1, seconds.Count);
+    }
+
+    [Test]
+    public void W4_OnAttack_PerHit_ForBothSides_NotOnSkippedReplayHit()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(100, 2, 1);
+        Spawn(enemy);
+        var hits = new List<(Combatant src, Combatant dst, int dmg)>();
+        cm.OnAttack += (s, t, d, r) => hits.Add((s, t, d));
+        var twoHits = MakeCard(1, 0, new InstantActionEntry { kind = InstantActionKind.Damage, amount = 4, hitCount = 2, targetTag = EffectTargetTag.Enemy });
+        twoHits.Play(enemy);                     // время 1, два удара
+        Assert.AreEqual(2, hits.Count);
+        Assert.IsTrue(hits.All(h => h.src == player && h.dst == enemy && h.dmg == 4));
+        cm.Wait();                               // в 2 враг бьёт игрока
+        Assert.AreEqual(3, hits.Count);
+        Assert.AreSame(enemy, hits[2].src);
+        Assert.AreSame(player, hits[2].dst);
+        RewindCard(2, 1, 0).Play(null);          // откат на 2 с: действие врага в 2 вернётся
+        cm.Wait();                               // повтор действия врага в 2: игрока он уже пережил
+        Assert.AreEqual(1, hits.Count(h => h.src == enemy && h.dst == player), "повтор действия врага по игроку не вызывает OnAttack");
+    }
+
+    // Подписчик «каждая 3-я атака игрока — 2 урона первому живому врагу», счётчик пишется через Record(null, …)
+    [Test]
+    public void W5_Subscriber_EveryThirdAttack_RewindUndoesCounterAndReaction_ReplayRepeatsIt()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(100, 99, 1);
+        Spawn(enemy);
+        int attacks = 0;
+        var seen = new List<(bool replay, int counterOnEntry, int enemyHp)>();
+        cm.OnAttack += (src, dst, dmg, replay) =>
+        {
+            if (src != player) return;
+            seen.Add((replay, attacks, enemy.CurrentHP));
+            int prev = attacks;
+            attacks++;
+            cm.Record(null, () => attacks = prev);
+            if (attacks % 3 == 0)
+            {
+                var first = cm.Enemies.FirstOrDefault(e => e.CurrentHP > 0);
+                if (first != null) first.TakeDamage(2);
+            }
+        };
+        Dmg(5, 1, 0).Play(enemy);
+        Dmg(5, 1, 0).Play(enemy);
+        Dmg(5, 1, 0).Play(enemy);                // третья атака в 2: реакция
+        Assert.AreEqual(3, attacks);
+        Assert.AreEqual(83, enemy.CurrentHP, "15 урона + реакция 2");
+        RewindCard(1, 1, 0).Play(null);          // откат на интервал с третьей атакой
+        var replayed = seen.Where(x => x.replay).ToList();
+        Assert.AreEqual(1, replayed.Count, "третья атака повторена");
+        Assert.AreEqual(2, replayed[0].counterOnEntry, "счётчик откатился");
+        Assert.AreEqual(85, replayed[0].enemyHp, "урон третьей атаки и реакции откатились (повторный удар уже нанесён)");
+        Assert.AreEqual(3, attacks, "реакция сработала снова");
+        Assert.AreEqual(83, enemy.CurrentHP, "итоговое HP то же, что до отката");
+    }
+
+    [Test]
+    public void W6_Subscriber_BlockOnNonReplayAttack_NotDoubledAfterRewindReplay()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(100, 99, 1);
+        Spawn(enemy);
+        cm.OnAttack += (src, dst, dmg, replay) => { if (src == player && !replay) player.GainBlock(3); };
+        Dmg(1, 1, 0).Play(enemy);
+        Assert.AreEqual(3, player.CurrentBlock);
+        RewindCard(1, 1, 0).Play(null);
+        Assert.AreEqual(99, enemy.CurrentHP, "атака повторена один раз");
+        Assert.AreEqual(3, player.CurrentBlock, "блок игрока при повторе не удвоился");
+    }
+
+    [Test]
+    public void W7_OnCombatStart_OncePerCombat_AfterPlayerAndEnemiesRegistered()
+    {
+        var em = Make<EncounterManager>();
+        em.combatManager = cm;
+        em.deckManager = Make<DeckManager>();
+        var hand = Make<HandManager>();
+        hand.combatManager = cm;
+        hand.deckManager = em.deckManager;
+        em.handManager = hand;
+        var area = new GameObject("Area", typeof(RectTransform)); created.Add(area);
+        em.enemiesArea = (RectTransform)area.transform;
+        var spawn = new GameObject("Spawn", typeof(RectTransform)); created.Add(spawn);
+        em.playerSpawnPoint = (RectTransform)spawn.transform;
+        var playerPrefab = new GameObject("PlayerPrefab"); created.Add(playerPrefab);
+        playerPrefab.AddComponent<Player>().maxHP = 30;
+        em.playerPrefab = playerPrefab;
+        var enemyPrefab = new GameObject("EnemyPrefab", typeof(RectTransform)); created.Add(enemyPrefab);
+        var proto = enemyPrefab.AddComponent<Enemy>();
+        proto.maxHP = 20;
+        var pattern = ScriptableObject.CreateInstance<EnemyPatternData>(); created.Add(pattern);
+        pattern.steps.Add(new EnemyActionStep { stepNameKey = "enemy.test.attack_player", delaySeconds = 99, target = EnemyActionTarget.Player,
+            instantActions = new List<InstantActionEntry> { Act(InstantActionKind.Damage, 1, EffectTargetTag.Player) } });
+        proto.pattern = pattern;
+        var encounter = ScriptableObject.CreateInstance<EncounterData>(); created.Add(encounter);
+        encounter.enemyPrefabs.Add(enemyPrefab);
+
+        int starts = 0, enemiesAtStart = -1;
+        bool playerAtStart = false;
+        cm.OnCombatStart += () => { starts++; enemiesAtStart = cm.Enemies.Count; playerAtStart = cm.player != null && cm.player != player; };
+        em.StartEncounter(encounter);
+        Assert.AreEqual(1, starts);
+        Assert.AreEqual(1, enemiesAtStart, "враги уже зарегистрированы");
+        Assert.IsTrue(playerAtStart, "игрок боя уже назначен");
+        cm.Wait();
+        MakeCard(1, 0).Play(null);
+        Assert.AreEqual(1, starts, "за бой — один раз");
+    }
 }

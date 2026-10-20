@@ -11,6 +11,7 @@ public class CombatHotkeys : MonoBehaviour
     void OnEnable()
     {
         input.OnSlot += HandleSlot;
+        input.OnWait += HandleWait;
         input.OnCancel += HandleCancel;
         input.OnToggleMap += HandleToggleMap;
         input.OnToggleDeck += HandleToggleDeck;
@@ -19,6 +20,7 @@ public class CombatHotkeys : MonoBehaviour
     void OnDisable()
     {
         input.OnSlot -= HandleSlot;
+        input.OnWait -= HandleWait;
         input.OnCancel -= HandleCancel;
         input.OnToggleMap -= HandleToggleMap;
         input.OnToggleDeck -= HandleToggleDeck;
@@ -31,6 +33,11 @@ public class CombatHotkeys : MonoBehaviour
         if (!InCombat) return;
         Card card = handManager.GetCardInSlot(slot);
         if (card != null) TargetSelectionManager.Instance.SelectCard(card);
+    }
+
+    private void HandleWait()
+    {
+        if (InCombat) TargetSelectionManager.Instance.Wait();
     }
 
     private void HandleCancel()

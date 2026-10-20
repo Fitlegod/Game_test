@@ -52,6 +52,7 @@ public class EncounterManager : MonoBehaviour
         SpawnEnemies(encounter);
 
         handManager.BeginNewHand();
+        combatManager.RaiseCombatStart();
     }
 
     private void SpawnPlayer()
