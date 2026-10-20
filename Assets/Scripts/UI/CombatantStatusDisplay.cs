@@ -16,14 +16,33 @@ public class CombatantStatusDisplay : MonoBehaviour
     void Start()
     {
         if (hpSlider != null) hpSlider.maxValue = target.maxHP;
+        if (effectsLabel != null && effectsLabel.GetComponent<EffectLabelHover>() == null)
+            effectsLabel.gameObject.AddComponent<EffectLabelHover>(); // подсказка при наведении; Raycast Target включается там же
+        if (effectsLabel != null) effectsLabel.raycastTarget = true;
     }
+
+    private CanvasGroup enemyGroup; // только у врага: корень скрывается при смерти, но остаётся активным (Update должен работать — после отката враг снова виден)
 
     void Update()
     {
+        if (enemyForTelegraph != null) UpdateEnemyVisibility();
         if (hpSlider != null) hpSlider.value = target.CurrentHP;
         if (blockLabel != null) blockLabel.text = target.CurrentBlock.ToString();
         if (effectsLabel != null) effectsLabel.text = BuildEffectsText();
         if (enemyForTelegraph != null && telegraphLabel != null) telegraphLabel.text = BuildTelegraphText();
+    }
+
+    private void UpdateEnemyVisibility()
+    {
+        if (enemyGroup == null)
+        {
+            var root = enemyForTelegraph.gameObject;
+            if (!root.TryGetComponent(out enemyGroup)) enemyGroup = root.AddComponent<CanvasGroup>();
+        }
+        bool alive = enemyForTelegraph.CurrentHP > 0;
+        enemyGroup.alpha = alive ? 1 : 0;
+        enemyGroup.blocksRaycasts = alive;
+        enemyGroup.interactable = alive;
     }
 
     private string BuildEffectsText()
@@ -54,7 +73,7 @@ public class CombatantStatusDisplay : MonoBehaviour
 
     private static void Join(ref string text, StatusEffectType type, float stacks)
     {
-        string entry = Loc.Format("effect.stacks", Loc.Get("effect.name." + type), stacks.ToString("0.##"));
+        string entry = "<link=\"" + type + "\">" + Loc.Format("effect.stacks", Loc.Get("effect.name." + type), stacks.ToString("0.##")) + "</link>";
         text = text.Length > 0 ? Loc.Format("effect.join", text, entry) : entry;
     }
 

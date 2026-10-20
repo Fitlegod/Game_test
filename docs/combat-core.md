@@ -92,6 +92,29 @@
 
 Победа/поражение, объявленные внутри откатываемого интервала, журналом не отменяются.
 
+## События для триггеров
+
+`CombatManager` (A9) — C#-события для талантов, реликвий, проклятий и стихий (подписчиков в игре пока нет, только тесты W):
+
+| Событие | Кто вызывает и когда |
+|---|---|
+| `OnCombatStart()` | `EncounterManager.StartEncounter` в конце настройки: после `SetPlayer`, `RegisterEnemies` и начальной руки, до первого хода |
+| `OnCardPlayed(CardInstance, Combatant target)` | `Card.Play` до `AdvanceTime` |
+| `OnCastSeconds(int seconds)` | `Card.Play` после `AdvanceTime(timeCostSeconds)`, до `ResolveUpTo` |
+| `OnAttack(source, target, damage, isReplay)` | `InstantActionEntry.Apply` (Damage) после каждого реально нанесённого удара (после `TakeDamage`), для обеих сторон; `damage` — итоговый урон после модификаторов; удар по уже мёртвой цели и пропущенные при повторе удары (действие врага по игроку, пропуск цели при повторе карты) события не дают. `isReplay = CurrentEventTime <= ReplayUntil` |
+
+Вызывает событие через `RaiseCombatStart/RaiseCardPlayed/RaiseCastSeconds/RaiseAttack` (C#-событие нельзя вызвать снаружи класса). Парирования пока нет: событие появится вместе с механикой.
+
+Правила:
+- `OnCombatStart`, `OnCardPlayed`, `OnCastSeconds` вызываются **вне событий таймлайна**. Журнал их не пишет, после отката они не повторяются: это действия игрока, а игрок не откатывается.
+- `OnAttack` вызывается **внутри события**. Подписчик пишет изменения своего состояния (счётчики) через `combatManager.Record(null, undo)`; изменения врагов идут обычными методами `Combatant` (они уже пишутся в журнал). При откате всё это отменяется, при повторе атака снова вызывает `OnAttack`, и реакция срабатывает заново.
+- При `isReplay == true` подписчик не применяет эффекты к игроку (как карта при повторе).
+- «Подождать» и Оглушение `OnCastSeconds` не вызывают.
+
+## «Подождать»
+
+`CombatManager.Wait()`: если бой окончен — ничего; иначе `AdvanceTime(1)` и `ResolveUpTo()`; секундами каста не считается. Единая точка входа для ввода — `TargetSelectionManager.Wait()` (поле `combatManager` задано в сцене): игнорирует вызов при `LockInput` и пока `PendingCard != null`. Её зовут `CombatHotkeys` (Пробел, только на экране боя) и кнопка «Подождать» (см. [ui.md](ui.md)).
+
 ## Единая точка кликов: `TargetSelectionManager`
 
 Синглтон (`Instance`, выставляется в `Awake`). И `Card`, и `Combatant` реализуют `IPointerClickHandler`, но оба **не** обрабатывают клик сами — оба сразу зовут сюда (`SelectCard`/`SelectTarget`).

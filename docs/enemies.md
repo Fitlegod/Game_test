@@ -60,6 +60,14 @@
 
 Раньше единственный `Player` стоял статично на сцене (`Canvas/Combatants/Player`) с отдельным `PlayerHPBar` в другой ветке иерархии (`Canvas/HPBars`). Оба убраны со сцены целиком: игрок теперь заспавненный объект, как и враги. `PlayerPrefab` (`Assets/Prefabs/Combat/PlayerPrefab.prefab`, рядом с `Enemy.prefab` в той же папке) — `Image` + `Player` + `CombatantStatusDisplay` на корне, с дочерними `Slider` (HP), `BlockIndicator`/`BlockText` и `EffectsText` — та же форма, что у `EnemyPrefab`, но без `AttackTimer`: `enemyForTelegraph`/`telegraphLabel` на его `CombatantStatusDisplay` оставлены пустыми, телеграф — только для врагов.
 
+## Мёртвый враг на поле боя
+
+Объект врага не уничтожается и из `CombatManager.enemies` не убирается: при откате враг оживает в том же объекте (обратные процедуры), а его номер в списке входит в ключ порядка событий. Вместо этого:
+
+- **Видимость.** `CombatantStatusDisplay.Update` (только у врага, `enemyForTelegraph != null`) держит `CanvasGroup` на корне врага (если его нет — добавляет кодом при первом `Update`, префаб не правится): при `CurrentHP <= 0` — `alpha = 0`, `blocksRaycasts = false`, `interactable = false`, иначе `1/true/true`. Корень не выключается: `Update` продолжает работать, и после отката враг снова появляется.
+- **Цель.** `Card.IsValidTarget` — `target is Enemy && target.CurrentHP > 0`; `TargetSelectionManager.HoveredTarget` для мёртвого возвращает `null` (превью числа не считается на мёртвого).
+- **Место.** Раскладка в `enemiesArea` — абсолютные `anchoredPosition` без `LayoutGroup`, `CanvasGroup` с `alpha = 0` место сохраняет: соседи не сдвигаются.
+
 ## Телеграф атаки — часть `CombatantStatusDisplay`
 
 Раньше отдельный `EnemyAttackTimerDisplay`, теперь — `BuildTelegraphText()` внутри `UI/CombatantStatusDisplay.cs` (код перенесён буквально, без переписывания; подробности и сигнатура полей — в [combat-core.md](combat-core.md)). Коротко: обратный отсчёт до атаки (`enemyForTelegraph.NextTime - combatManager.CurrentTime`), название текущего шага и построчное описание каждого его действия/эффекта через тот же `ComputePreviewAmount` из `CardActions.cs`, `CardTextHelpers.HitCountSuffix` (суффикс цели — внутри самой фразы `combat.action.<Kind>.<EnemyActionTarget>`), что и текст карты игрока ([cards.md](cards.md)). Если у шага сейчас нет резолвящейся цели, для каждого действия печатает «(нет цели)» вместо числа.

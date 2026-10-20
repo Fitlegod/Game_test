@@ -35,7 +35,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         data.instantActions.Exists(a => a.targetTag == EffectTargetTag.Enemy) ||
         data.appliedEffects.Exists(e => e.targetTag == EffectTargetTag.Enemy);
 
-    public bool IsValidTarget(Combatant target) => target is Enemy;
+    public bool IsValidTarget(Combatant target) => target is Enemy && target.CurrentHP > 0; // мёртвый враг остаётся в списке (оживает при откате), но целью не бывает
 
     public void Play(Combatant target)
     {
@@ -49,7 +49,9 @@ public class Card : MonoBehaviour, IPointerClickHandler
         if (HandManager.Instance != null)
             HandManager.Instance.RemoveFromHand(this); // слот свободен уже на время каста
 
+        cm.RaiseCardPlayed(playedInstance, target);
         cm.AdvanceTime(playedInstance.data.timeCostSeconds);
+        cm.RaiseCastSeconds(playedInstance.data.timeCostSeconds);
         cm.ResolveUpTo();
 
         if (HandManager.Instance != null)

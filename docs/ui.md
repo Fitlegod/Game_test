@@ -28,12 +28,23 @@
   - Esc: если ждёт цель карта — `TargetSelectionManager.CancelSelection()` (карта остаётся в руке), иначе `ScreenManager.CloseTopOverlay()`.
   - M: только в бою — `MapManager.ToggleMapView()` (оверлей просмотра карты). На экране `Map` ничего.
   - D: только в бою — открыть/закрыть оверлей стопок (`DeckPileScreen.Open/Close`).
-  - `Wait`: подписчиков пока нет (кнопку «Подождать» сделает A11, сдвиг времени — A10).
+  - Пробел (`OnWait`): только в бою — `TargetSelectionManager.Wait()`. Игнорируется при заблокированном вводе (конец боя) и пока выбранная карта ждёт цель; иначе `CombatManager.Wait()` (время +1 с, разбор событий).
+- Кнопка «Подождать» (`WaitButton` в `CombatRoot`, подпись — `LocalizedText` `combat.wait`) вызывает тот же `TargetSelectionManager.Wait()`.
 - На каждом слоте руки — подпись `KeyLabel` с номером клавиши (под картой).
+
+## Мёртвые враги
+
+Мёртвый враг скрывается `CanvasGroup` (alpha 0, без raycast) и не может быть целью карты; объект и запись в `CombatManager.Enemies` остаются ради отката — подробности в [enemies.md](enemies.md).
+
+## Подсказки эффектов (`UI/EffectTooltip.cs`)
+
+`CombatantStatusDisplay` оборачивает каждый эффект строки эффектов (и Оглушение врага) в `<link="Тип">…</link>`. `EffectLabelHover` (в том же файле; `CombatantStatusDisplay.Start` добавляет его на `effectsLabel` и включает Raycast Target — правка префабов врагов не нужна) на `IPointerMoveHandler` берёт позицию из `PointerEventData` (`Mouse.current` не используется), ищет ссылку через `TMP_TextUtilities.FindIntersectingLink` и показывает общую плашку `EffectTooltip` (префаб `Prefabs/UI/EffectTooltip`, один экземпляр на `Canvas`; корень всегда активен, прячется дочерняя `Panel`) рядом с курсором; при уходе с текста плашка скрывается. Текст: заголовок `effect.name.<Тип>`, описание `effect.desc.<Тип>` (все 10 типов, одной строкой — `
+` в `ru.txt` не работает).
 
 ## Таблица строк (`Loc`)
 
 - Весь текст, который видит игрок, берётся по ключу из `Assets/Resources/Strings/ru.txt` (UTF-8, `ключ = текст`, `#` — комментарий, `\n` в тексте задуман как перенос, но сейчас не работает: `Loc.Parse` делает `Replace("\n", "\n")`, то есть ничего не меняет (ошибка, см. [roadmap.md](roadmap.md))). Группы ключей по префиксу: `ui.`, `combat.`, `card.`, `enemy.`, `effect.`, `map.`. `Debug.Log` не локализуется.
+- Группа `effect.`: `effect.name.<Тип>`, `effect.genitive.<Тип>` (Regen называется «Регенерация», не «Лечение»), `effect.desc.<Тип>`.
 - `Loc` (`Localization/Loc.cs`): `Get(key)`, `Format(key, args...)`, `Has(key)`. Файл грузится один раз (сбрасывается при старте Play Mode). Нет ключа → `[ключ]` в тексте и одно предупреждение на ключ. Повтор ключа или неверная строка → `Debug.LogError` при загрузке (строка пропускается).
 - Фразы хранятся целиком с подстановками (`Наносит {0} урона{1} всем врагам`), а не склейкой кусков. Ведущий пробел перед `{1}` (число ударов) добавляет код — у значений в файле пробелы по краям обрезаются.
 - `LocalizedText` (`Localization/LocalizedText.cs`, поле `locKey`) — компонент на статичных `TMP_Text` сцены/префабов, ставит текст при включении. Подписи кнопок стопок («Колода 0» и т. д.) им не охвачены: `DeckPileCountDisplay` всё равно перезаписывает их числом.

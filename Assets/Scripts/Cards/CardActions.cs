@@ -35,7 +35,9 @@ public class InstantActionEntry
                 case InstantActionKind.Damage:
                     outgoing = outgoingOverride ?? source.CalculateOutgoingDamage(amount);
                     int finalDamage = target.ApplyIncomingDamageModifiers(outgoing);
+                    bool alive = target.CurrentHP > 0; // удар по уже мёртвой цели (второй hit после убийства) — не удар
                     target.TakeDamage(finalDamage);
+                    if (alive) combatManager.RaiseAttack(source, target, finalDamage);
                     Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
                     break;
 
