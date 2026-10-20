@@ -1530,4 +1530,55 @@ public class CombatTests
         MakeCard(5, 0).Play(null);        // каст 0→5, в 2 Оглушение 3
         Assert.AreEqual(8, cm.CurrentTime);
     }
+
+    // ---------- Мёртвый враг не цель (группа X) ----------
+
+    [Test]
+    public void X1_IsValidTarget_FalseForDeadEnemy_TrueForAlive()
+    {
+        var dead = MakeEnemy(5, 99, 1);
+        var alive = MakeEnemy(50, 99, 1);
+        Spawn(dead, alive);
+        var card = Dmg(3, 1, 0);
+        Assert.IsTrue(card.IsValidTarget(dead));
+        dead.TakeDamage(10);
+        Assert.IsFalse(card.IsValidTarget(dead));
+        Assert.IsTrue(card.IsValidTarget(alive));
+    }
+
+    [Test]
+    public void X2_SelectTarget_OnDeadEnemy_PlaysNothing_CardStaysPending()
+    {
+        NoDecay();
+        var dead = MakeEnemy(5, 99, 1);
+        var alive = MakeEnemy(50, 99, 1);
+        Spawn(dead, alive);
+        dead.TakeDamage(10);
+        var tsm = Make<TargetSelectionManager>();
+        var card = Dmg(3, 1, 0);
+        tsm.SelectCard(card);
+        tsm.SetHoveredTarget(dead);
+        Assert.IsNull(tsm.HoveredTarget, "превью не на мёртвого");
+        tsm.SelectTarget(dead);
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(50, alive.CurrentHP);
+        Assert.AreEqual(0, dead.CurrentHP);
+        Assert.AreSame(card, tsm.PendingCard, "карта продолжает ждать цель");
+    }
+
+    [Test]
+    public void X3_RewindOverDeath_EnemyValidTargetAgain_UntilReplayKillsHimAgain()
+    {
+        NoDecay();
+        var victim = MakeEnemy(5, 99, 1);
+        Spawn(victim, MakeEnemy(50, 99, 1));
+        MakeCard(3, 2, Act(InstantActionKind.Damage, 10, EffectTargetTag.Enemy)).Play(victim); // смерть в 2, время 3
+        Assert.IsFalse(Dmg(1, 1, 0).IsValidTarget(victim));
+        RewindCard(3, 1, 1).Play(null);                   // событие в 4, откат на 3 с: R=1, время после отката 1 — смерть в 2 ещё впереди
+        Assert.AreEqual(1, cm.CurrentTime);
+        Assert.IsTrue(victim.CurrentHP > 0, "враг ожил в том же объекте");
+        Assert.IsTrue(Dmg(1, 1, 0).IsValidTarget(victim));
+        Advance(1);                                       // повтор удара в 2 убивает его снова
+        Assert.IsFalse(Dmg(1, 1, 0).IsValidTarget(victim));
+    }
 }

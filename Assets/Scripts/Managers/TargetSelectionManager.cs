@@ -5,7 +5,8 @@ public class TargetSelectionManager : MonoBehaviour
     public static TargetSelectionManager Instance { get; private set; }
 
     public Card PendingCard { get; private set; }
-    public Combatant HoveredTarget { get; private set; }
+    private Combatant hoveredTarget;
+    public Combatant HoveredTarget => hoveredTarget != null && hoveredTarget.CurrentHP > 0 ? hoveredTarget : null; // превью не на мёртвого
 
     private bool inputLocked;
 
@@ -24,10 +25,10 @@ public class TargetSelectionManager : MonoBehaviour
         inputLocked = false;
     }
 
-    public void SetHoveredTarget(Combatant target) => HoveredTarget = target;
+    public void SetHoveredTarget(Combatant target) => hoveredTarget = target;
     public void ClearHoveredTarget(Combatant target)
     {
-        if (HoveredTarget == target) HoveredTarget = null;
+        if (hoveredTarget == target) hoveredTarget = null;
     }
 
     public void SelectCard(Card card)

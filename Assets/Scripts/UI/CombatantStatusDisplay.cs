@@ -18,12 +18,28 @@ public class CombatantStatusDisplay : MonoBehaviour
         if (hpSlider != null) hpSlider.maxValue = target.maxHP;
     }
 
+    private CanvasGroup enemyGroup; // только у врага: корень скрывается при смерти, но остаётся активным (Update должен работать — после отката враг снова виден)
+
     void Update()
     {
+        if (enemyForTelegraph != null) UpdateEnemyVisibility();
         if (hpSlider != null) hpSlider.value = target.CurrentHP;
         if (blockLabel != null) blockLabel.text = target.CurrentBlock.ToString();
         if (effectsLabel != null) effectsLabel.text = BuildEffectsText();
         if (enemyForTelegraph != null && telegraphLabel != null) telegraphLabel.text = BuildTelegraphText();
+    }
+
+    private void UpdateEnemyVisibility()
+    {
+        if (enemyGroup == null)
+        {
+            var root = enemyForTelegraph.gameObject;
+            if (!root.TryGetComponent(out enemyGroup)) enemyGroup = root.AddComponent<CanvasGroup>();
+        }
+        bool alive = enemyForTelegraph.CurrentHP > 0;
+        enemyGroup.alpha = alive ? 1 : 0;
+        enemyGroup.blocksRaycasts = alive;
+        enemyGroup.interactable = alive;
     }
 
     private string BuildEffectsText()

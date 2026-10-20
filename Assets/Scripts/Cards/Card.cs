@@ -35,7 +35,7 @@ public class Card : MonoBehaviour, IPointerClickHandler
         data.instantActions.Exists(a => a.targetTag == EffectTargetTag.Enemy) ||
         data.appliedEffects.Exists(e => e.targetTag == EffectTargetTag.Enemy);
 
-    public bool IsValidTarget(Combatant target) => target is Enemy;
+    public bool IsValidTarget(Combatant target) => target is Enemy && target.CurrentHP > 0; // мёртвый враг остаётся в списке (оживает при откате), но целью не бывает
 
     public void Play(Combatant target)
     {
