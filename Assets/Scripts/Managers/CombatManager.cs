@@ -54,11 +54,14 @@ public class CombatManager : MonoBehaviour
     public event System.Action OnCombatStart;
     public event System.Action<CardInstance, Combatant> OnCardPlayed;
     public event System.Action<int> OnCastSeconds;
+    public event System.Action<CardInstance, Enemy, bool> OnParry; // один раз на срабатывание карты, до эффектов Парирования
     public event System.Action<Combatant, Combatant, int, bool> OnAttack; // внутри события: подписчик пишет своё состояние через Record(null, undo)
 
     public void RaiseCombatStart() => OnCombatStart?.Invoke();
     public void RaiseCardPlayed(CardInstance card, Combatant target) => OnCardPlayed?.Invoke(card, target);
     public void RaiseCastSeconds(int seconds) => OnCastSeconds?.Invoke(seconds);
+    public void RaiseParry(CardInstance card, Enemy enemy) =>
+        OnParry?.Invoke(card, enemy, CurrentEvent != null && CurrentEventTime <= ReplayUntil);
     public void RaiseAttack(Combatant source, Combatant target, int damage) =>
         OnAttack?.Invoke(source, target, damage, CurrentEvent != null && CurrentEventTime <= ReplayUntil);
 

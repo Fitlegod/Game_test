@@ -101,9 +101,10 @@
 | `OnCombatStart()` | `EncounterManager.StartEncounter` в конце настройки: после `SetPlayer`, `RegisterEnemies` и начальной руки, до первого хода |
 | `OnCardPlayed(CardInstance, Combatant target)` | `Card.Play` до `AdvanceTime` |
 | `OnCastSeconds(int seconds)` | `Card.Play` после `AdvanceTime(timeCostSeconds)`, до `ResolveUpTo` |
+| `OnParry(CardInstance card, Enemy enemy, bool isReplay)` | `Card.ApplyAllEffects` один раз на срабатывание карты, когда выполнено условие Парирования, после обычных эффектов и до `parryActions`/`parryEffects` (см. [cards.md](cards.md)); `enemy` — парированный враг (первый по `Enemies`, если подходят несколько); `isReplay` — как у `OnAttack`. Вызывается внутри события карты, поэтому правила `OnAttack` (журнал, откат, повтор) действуют и здесь |
 | `OnAttack(source, target, damage, isReplay)` | `InstantActionEntry.Apply` (Damage) после каждого реально нанесённого удара (после `TakeDamage`), для обеих сторон; `damage` — итоговый урон после модификаторов; удар по уже мёртвой цели и пропущенные при повторе удары (действие врага по игроку, пропуск цели при повторе карты) события не дают. `isReplay = CurrentEventTime <= ReplayUntil` |
 
-Вызывает событие через `RaiseCombatStart/RaiseCardPlayed/RaiseCastSeconds/RaiseAttack` (C#-событие нельзя вызвать снаружи класса). Парирования пока нет: событие появится вместе с механикой.
+Вызывает событие через `RaiseCombatStart/RaiseCardPlayed/RaiseCastSeconds/RaiseParry/RaiseAttack` (C#-событие нельзя вызвать снаружи класса).
 
 Правила:
 - `OnCombatStart`, `OnCardPlayed`, `OnCastSeconds` вызываются **вне событий таймлайна**. Журнал их не пишет, после отката они не повторяются: это действия игрока, а игрок не откатывается.

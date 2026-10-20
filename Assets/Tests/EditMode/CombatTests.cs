@@ -1755,4 +1755,216 @@ public class CombatTests
         MakeCard(1, 0).Play(null);
         Assert.AreEqual(1, starts, "за бой — один раз");
     }
+
+    // ---------- Парирование (группа Y) и откат с Неуязвимостью (Z) ----------
+
+    // Карта: каст 1, эффект через 1 (эффект в t+1). main — обычное действие; parry добавляется отдельно
+    Card ParryCard(InstantActionEntry main, AppliedEffectEntry parryEffect = null, InstantActionEntry parryAction = null)
+    {
+        var card = MakeCard(1, 1, main);
+        if (parryEffect != null) card.data.parryEffects.Add(parryEffect);
+        if (parryAction != null) card.data.parryActions.Add(parryAction);
+        return card;
+    }
+
+    static AppliedEffectEntry Eff(StatusEffectType type, float stacks, EffectTargetTag tag)
+        => new AppliedEffectEntry { statusType = type, stacks = stacks, targetTag = tag };
+
+    List<(CardInstance, Enemy, bool)> WatchParry()
+    {
+        var list = new List<(CardInstance, Enemy, bool)>();
+        cm.OnParry += (c, e, r) => list.Add((c, e, r));
+        return list;
+    }
+
+    [Test]
+    public void Y1_SelectedTarget_ParryOnlyFromSelectedEnemyAction()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 1, 1);          // действует в 1, 2, 3…
+        var b = MakeEnemy(100, 99, 1);
+        Spawn(a, b);
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy)).Play(b);   // эффект в 1: действует A, не B
+        Assert.AreEqual(0, b.GetStacks(StatusEffectType.Weak), "выбран B, а в 1 действует A: Парирования нет");
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy)).Play(a);   // эффект в 2: действует A
+        Assert.AreEqual(1, a.GetStacks(StatusEffectType.Weak), "выбран A, он действует в 2: Парирование");
+    }
+
+    [Test]
+    public void Y2_NoEnemyTarget_ParryFromAnyEnemy()
+    {
+        NoDecay();
+        Spawn(MakeEnemy(100, 99, 1), MakeEnemy(100, 1, 0));
+        ParryCard(Act(InstantActionKind.Block, 5, EffectTargetTag.Player), null, Act(InstantActionKind.Block, 5, EffectTargetTag.Player)).Play(null);
+        Assert.AreEqual(10, player.CurrentBlock);
+    }
+
+    [Test]
+    public void Y3_AllEnemies_ParryFromAnyEnemy()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 99, 1);
+        var b = MakeEnemy(100, 1, 1);
+        Spawn(a, b);
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.AllEnemies), Eff(StatusEffectType.Weak, 2, EffectTargetTag.AllEnemies)).Play(null);
+        Assert.AreEqual(2, a.GetStacks(StatusEffectType.Weak));
+        Assert.AreEqual(2, b.GetStacks(StatusEffectType.Weak));
+    }
+
+    [Test]
+    public void Y4_EnemyAndAllEnemies_OnlySelectedEnemyCounts()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 99, 1);         // выбранный, не действует
+        var b = MakeEnemy(100, 1, 1);          // невыбранный, действует
+        Spawn(a, b);
+        var card = ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Poison, 4, EffectTargetTag.AllEnemies));
+        card.data.instantActions.Add(Act(InstantActionKind.Damage, 1, EffectTargetTag.AllEnemies));
+        card.Play(a);
+        Assert.AreEqual(0, a.GetStacks(StatusEffectType.Poison));
+        Assert.AreEqual(0, b.GetStacks(StatusEffectType.Poison), "выбран A, B действует, но не выбран: Парирования нет");
+    }
+
+    [Test]
+    public void Y5_CardStunsSelectedEnemy_ParryCountedByOriginalTime()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 1, 3);
+        Spawn(a);
+        var card = ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy));
+        card.data.appliedEffects.Add(Eff(StatusEffectType.Stun, 3, EffectTargetTag.Enemy));
+        card.Play(a);
+        Assert.AreEqual(1, a.GetStacks(StatusEffectType.Weak), "условие посчитано до Оглушения");
+        Assert.AreEqual(30, player.CurrentHP, "действие врага сдвинуто Оглушением и в 1 не сработало");
+        Assert.AreEqual(4, a.NextTime);
+    }
+
+    [Test]
+    public void Y6_NoParry_ForDeadEnemy_OrEnemyWhoseActionWasStunnedAway()
+    {
+        NoDecay();
+        var dead = MakeEnemy(5, 1, 1);
+        var alive = MakeEnemy(100, 1, 1);
+        Spawn(dead, alive);
+        dead.TakeDamage(10);
+        var log = WatchParry();
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy)).Play(dead);
+        Assert.AreEqual(0, log.Count, "мёртвый враг не действует");
+        // Оглушение (карта) уводит действие alive с 2 на 5: следующая карта в 3 не парирует
+        var stun = MakeCard(1, 0, Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy));
+        stun.data.appliedEffects.Add(Eff(StatusEffectType.Stun, 3, EffectTargetTag.Enemy));
+        stun.Play(alive);                                       // время 2 (после 1+1), действие alive было в 2, теперь в 5
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy)).Play(alive);   // эффект в 3
+        Assert.AreEqual(0, alive.GetStacks(StatusEffectType.Weak));
+        Assert.AreEqual(0, log.Count);
+    }
+
+    [Test]
+    public void Y7_EnemyStepWithoutAttack_StillParried()
+    {
+        NoDecay();
+        var enemy = MakeEnemyWithSteps(100, (Act(InstantActionKind.Block, 5, EffectTargetTag.Player), EnemyActionTarget.Self, 1));
+        Spawn(enemy);
+        var log = WatchParry();
+        ParryCard(Act(InstantActionKind.Damage, 1, EffectTargetTag.Enemy), Eff(StatusEffectType.Weak, 1, EffectTargetTag.Enemy)).Play(enemy);
+        Assert.AreEqual(1, log.Count);
+        Assert.AreEqual(1, enemy.GetStacks(StatusEffectType.Weak));
+    }
+
+    [Test]
+    public void Y8_RewindAndReplay_ParryAgain_PlayerNotDoubled_FirstPassNumbers()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 1, 0);
+        Spawn(a);
+        var log = WatchParry();
+        var card = ParryCard(Act(InstantActionKind.Damage, 4, EffectTargetTag.Enemy), null, Act(InstantActionKind.Damage, 2, EffectTargetTag.Enemy));
+        card.data.parryActions.Add(Act(InstantActionKind.Block, 3, EffectTargetTag.Player));
+        card.Play(a);                                        // эффект в 1 совпал с действием A
+        Assert.AreEqual(94, a.CurrentHP);
+        Assert.AreEqual(3, player.CurrentBlock);
+        Assert.AreEqual(1, log.Count);
+        Assert.IsFalse(log[0].Item3);
+        Assert.AreSame(a, log[0].Item2);
+        player.AddEffectStacks(StatusEffectType.Strength, 5);   // игрок не откатывается: повтор обязан взять числа первого прохода
+        RewindCard(2, 1, 1).Play(null);                      // событие в 2, откат на 2 с: время 0, A снова должен действовать в 1
+        Assert.AreEqual(100, a.CurrentHP, "урон карты и Парирования откатился");
+        Advance(1);                                          // повтор карты в 1, действие A возвращено откатом
+        Assert.AreEqual(2, log.Count, "Парирование сработало снова");
+        Assert.IsTrue(log[1].Item3, "isReplay");
+        Assert.AreEqual(94, a.CurrentHP, "числа первого прохода, а не усиленные Силой");
+        Assert.AreEqual(3, player.CurrentBlock, "на игрока при повторе не действует");
+    }
+
+    [Test]
+    public void Y9_TwoEnemiesActing_OneParry_FirstInList()
+    {
+        NoDecay();
+        var a = MakeEnemy(100, 1, 0);
+        var b = MakeEnemy(100, 1, 0);
+        Spawn(a, b);
+        var log = WatchParry();
+        ParryCard(Act(InstantActionKind.Block, 5, EffectTargetTag.Player), null, Act(InstantActionKind.Block, 5, EffectTargetTag.Player)).Play(null);
+        Assert.AreEqual(1, log.Count);
+        Assert.AreSame(a, log[0].Item2);
+        Assert.AreEqual(10, player.CurrentBlock, "эффекты Парирования применены один раз");
+    }
+
+    [Test]
+    public void Y10_RealAssets_FieldsAndBehaviour()
+    {
+        NoDecay();
+        CardData Load(string file) => Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<CardData>("Assets/Data/Cards/" + file));
+        var guard = Load("ParryGuard_data.asset");
+        var wave = Load("ParryWave_data.asset");
+        var strike = Load("ParryStrike_data.asset");
+        created.AddRange(new Object[] { guard, wave, strike });
+        foreach (var d in new[] { guard, wave, strike })
+        {
+            Assert.AreEqual(1, d.timeCostSeconds);
+            Assert.AreEqual(1, d.effectDelaySeconds);
+        }
+        Assert.AreEqual(InstantActionKind.Block, guard.instantActions.Single().kind);
+        Assert.AreEqual(10, guard.instantActions.Single().amount);
+        Assert.AreEqual(EffectTargetTag.Player, guard.instantActions.Single().targetTag);
+        Assert.AreEqual((StatusEffectType.Weak, 3f, EffectTargetTag.Enemy), (guard.parryEffects.Single().statusType, guard.parryEffects.Single().stacks, guard.parryEffects.Single().targetTag));
+        Assert.AreEqual((InstantActionKind.Damage, 1, EffectTargetTag.AllEnemies), (wave.instantActions.Single().kind, wave.instantActions.Single().amount, wave.instantActions.Single().targetTag));
+        Assert.AreEqual((StatusEffectType.Vulnerable, 1f, EffectTargetTag.AllEnemies), (wave.parryEffects.Single().statusType, wave.parryEffects.Single().stacks, wave.parryEffects.Single().targetTag));
+        Assert.AreEqual((InstantActionKind.Damage, 13, EffectTargetTag.Enemy), (strike.instantActions.Single().kind, strike.instantActions.Single().amount, strike.instantActions.Single().targetTag));
+        Assert.AreEqual((StatusEffectType.Poison, 4f, EffectTargetTag.AllEnemies), (strike.parryEffects.Single().statusType, strike.parryEffects.Single().stacks, strike.parryEffects.Single().targetTag));
+
+        var guardCard = Make<Card>(); guardCard.instance = new CardInstance(guard); guardCard.combatManager = cm;
+        Assert.IsTrue(guardCard.RequiresTarget, "цель-враг только в Парировании тоже требует выбора цели");
+
+        var a = MakeEnemy(100, 1, 1);
+        Spawn(a);
+        Card Play(CardData d, Combatant target) { var c = Make<Card>(); c.instance = new CardInstance(d); c.combatManager = cm; c.Play(target); return c; }
+        Play(strike, a);                                      // эффект в 1 совпал с действием A
+        Assert.AreEqual(87, a.CurrentHP);
+        Assert.IsTrue(a.GetStacks(StatusEffectType.Poison) > 0, "Парирование ядовитого выпада");
+        Play(guard, a);                                       // эффект в 2 совпал с действием A
+        Assert.AreEqual(3, a.GetStacks(StatusEffectType.Weak));
+        Assert.AreEqual(10, player.CurrentBlock);
+        Play(wave, null);                                     // эффект в 3 совпал
+        Assert.AreEqual(1, a.GetStacks(StatusEffectType.Vulnerable));
+    }
+
+    [Test]
+    public void Z1_RewindWithInvulnerable_StacksAndTickReturn_DamageStillBlockedOnReplay()
+    {
+        NoDecay();
+        var enemy = MakeEnemy(50, 99, 1);
+        Spawn(enemy);
+        var invuln = MakeCard(1, 0, Act(InstantActionKind.Damage, 0, EffectTargetTag.Enemy));
+        invuln.data.appliedEffects.Add(Eff(StatusEffectType.Invulnerable, 5, EffectTargetTag.Enemy));
+        invuln.Play(enemy);                                   // Неуязвимость 5 в 0, время 1
+        Dmg(10, 1, 0).Play(enemy);                            // удар в 1 не проходит, время 2
+        Assert.AreEqual(50, enemy.CurrentHP);
+        RewindCard(3, 1, 1).Play(null);                       // событие в 3, откат на 3 с: время 0; повтор Неуязвимости в 0
+        Assert.AreEqual(5, enemy.GetStacks(StatusEffectType.Invulnerable), "стаки откатились и наложены один раз");
+        Assert.IsTrue(HasTick(enemy, StatusEffectType.Invulnerable));
+        Advance(1);                                           // повтор удара в 1 — Неуязвимость на месте
+        Assert.AreEqual(50, enemy.CurrentHP, "при повторе урон снова не проходит");
+        Assert.AreEqual(4, enemy.GetStacks(StatusEffectType.Invulnerable));
+    }
 }
