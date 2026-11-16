@@ -2,5 +2,7 @@ public enum CardType
 {
     Attack,
     Skill,
-    Power
+    Power,
+    Curse,
+    Status
 }

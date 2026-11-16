@@ -2,16 +2,22 @@
 
 Классы: `Card`, `CardData`, `CardInstance`, `InstantActionEntry`/`AppliedEffectEntry`/`InstantActionKind`/`CardPropertyFlags` (`Cards/CardActions.cs`), `CardTextHelpers`, `CardPreviewDisplay`, `EffectTargetTag`, `CardType`.
 
-Файлы: `Cards/Card.cs`, `Cards/CardData.cs`, `Cards/CardInstance.cs`, `Cards/CardActions.cs`, `Cards/CardTextHelpers.cs`, `UI/CardPreviewDisplay.cs`, `Enums/EffectTargetTag.cs`, `Enums/CardType.cs`.
+Файлы: `Cards/Card.cs`, `Cards/CardData.cs`, `Cards/CardInstance.cs`, `Cards/CardActions.cs`, `Cards/CardTextHelpers.cs`, `UI/CardPreviewDisplay.cs`, `Enums/EffectTargetTag.cs`, `Enums/CardType.cs`, `Enums/CardRarity.cs`.
 
 См. также: [effects.md](effects.md) — точные формулы, которые считает `ComputePreviewAmount`/`Apply`; [combat-core.md](combat-core.md) — что делает `AdvanceTime`/`ResolveUpTo`, вызываемые из `Play()`; [deck-hand.md](deck-hand.md) — куда уходит `CardInstance` после розыгрыша; [enemies.md](enemies.md) — та же пара действий (`InstantActionEntry`/`AppliedEffectEntry`) на стороне `EnemyActionStep`.
 
+
+
 ## Три уровня данных одной карты
 
-- **`CardData`** (`ScriptableObject`) — общий шаблон-ассет одной уникальной карты: `nameKey` (ключ названия в `ru.txt`: `card.<id>.name`; текст — `DisplayName`), `timeCostSeconds` и `effectDelaySeconds` (оба `int`, целые секунды), `cardType` (см. ниже), `instantActions`, `appliedEffects`, `drawCardsOnPlay`, `properties` (`CardPropertyFlags`). Один ассет на все копии карты в игре — например, один `Jab_Data` для всех Тычков.
-- **`CardType`** (`Attack`/`Skill`/`Power`) — поле на `CardData`, классифицирующее карту по одной из трёх привычных для карточного рогалика категорий (атака / умение / сила). Сейчас это **чисто информационная классификация**: ни `Card`, ни `TargetSelectionManager`, ни `DeckManager` не читают `cardType` ни в одной ветке кода — оно не влияет ни на розыгрыш (`Play`/`ApplyAllEffects`), ни на текст карты, ни на то, куда карта уходит после игры (это решает `CardPropertyFlags.Exhaust`, а не `cardType`). Поле заведено заранее ради будущей категоризации (фильтры в ещё не реализованном экране колоды, иконки по типу, генератор наград по типу карты), но осознанно не обрастает логикой, которую нужно держать в голове при чтении текущего кода — YAGNI из корневого `CLAUDE.md`: место под механику зарезервировано, сама механика не пишется, пока не понадобится.
-- **`CardInstance`** (`[Serializable]`, обычный C#-класс, не `ScriptableObject` и не `MonoBehaviour`) — конкретная копия карты в колоде персонажа (`DeckManager.characterDeck`, список): ссылка на `CardData` + `instanceProperties` — личные добавки поверх шаблона. `EffectiveProperties => data.properties | instanceProperties` — побитовое ИЛИ: флаги шаблона всегда действуют, флаги экземпляра могут только добавлять, никогда не снимать. Так одна конкретная копия Тычка может быть помечена Сжигаемым, пока остальные копии той же карты — нет.
-- **`Card`** (`MonoBehaviour` на объекте карты в руке) — хранит `CardInstance instance`, не сырой `CardData` напрямую; `data` — read-only проброс (`instance.data`). Это тот объект, который создаёт `HandManager` в слоте руки и через который проходят клики `TargetSelectionManager`.
+- **`CardData`** (`ScriptableObject`) — общий шаблон-ассет одной уникальной карты: `nameKey`, `cardType`, `rarity`, `illustration`, `timeCostSeconds`, `effectDelaySeconds`, `upgradedVersion`, `instantActions`, `appliedEffects`, `drawCardsOnPlay`, `parryActions`, `parryEffects`, `properties`. Один ассет используется всеми копиями карты.
+- **`CardType`** — `Attack`, `Skill`, `Power`, `Curse`, `Status`. `Power` соответствует таланту из дизайн-документа. Тип — информационная классификация: сам по себе он не меняет розыгрыш карты.
+- **`CardRarity`** — `Common`, `Uncommon`, `Rare`, `Legendary`. Хранит редкость карты; логика генерации наград и фильтрации по редкости реализуется отдельно.
+- **`upgradedVersion`** — ссылка на улучшенный вариант карты. У улучшенного варианта не должно быть следующей улучшенной версии; самоссылка также недопустима. Эти ограничения проверяются в `OnValidate`.
+- **`illustration`** — ссылка на спрайт иллюстрации. Отображение иллюстрации будет подключено на этапе UI.
+- **`CardInstance`** (`[Serializable]`, обычный C#-класс, не `ScriptableObject` и не `MonoBehaviour`) — конкретная копия карты в колоде персонажа (`DeckManager.characterDeck`): ссылка на `CardData` и `instanceProperties` — индивидуальные добавки поверх шаблона. `EffectiveProperties => data.properties | instanceProperties` — побитовое ИЛИ: свойства шаблона всегда действуют, а свойства экземпляра могут только добавляться, но не сниматься. Поэтому одна копия карты может быть Сжигаемой, а остальные копии той же карты — нет.
+- `CreateCopy()` создаёт независимый экземпляр с теми же данными и индивидуальными свойствами. `CanUpgrade` проверяет наличие улучшенной версии, а `TryUpgrade()` заменяет `data` только у текущего экземпляра.
+- **`Card`** (`MonoBehaviour` на объекте карты в руке) — хранит `CardInstance instance`, а не сырой `CardData`; `data` — read-only проброс (`instance.data`). Это объект, который создаёт `HandManager` в слоте руки и через который проходят клики `TargetSelectionManager`.
 
 ## Жизненный цикл `Card`
 
