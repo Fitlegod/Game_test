@@ -125,3 +125,9 @@ graphify-out/
 # so the diff never carries useful content between commits. Self-rebuilds from
 # the OS font on demand, so it's safe to leave untracked.
 /Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+
+# Obsidian: персональное состояние рабочего пространства
+docs/.obsidian/workspace.json
+docs/.obsidian/workspace-mobile.json
+docs/.obsidian/graph.json
+docs/.obsidian/cache/
