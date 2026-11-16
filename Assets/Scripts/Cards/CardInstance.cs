@@ -9,5 +9,26 @@ public class CardInstance
         this.data = data;
     }
 
-    public CardPropertyFlags EffectiveProperties => data.properties | instanceProperties;
+    public CardPropertyFlags EffectiveProperties =>
+        data.properties | instanceProperties;
+
+    public bool CanUpgrade =>
+        data != null && data.upgradedVersion != null;
+
+    public bool TryUpgrade()
+    {
+        if (!CanUpgrade)
+            return false;
+
+        data = data.upgradedVersion;
+        return true;
+    }
+
+    public CardInstance CreateCopy()
+    {
+        return new CardInstance(data)
+        {
+            instanceProperties = instanceProperties
+        };
+    }
 }
