@@ -16,8 +16,6 @@ public class InstantActionEntry
     public int hitCount = 1;
     public EffectTargetTag targetTag;
 
-    // Возвращает «исходящее» число: урон после модификаторов источника (до модификаторов цели), блок после Крепости/Хрупкости получателя, лечение.
-    // outgoingOverride — число из первого срабатывания карты (повтор после отката): формулы источника заново не считаются.
     public float Apply(CombatManager combatManager, Combatant source, Combatant target, float? outgoingOverride = null)
     {
         if (kind == InstantActionKind.Rewind)
@@ -27,35 +25,51 @@ public class InstantActionEntry
         }
 
         float outgoing = amount;
-
         for (int i = 0; i < hitCount; i++)
-        {
-            switch (kind)
-            {
-                case InstantActionKind.Damage:
-                    outgoing = outgoingOverride ?? source.CalculateOutgoingDamage(amount);
-                    int finalDamage = target.ApplyIncomingDamageModifiers(outgoing);
-                    bool alive = target.CurrentHP > 0; // удар по уже мёртвой цели (второй hit после убийства) — не удар
-                    target.TakeDamage(finalDamage);
-                    if (alive) combatManager.RaiseAttack(source, target, finalDamage);
-                    Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
-                    break;
+            outgoing = ApplySingleHit(combatManager, source, target, outgoingOverride);
 
-                case InstantActionKind.Block:
-                    Combatant blockRecipient = target ?? source;
-                    int finalBlock = (int)(outgoing = outgoingOverride ?? blockRecipient.CalculateIncomingBlock(amount));
-                    blockRecipient.GainBlock(finalBlock);
-                    Debug.Log("Даёт " + finalBlock + " блока цели " + blockRecipient.name + " (база " + amount + ")");
-                    break;
-
-                case InstantActionKind.Heal:
-                    Combatant healRecipient = target ?? source;
-                    healRecipient.Heal(amount);
-                    Debug.Log("Лечит " + amount + " HP цели " + healRecipient.name);
-                    break;
-            }
-        }
         return outgoing;
+    }
+
+    // Применяет ровно одно попадание. Используется картами с RandomEnemy,
+    // чтобы выбирать цель заново перед каждым ударом.
+    // Apply() выше сохраняет прежнее поведение для действий врагов.
+    public float ApplySingleHit(CombatManager combatManager, Combatant source, Combatant target, float? outgoingOverride = null)
+    {
+        if (kind == InstantActionKind.Rewind)
+        {
+            combatManager.Rewind(amount);
+            return amount;
+        }
+
+        switch (kind)
+        {
+            case InstantActionKind.Damage:
+                float damageOutgoing = outgoingOverride ?? source.CalculateOutgoingDamage(amount);
+                int finalDamage = target.ApplyIncomingDamageModifiers(damageOutgoing);
+                bool alive = target.CurrentHP > 0;
+                target.TakeDamage(finalDamage);
+                if (alive) combatManager.RaiseAttack(source, target, finalDamage);
+                Debug.Log("Наносит " + finalDamage + " урона (база " + amount + ") цели " + target.name);
+                return damageOutgoing;
+
+            case InstantActionKind.Block:
+                Combatant blockRecipient = target ?? source;
+                float blockOutgoing = outgoingOverride ?? blockRecipient.CalculateIncomingBlock(amount);
+                int finalBlock = (int)blockOutgoing;
+                blockRecipient.GainBlock(finalBlock);
+                Debug.Log("Даёт " + finalBlock + " блока цели " + blockRecipient.name + " (база " + amount + ")");
+                return blockOutgoing;
+
+            case InstantActionKind.Heal:
+                Combatant healRecipient = target ?? source;
+                healRecipient.Heal(amount);
+                Debug.Log("Лечит " + amount + " HP цели " + healRecipient.name);
+                return amount;
+
+            default:
+                return amount;
+        }
     }
 
     public int ComputePreviewAmount(Combatant source, Combatant recipient)
@@ -82,6 +96,7 @@ public class InstantActionEntry
     {
         if (tag == EffectTargetTag.Enemy) return "Enemy";
         if (tag == EffectTargetTag.AllEnemies) return "AllEnemies";
+        if (tag == EffectTargetTag.RandomEnemy) return "RandomEnemy";
         return "Player";
     }
 }

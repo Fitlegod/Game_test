@@ -2042,4 +2042,283 @@ public class CombatTests
         tsm.SetHoveredTarget(enemy);
         Assert.AreSame(enemy, tsm.HoveredTarget);
     }
+
+
+    // ---------- B2: случайные цели ----------
+
+    // Предсказывает последовательность индексов Unity Random.Range,
+    // не меняя итоговое состояние генератора случайных чисел.
+    static int[] PredictRandomIndices(int seed, int count, int hits)
+    {
+        var previousState = Random.state;
+        try
+        {
+            Random.InitState(seed);
+            var result = new int[hits];
+
+            for (int i = 0; i < hits; i++)
+                result[i] = Random.Range(0, count);
+
+            return result;
+        }
+        finally
+        {
+            Random.state = previousState;
+        }
+    }
+
+    static int SeedWithDifferentFirstTwoIndices()
+    {
+        for (int seed = 1; seed < 10000; seed++)
+        {
+            var indices = PredictRandomIndices(seed, 2, 2);
+            if (indices[0] != indices[1])
+                return seed;
+        }
+
+        Assert.Fail("Не удалось подобрать seed для двух разных целей");
+        return -1;
+    }
+
+    Card RandomDamageCard(int amount, int hitCount = 1)
+    {
+        return MakeCard(1, 1, new InstantActionEntry
+        {
+            kind = InstantActionKind.Damage,
+            amount = amount,
+            hitCount = hitCount,
+            targetTag = EffectTargetTag.RandomEnemy
+        });
+    }
+
+    Card RandomParryCard()
+    {
+        var card = RandomDamageCard(1);
+        card.data.parryActions.Add(
+            Act(InstantActionKind.Block, 5, EffectTargetTag.Player));
+        return card;
+    }
+
+    [Test]
+    public void B2_1_RandomEnemy_SelectsLivingEnemy()
+    {
+        NoDecay();
+
+        var dead = MakeEnemy(5, 99, 1);
+        var alive = MakeEnemy(50, 99, 1);
+        dead.SetCurrentHP(0);
+        Spawn(dead, alive);
+
+        RandomDamageCard(5).Play(null);
+
+        Assert.AreEqual(0, dead.CurrentHP, "Мёртвый враг не должен получить урон");
+        Assert.AreEqual(45, alive.CurrentHP, "Единственный живой враг должен получить урон");
+    }
+
+    [Test]
+    public void B2_2_RandomEnemy_NoLivingTargets_DoesNothing()
+    {
+        NoDecay();
+
+        // В бою пока нет врагов.
+        var card = RandomDamageCard(5);
+
+        Assert.DoesNotThrow(() => card.Play(null));
+        Assert.AreEqual(1, cm.CurrentTime);
+        Assert.AreEqual(0, cm.Enemies.Count);
+    }
+
+    [Test]
+    public void B2_3_RandomEnemy_MultiHit_RollsTargetForEveryHit()
+    {
+        NoDecay();
+
+        var a = MakeEnemy(100, 99, 1);
+        var b = MakeEnemy(100, 99, 1);
+        Spawn(a, b);
+
+        int seed = SeedWithDifferentFirstTwoIndices();
+        var expected = PredictRandomIndices(seed, 2, 2);
+
+        Assert.AreNotEqual(expected[0], expected[1],
+            "Тестовый seed должен выбирать разные цели");
+
+        Random.InitState(seed);
+
+        RandomDamageCard(1, hitCount: 2).Play(null);
+
+        Assert.AreEqual(99, a.CurrentHP,
+            "Первый или второй удар должен попасть в A");
+        Assert.AreEqual(99, b.CurrentHP,
+            "Первый или второй удар должен попасть в B");
+    }
+
+    [Test]
+    public void B2_4_RandomEnemy_AppliedEffect_SelectsLivingEnemy()
+    {
+        NoDecay();
+
+        var a = MakeEnemy(100, 99, 1);
+        var b = MakeEnemy(100, 99, 1);
+        Spawn(a, b);
+
+        int seed = 12345;
+        int expectedIndex = PredictRandomIndices(seed, 2, 1)[0];
+
+        Random.InitState(seed);
+
+        var card = MakeCard(1, 1);
+        card.data.appliedEffects.Add(
+            Eff(StatusEffectType.Weak, 2, EffectTargetTag.RandomEnemy));
+
+        card.Play(null);
+
+        var selected = expectedIndex == 0 ? a : b;
+        var other = expectedIndex == 0 ? b : a;
+
+        Assert.AreEqual(2, selected.GetStacks(StatusEffectType.Weak),
+            "Случайный эффект должен попасть в выбранного врага");
+        Assert.AreEqual(0, other.GetStacks(StatusEffectType.Weak),
+            "Другой враг не должен получить эффект");
+    }
+
+    [Test]
+    public void B2_5_RandomEnemy_ParryTriggersWhenSelectedEnemyIsActing()
+    {
+        NoDecay();
+
+        const int seed = 12345;
+        int selectedIndex = PredictRandomIndices(seed, 2, 1)[0];
+
+        // Располагаем действующего врага именно на случайно выбранном индексе.
+        var first = MakeEnemy(100, selectedIndex == 0 ? 1 : 99, 0);
+        var second = MakeEnemy(100, selectedIndex == 1 ? 1 : 99, 0);
+        Spawn(first, second);
+
+        Random.InitState(seed);
+
+        var log = WatchParry();
+        RandomParryCard().Play(null);
+
+        Assert.AreEqual(1, log.Count,
+            "Парирование должно сработать один раз");
+        Assert.AreSame(selectedIndex == 0 ? first : second, log[0].Item2,
+            "Парируется именно выбранный случайный враг");
+        Assert.AreEqual(5, player.CurrentBlock,
+            "Действие Парирования должно примениться");
+    }
+
+    [Test]
+    public void B2_6_RandomEnemy_ParryDoesNotTriggerWhenActingEnemyWasNotSelected()
+    {
+        NoDecay();
+
+        const int seed = 12345;
+        int selectedIndex = PredictRandomIndices(seed, 2, 1)[0];
+        int actingIndex = 1 - selectedIndex;
+
+        var first = MakeEnemy(100, actingIndex == 0 ? 1 : 99, 0);
+        var second = MakeEnemy(100, actingIndex == 1 ? 1 : 99, 0);
+        Spawn(first, second);
+
+        Random.InitState(seed);
+
+        var log = WatchParry();
+        RandomParryCard().Play(null);
+
+        Assert.AreEqual(0, log.Count,
+            "Действующий враг не был выбран случайной целью");
+        Assert.AreEqual(0, player.CurrentBlock,
+            "Действие Парирования не должно примениться");
+    }
+
+    [Test]
+    public void B2_7_RandomEnemy_ReplayUsesSameTarget()
+    {
+        NoDecay();
+
+        var a = MakeEnemy(100, 99, 1);
+        var b = MakeEnemy(100, 99, 1);
+        Spawn(a, b);
+
+        Random.InitState(12345);
+
+        var card = RandomDamageCard(5);
+        card.Play(null);
+
+        int firstPassA = a.CurrentHP;
+        int firstPassB = b.CurrentHP;
+
+        Assert.AreNotEqual(100, firstPassA + firstPassB - 100,
+            "Карта должна нанести урон");
+
+        Assert.AreEqual(1,
+            (firstPassA < 100 ? 1 : 0) + (firstPassB < 100 ? 1 : 0),
+            "При одном ударе должна пострадать ровно одна цель");
+
+        // Откатываем первое срабатывание карты.
+        RewindCard(2, 1, 1).Play(null);
+
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(100, a.CurrentHP);
+        Assert.AreEqual(100, b.CurrentHP);
+
+        // Повторяем событие карты.
+        Advance(1);
+
+        Assert.AreEqual(firstPassA, a.CurrentHP,
+            "При повторе цель A должна остаться той же");
+        Assert.AreEqual(firstPassB, b.CurrentHP,
+            "При повторе цель B должна остаться той же");
+    }
+
+    [Test]
+    public void B2_8_RandomEnemy_ReplayKeepsCachedNullTarget()
+    {
+        NoDecay();
+
+        // Первое срабатывание происходит без живых врагов.
+        var card = RandomDamageCard(5);
+        card.Play(null);
+
+        Assert.AreEqual(1, cm.CurrentTime);
+
+        // Враг появляется уже после первого срабатывания.
+        var lateEnemy = MakeEnemy(50, 99, 1);
+        Spawn(lateEnemy);
+
+        // Откат возвращает событие карты в очередь.
+        RewindCard(2, 1, 1).Play(null);
+
+        Assert.AreEqual(0, cm.CurrentTime);
+        Assert.AreEqual(50, lateEnemy.CurrentHP);
+
+        // Повтор не должен выбирать новую цель вместо сохранённого null.
+        Advance(1);
+
+        Assert.AreEqual(50, lateEnemy.CurrentHP,
+            "Повтор должен сохранить отсутствие цели первого срабатывания");
+    }
+
+    [Test]
+    public void B2_9_RandomEnemy_DirectApplyAllEffectsWithNullCache_IsSafe()
+    {
+        NoDecay();
+
+        var data = ScriptableObject.CreateInstance<CardData>();
+        created.Add(data);
+
+        data.instantActions.Add(
+            Act(InstantActionKind.Damage, 5, EffectTargetTag.RandomEnemy));
+
+        data.parryActions.Add(
+            Act(InstantActionKind.Block, 5, EffectTargetTag.Player));
+
+        Assert.DoesNotThrow(() =>
+            Card.ApplyAllEffects(data, cm, null));
+
+        Assert.AreEqual(0, player.CurrentBlock,
+            "Без действующих врагов Парирование не должно сработать");
+    }
+
 }
