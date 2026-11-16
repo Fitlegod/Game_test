@@ -63,6 +63,10 @@ card.action.Heal.Player = Восстанавливает {0} HP
 card.action.Rewind.Enemy = Откат {0}
 card.action.Rewind.AllEnemies = Откат {0}
 card.action.Rewind.Player = Откат {0}
+card.action.Damage.RandomEnemy = Наносит {0} урона{1} случайному врагу
+card.action.Block.RandomEnemy = Даёт {0} блока{1} случайному врагу
+card.action.Heal.RandomEnemy = Восстанавливает {0} HP случайному врагу
+card.action.Rewind.RandomEnemy = Откат {0}
 
 # Накладываемые эффекты карты ({0} — стаки, {1} — название в родительном падеже)
 card.effect.positive.Enemy = Даёт {0} {1} врагу
@@ -71,6 +75,8 @@ card.effect.positive.Player = Даёт {0} {1}
 card.effect.negative.Enemy = Накладывает {0} {1}
 card.effect.negative.AllEnemies = Накладывает {0} {1} всем врагам
 card.effect.negative.Player = Даёт {0} {1}
+card.effect.positive.RandomEnemy = Даёт {0} {1} случайному врагу
+card.effect.negative.RandomEnemy = Накладывает {0} {1} на случайного врага
 
 # Статус-эффекты
 effect.genitive.Strength = Силы

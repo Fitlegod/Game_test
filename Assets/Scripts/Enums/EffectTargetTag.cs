@@ -2,5 +2,6 @@ public enum EffectTargetTag
 {
     Player,
     Enemy,
-    AllEnemies
+    AllEnemies,
+    RandomEnemy
 }
