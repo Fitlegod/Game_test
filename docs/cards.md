@@ -2,7 +2,7 @@
 
 Классы: `Card`, `CardData`, `CardInstance`, `InstantActionEntry`/`AppliedEffectEntry`/`InstantActionKind`/`CardPropertyFlags` (`Cards/CardActions.cs`), `CardTextHelpers`, `CardPreviewDisplay`, `EffectTargetTag`, `CardType`, `CardLibrary`.
 
-Файлы: `Cards/Card.cs`, `Cards/CardData.cs`, `Cards/CardInstance.cs`, `Cards/CardActions.cs`, `Cards/CardTextHelpers.cs`, `UI/CardPreviewDisplay.cs`, `Enums/EffectTargetTag.cs`, `Enums/CardType.cs`, `Enums/CardRarity.cs`.
+Файлы: `Cards/Card.cs`, `Cards/CardData.cs`, `Cards/CardInstance.cs`, `Cards/CardLibrary.cs`, `Cards/CardActions.cs`, `Cards/CardTextHelpers.cs`, `UI/CardPreviewDisplay.cs`, `Enums/EffectTargetTag.cs`, `Enums/CardType.cs`, `Enums/CardRarity.cs`.
 
 См. также: [effects.md](effects.md) — точные формулы, которые считает `ComputePreviewAmount`/`Apply`; [combat-core.md](combat-core.md) — что делает `AdvanceTime`/`ResolveUpTo`, вызываемые из `Play()`; [deck-hand.md](deck-hand.md) — куда уходит `CardInstance` после розыгрыша; [enemies.md](enemies.md) — та же пара действий (`InstantActionEntry`/`AppliedEffectEntry`) на стороне `EnemyActionStep`.
 
