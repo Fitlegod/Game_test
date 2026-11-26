@@ -38,6 +38,9 @@ public class TargetSelectionManager : MonoBehaviour
 
     private void UpdateTargetHighlights()
     {
+        if (combatManager == null || combatManager.Enemies == null)
+            return;
+
         foreach (var enemy in combatManager.Enemies)
         {
             var highlight = enemy.GetComponent<TargetHighlight>();
