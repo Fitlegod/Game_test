@@ -21,6 +21,8 @@ public class TargetSelectionManager : MonoBehaviour
     public void LockInput()
     {
         inputLocked = true;
+        PendingCard = null;
+        UpdateTargetHighlights();
     }
 
     public void UnlockInput()
@@ -34,6 +36,27 @@ public class TargetSelectionManager : MonoBehaviour
         if (hoveredTarget == target) hoveredTarget = null;
     }
 
+    private void UpdateTargetHighlights()
+    {
+        foreach (var enemy in combatManager.Enemies)
+        {
+            var highlight = enemy.GetComponent<TargetHighlight>();
+
+            if (highlight == null)
+                continue;
+
+            bool shouldHighlight =
+                PendingCard != null &&
+                enemy.CurrentHP > 0 &&
+                PendingCard.IsValidTarget(enemy);
+
+            if (shouldHighlight)
+                highlight.Show();
+            else
+                highlight.Hide();
+        }
+    }
+
     public void SelectCard(Card card)
     {
         if (inputLocked) return;
@@ -41,11 +64,13 @@ public class TargetSelectionManager : MonoBehaviour
         if (card.RequiresTarget)
         {
             PendingCard = card;
+            UpdateTargetHighlights();
             Debug.Log(card.data.DisplayName + ": выбери цель");
         }
         else
         {
             PendingCard = null;
+            UpdateTargetHighlights();
             card.Play(null);
         }
     }
@@ -60,6 +85,7 @@ public class TargetSelectionManager : MonoBehaviour
     public void CancelSelection()
     {
         PendingCard = null;
+        UpdateTargetHighlights();
     }
 
     public void SelectTarget(Combatant target)
@@ -70,6 +96,7 @@ public class TargetSelectionManager : MonoBehaviour
         {
             PendingCard.Play(target);
             PendingCard = null;
+            UpdateTargetHighlights();
         }
     }
 }
