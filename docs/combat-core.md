@@ -1,8 +1,8 @@
 # Боевое ядро
 
-Классы: `CombatManager`, `IScheduledEvent`/`OneShotEvent`/`PeriodicEffectEvent` (`Combat/TimedEffects.cs`), `TargetSelectionManager`, `Combatant` (структура и участники), `Player`, `PlayerRunState`.
+Классы: `CombatManager`, `IScheduledEvent`/`OneShotEvent`/`PeriodicEffectEvent` (`Combat/TimedEffects.cs`), `TargetSelectionManager`, `TargetHighlight`, `Combatant` (структура и участники), `Player`, `PlayerRunState`.
 
-Файлы: `Managers/CombatManager.cs`, `Combat/TimedEffects.cs`, `Combat/PlayerRunState.cs`, `Managers/TargetSelectionManager.cs`, `Combatants/Combatant.cs`, `Combatants/Player.cs`, `UI/CombatantStatusDisplay.cs`.
+Файлы: `Managers/CombatManager.cs`, `Combat/TimedEffects.cs`, `Combat/PlayerRunState.cs`, `Managers/TargetSelectionManager.cs`, `Combat/TargetHighlight.cs`, `Combatants/Combatant.cs`, `Combatants/Player.cs`, `UI/CombatantStatusDisplay.cs`.
 
 См. также: [effects.md](effects.md) — формулы урона/блока/лечения и стаки статус-эффектов на `Combatant`; [cards.md](cards.md) — что запускает `Play()`; [enemies.md](enemies.md) — как `Enemy` встраивается в тот же реестр расписания; [map.md](map.md) — карта локации, с которой стартует каждый бой и на которую возвращает его исход.
 
@@ -127,6 +127,9 @@
 - `HoveredTarget` — над каким `Combatant` сейчас курсор; используется только для живого предпросмотра урона/блока в тексте карты (см. [cards.md](cards.md)), к выбору цели отношения не имеет. Возвращает цель, только если она жива и (`PendingCard == null` или `PendingCard.IsValidTarget(цель)`): наведение на игрока при выбранной карте с целью-врагом превью не меняет.
 - `SelectCard(card)` — если `card.RequiresTarget` (есть хоть одно действие/эффект с `EffectTargetTag.Enemy`), карта становится `PendingCard` и ждёт клика по цели; иначе разыгрывается немедленно с `target: null`.
 - `SelectTarget(target)` — срабатывает только если есть `PendingCard` и `PendingCard.IsValidTarget(target)` (сейчас — `target is Enemy && target.CurrentHP > 0`); разыгрывает карту по цели и сбрасывает `PendingCard`.
+- `UpdateTargetHighlights()` — обновляет подсветку всех врагов из `CombatManager.Enemies`. Враг подсвечивается, только если выбрана карта (`PendingCard != null`), враг жив (`CurrentHP > 0`) и карта допускает его как цель (`PendingCard.IsValidTarget(enemy)`). Для каждого врага компонент `TargetHighlight` включается или выключается в соответствии с этим условием.
+- `TargetHighlight` (`Combat/TargetHighlight.cs`) — визуальный компонент на корневом объекте врага. Содержит ссылку `highlightVisual` на дочерний объект с визуальным оформлением подсветки. `Awake()` скрывает подсветку; `Show()` и `Hide()` только включают и выключают `highlightVisual`. Сам компонент не определяет доступность цели и не управляет выбором — этим занимается `TargetSelectionManager`. На `Enemy.prefab` компонент установлен на корневом объекте, а поле `Highlight Visual` ссылается на дочерний UI Image.
+- Обновление подсветки вызывается при выборе карты, не требующей цели, при отмене выбора, после успешного выбора цели и при блокировке ввода. Поэтому подсветка снимается после розыгрыша карты, при отмене через Esc и при завершении боя. При выборе новой целевой карты она рассчитывается заново, без сохранения состояния предыдущего выбора.
 - `LockInput()` — выставляет `inputLocked`, проверяется в начале и `SelectCard`, и `SelectTarget`. Единственный способ, которым `CombatManager.EndCombat` замораживает ввод после конца боя.
 - `UnlockInput()` — снимает `inputLocked`. Единственный вызывающий — `CombatManager.ResetForNewCombat()` в начале следующего боя; без него `inputLocked`, однажды выставленный `LockInput()`, не снимался бы вообще ничем, и после первой же победы весь дальнейший цикл боёв оставался бы некликабельным.
 - `SetHoveredTarget`/`ClearHoveredTarget` — вызываются из `Combatant.OnPointerEnter`/`OnPointerExit`, чисто для наведения, к блокировке ввода не относятся.
